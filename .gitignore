@@ -1,0 +1,15 @@
+# Executables & object files
+*.exe
+*.o
+bin/*
+
+
+# IDE project files
+*.xcodeproj
+*.xcodeproj/*
+
+
+
+# Miscellaneous
+.DS_Store
+
