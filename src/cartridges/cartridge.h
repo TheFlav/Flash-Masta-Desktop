@@ -11,20 +11,22 @@
 
 class cartridge
 {
-protected:
-  const unsigned int size_bytes;
-  
 public:
+  typedef unsigned int address;
+  
   enum console_type
   {
     UNKNOWN,
     NEO_GEO
   };
   
-  cartridge(unsigned int size_bytes);
+  cartridge(address size_bytes);
   
-  virtual unsigned int size() const;
+  virtual address size() const;
   virtual console_type console_type() const = 0;
+  
+protected:
+  const address size_bytes;
 };
 
 #endif
