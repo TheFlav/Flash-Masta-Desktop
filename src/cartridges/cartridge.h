@@ -14,19 +14,21 @@ class cartridge
 public:
   typedef unsigned int address;
   
-  enum console_type
+  enum system_type
   {
     UNKNOWN,
     NEO_GEO
   };
   
-  cartridge(address size_bytes);
+  cartridge(unsigned int size, address base_address);
   
-  virtual address size() const;
-  virtual console_type console_type() const = 0;
+  unsigned int size() const;
+  address base_address() const;
+  virtual system_type system() const = 0;
   
 protected:
-  const address size_bytes;
+  const unsigned int m_size;
+  const address m_base_address;
 };
 
 #endif
