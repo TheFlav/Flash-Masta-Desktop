@@ -6,20 +6,25 @@
 //  Copyright (c) 2015 7400 Circuits. All rights reserved.
 //
 
-#ifndef __CARTRIDGE_H__
-#define __CARTRIDGE_H__
+#ifndef __FLASHMASTA_CARTRIDGES_CARTRIDGE_H__
+#define __FLASHMASTA_CARTRIDGES_CARTRIDGE_H__
 
 class cartridge
 {
-  
-  
+protected:
+  const unsigned int size_bytes;
   
 public:
-  virtual unsigned int manufacturer_id() const = 0;
-  virtual unsigned int product_id() const = 0;
-  virtual unsigned int size() const = 0;
-  virtual unsigned int chips() const = 0;
-  virtual unsigned int chip_size(unsigned int chip = 0) const = 0;
+  enum console_type
+  {
+    UNKNOWN,
+    NEO_GEO
+  };
+  
+  cartridge(unsigned int size_bytes);
+  
+  virtual unsigned int size() const;
+  virtual console_type console_type() const = 0;
 };
 
 #endif

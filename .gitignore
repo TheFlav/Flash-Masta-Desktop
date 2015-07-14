@@ -1,6 +1,7 @@
 # Executables & object files
 *.exe
 *.o
+build/*
 bin/*
 
 
@@ -13,4 +14,5 @@ bin/*
 
 # Miscellaneous
 .DS_Store
+*.autosave
 
