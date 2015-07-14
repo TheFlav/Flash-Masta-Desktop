@@ -1,9 +1,9 @@
-#ifndef __FLASHMASTA_MULTI_CHIP_CARTRIDGE_H__
-#define __FLASHMASTA_MULTI_CHIP_CARTRIDGE_H__
+#ifndef __FLASHMASTA_CARTRIDGES_MC_CARTRIDGE_H__
+#define __FLASHMASTA_CARTRIDGES_MC_CARTRIDGE_H__
 
 #include "cartridge.h"
 
-class multi_chip_cartridge: public cartridge
+class mc_cartridge: public cartridge
 {
 public:
   typedef unsigned int chip_index;
@@ -21,7 +21,7 @@ public:
     const address m_base_address;
   };
   
-  multi_chip_cartridge(unsigned int size,
+  mc_cartridge(unsigned int size,
                        address base_address,
                        unsigned int num_chips);
   

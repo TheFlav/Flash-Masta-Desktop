@@ -1,11 +1,3 @@
-//
-//  cartridge.h
-//  FlashMasta
-//
-//  Created by Dan on 7/14/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
-
 #ifndef __FLASHMASTA_CARTRIDGES_CARTRIDGE_H__
 #define __FLASHMASTA_CARTRIDGES_CARTRIDGE_H__
 

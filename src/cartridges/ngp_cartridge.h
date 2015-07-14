@@ -1,14 +1,14 @@
-#ifndef __FLASHMASTA_CARTRIDGES_NEO_GEO_CARTRIDGE_H__
-#define __FLASHMASTA_CARTRIDGES_NEO_GEO_CARTRIDGE_H__
+#ifndef __FLASHMASTA_CARTRIDGES_NGP_CARTRIDGE_H__
+#define __FLASHMASTA_CARTRIDGES_NGP_CARTRIDGE_H__
 
-#include "multi_chip_cartridge.h"
+#include "mc_cartridge.h"
 #include <vector>
 
-class neo_geo_cartridge: public multi_chip_cartridge
+class ngp_cartridges: public mc_cartridge
 {
 public:
   
-  class neo_geo_chip: public multi_chip_cartridge::chip
+  class chip: public mc_cartridge::chip
   {
   public:
     typedef unsigned int block_index;
@@ -31,11 +31,11 @@ public:
       const bool m_is_protected;
     };
     
-    neo_geo_chip(unsigned int size,
+    chip(unsigned int size,
                  address base_address,
                  unsigned int num_blocks,
                  const std::vector<block>& blocks);
-    neo_geo_chip(const neo_geo_chip& other);
+    chip(const chip& other);
     
     unsigned int num_blocks() const;
     const block& get_block(block_index block) const;
@@ -46,17 +46,17 @@ public:
     
   };
   
-  neo_geo_cartridge(unsigned int size,
+  ngp_cartridges(unsigned int size,
                     address base_address,
                     unsigned int num_chips,
-                    const std::vector<neo_geo_chip>& chips);
-  neo_geo_cartridge(const neo_geo_cartridge& other);
+                    const std::vector<chip>& chips);
+  ngp_cartridges(const ngp_cartridges& other);
   
-  const neo_geo_chip& get_chip(chip_index chip) const;
+  const chip& get_chip(chip_index chip) const;
   system_type system() const;
   
 private:
-  const std::vector<neo_geo_chip> m_chips;
+  const std::vector<chip> m_chips;
 };
 
 #endif
