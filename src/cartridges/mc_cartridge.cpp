@@ -1,5 +1,6 @@
 #include "mc_cartridge.h"
 
+// Conveniences (and only local to this file)
 typedef mc_cartridge::address address;
 typedef mc_cartridge::chip_index chip_index;
 
@@ -17,6 +18,12 @@ inline unsigned int mc_cartridge::num_chips() const
 
 mc_cartridge::chip::chip(unsigned int size, address base_address)
   : m_size(size), m_base_address(base_address)
+{
+  // Nothing else to do
+}
+
+mc_cartridge::chip::chip(const chip& other)
+  : m_size(other.m_size), m_base_address(other.m_base_address)
 {
   // Nothing else to do
 }
