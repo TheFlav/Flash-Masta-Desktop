@@ -1,7 +1,7 @@
 #include <iostream>
+#include "../../hardware/PC-App-CLI/NeoLinkmasta.h"
 
 int main(int argc, char** argv)
 {
-  std::cout << "It works!" << std::endl;
-  return 0;
+  return _main(argc, argv);
 }
