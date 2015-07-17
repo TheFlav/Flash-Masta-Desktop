@@ -100,8 +100,6 @@ void queryMicroSD(void);
  End Micro SD functions
  **************************/
 
-void close_libusb(void);
-
 int _main(int argc, char *argv[]);
 
   

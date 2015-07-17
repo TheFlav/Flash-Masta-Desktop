@@ -1800,7 +1800,7 @@ void queryMicroSD(void)
    End Micro SD functions
 **************************/
 
-void close_libusb(void)
+static void close_libusb(void)
 {
     //blink the LED 2 times to signal that we're exiting
     build_linkmasta_led(2);
