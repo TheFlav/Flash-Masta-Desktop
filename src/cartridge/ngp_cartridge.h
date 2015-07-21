@@ -1,5 +1,5 @@
-#ifndef __FLASHMASTA_CARTRIDGES_NGP_CARTRIDGE_H__
-#define __FLASHMASTA_CARTRIDGES_NGP_CARTRIDGE_H__
+#ifndef __NGP_CARTRIDGE_H__
+#define __NGP_CARTRIDGE_H__
 
 #include "mc_cartridge.h"
 #include <vector>
@@ -23,7 +23,6 @@ public:
   public:
     typedef unsigned int block_index;  //<! Data type used to represent the index of a block of memory
     
-    
     /**
      * Class representing a block of memory on a Neo Geo Pocket chip. Contains
      * methods to get the number of bytes in the block, the base address of the
@@ -33,22 +32,10 @@ public:
     {
     public:
       /**
-       * Designated constructor for the block class. Initializes with
-       * information about the size of the block (in bytes), the base address of
-       * the block, and whether or not the block is protected from write
-       * acceess. Note that if a block is reported as being protected, that does
-       * not necessarily mean that it is impossible to write to that block.
-       *
-       * @param[in] size - The number of bytes in this block of memory.
-       * @param[in] base_address - The base address of the block. Can be used
-       *   for address offsets.
-       * @param[in] is_protected - Boolean indicating whether the memory block
-       *   is protected, true for protected, false for not. This property
-       *   does not strictly mean read-only, since it is possible for the
-       *   cartridge to report that a block is protected when in fact allows
-       *   writes to that block.
+       * Designated constructor for the block class. Initializes properties
+       * to the default value of each type.
        */
-      block(unsigned int size, address base_address, bool is_protected);
+      block();
       
       /**
        * Copy constructor for the block class. Performs a deep copy of the
@@ -71,7 +58,7 @@ public:
        *
        * @return The starting address of the block.
        */
-      address      base_address() const;
+      address_t     base_address() const;
       
       /**
        * Gets whether or not the block is declared as "protected" by the Neo
@@ -82,24 +69,18 @@ public:
        */
       bool         is_protected() const;
       
-    protected:
-      const unsigned int m_size;          //<! The number of bytes
-      const address      m_base_address;  //<! The starting memory address
-      const bool         m_is_protected;  //<! Whether or not the block is protected
+      unsigned int m_size;          //<! The number of bytes
+      address_t    m_base_address;  //<! The starting memory address
+      bool         m_is_protected;  //<! Whether or not the block is protected
     };
+    
+    
     
     /**
      * Designated constructor for the gnp_cartridge::chip class. Initializes
-     * with information about the size, base address, and the memory blocks of
-     * the chip.
-     *
-     * @param[in] size - The size of the chip in bytes, taking all blocks into
-     *   account.
-     * @param[in] base_address - The starting address of the chip.
-     * @param[in] num_blocks - The number of blocks the chip is divided into.
-     * @param[in] blocks - Vector of blocks composing the chip.
+     * properties to default values of each type.
      */
-    chip(unsigned int size, address base_address, unsigned int num_blocks, const std::vector<block>& blocks);
+    chip();
     
     /**
      * Copy constructor for the gnp_cartridge::chip class. Initializes with
@@ -108,6 +89,19 @@ public:
      * @param[in] other - Original chip instance to create a copy of.
      */
     chip(const chip& other);
+    
+    /**
+     * Gets the id of the manufacturer of the chip.
+     * 
+     * @return The id of the manufacturer of the chip.
+     */
+    unsigned int manufacturer_id() const;
+    
+    /**
+     * Gets the device id of the chip itself.
+     * @return The device id of the chip itself.
+     */
+    unsigned int device_id() const;
     
     /**
      * Gets the number of blocks making up the chip.
@@ -128,25 +122,19 @@ public:
      */
     const block& get_block(block_index block) const;
     
-  protected:
-    const unsigned int       m_num_blocks; //<! The number of blocks the chip is divided into
-    const std::vector<block> m_blocks;     //<! List of block objects containing information on each individual block
+    unsigned int       m_manufacturer_id;  //<! Manufacturer's id
+    unsigned int       m_device_id;        //<! Device's id
+    unsigned int       m_num_blocks;       //<! The number of blocks the chip is divided into
+    std::vector<block> m_blocks;           //<! List of block objects containing information on each individual block
   };
   
+  
+  
   /**
-   * Designated constructor for the ngp_cartridge. Initializes with information
-   * on cartridge capacity, the base address, the number of on-board storage
-   * chips, and a list actual chip objects containing chip information.
-   *
-   * @param[in] size - The capacity of the cartridge in bytes.
-   * @param[in] address - The starting address of the cartridge, used for any
-   *   memory access offsets. Will typically be 0.
-   * @param[in] num_chips - The number of chips the cartridge contains. Usually
-   *   between 1 and 2.
-   * @param[in] chips - List containing initialized chip objects representing
-   *   the cartridge's on-board chips and containing information on each.
+   * Designated constructor for the ngp_cartridge. Initializes properties
+   * with default values of each type.
    */
-  ngp_cartridge(unsigned int size, address base_address, unsigned int num_chips, const std::vector<chip>& chips);
+  ngp_cartridge();
   
   /**
    * Copy constructor for the ngp_cargridge class. Initializes with information
@@ -157,13 +145,12 @@ public:
   ngp_cartridge(const ngp_cartridge& other);
   
   // Note: documentation contained in super class mc_cartridge
-  const chip& get_chip(chip_index chip) const;
+  const chip* get_chip(chip_index chip) const;
   
   // Note: documentation contained in super class cartridge
   system_type system() const;
   
-private:
-  const std::vector<chip> m_chips;   //<! List of chips in cartridge.
+  std::vector<chip> m_chips;   //<! List of chips in cartridge.
 };
 
-#endif
+#endif // __NGP_CARTRIDGE_H__

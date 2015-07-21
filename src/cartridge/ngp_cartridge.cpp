@@ -1,30 +1,26 @@
 #include "ngp_cartridge.h"
 
 // Conveniences (and only local to this file)
-typedef ngp_cartridge::address address;
 typedef ngp_cartridge::chip_index chip_index;
-typedef ngp_cartridge::chip neo_geo_chip;
-typedef neo_geo_chip::block_index block_index;
+typedef ngp_cartridge::chip chip;
+typedef ngp_cartridge::chip::block_index block_index;
 using namespace std;
 
-ngp_cartridge::ngp_cartridge(unsigned int size, address base_address,
-  unsigned int num_chips, const vector<chip>& chips)
-  : mc_cartridge(size, base_address, num_chips),
-    m_chips(chips)
+ngp_cartridge::ngp_cartridge()
+  : mc_cartridge(), m_chips(0)
 {
   // Nothing else to do
 }
 
 ngp_cartridge::ngp_cartridge(const ngp_cartridge& other)
-  : mc_cartridge(other.m_size, other.m_base_address, other.m_num_chips),
-    m_chips(other.m_chips)
+  : mc_cartridge(other), m_chips(other.m_chips)
 {
   // Nothing else to do
 }
 
-const neo_geo_chip& ngp_cartridge::get_chip(chip_index chip) const
+const chip* ngp_cartridge::get_chip(chip_index chip) const
 {
-  return m_chips[chip];
+  return &m_chips[chip];
 }
 
 cartridge::system_type ngp_cartridge::system() const
@@ -39,19 +35,29 @@ cartridge::system_type ngp_cartridge::system() const
 ////////////////////////////////////////////////////////////////////////////////
 
 
-ngp_cartridge::chip::chip(unsigned int size,
-  address base_address, unsigned int num_blocks, const vector<block>& blocks)
-  : mc_cartridge::chip(size, base_address), m_num_blocks(num_blocks),
-    m_blocks(blocks)
+ngp_cartridge::chip::chip()
+  : mc_cartridge::chip(), m_manufacturer_id(0), m_device_id(0),
+    m_num_blocks(0), m_blocks(0)
 {
   // Nothing else to do
 }
 
 ngp_cartridge::chip::chip(const chip& other)
-  : mc_cartridge::chip(other.m_size, other.m_base_address),
+  : mc_cartridge::chip(other),
+    m_manufacturer_id(other.m_manufacturer_id), m_device_id(other.m_device_id),
     m_num_blocks(other.m_num_blocks), m_blocks(other.m_blocks)
 {
   // Nothing else to do
+}
+
+inline unsigned int ngp_cartridge::chip::manufacturer_id() const
+{
+  return m_manufacturer_id;
+}
+
+inline unsigned int ngp_cartridge::chip::device_id() const
+{
+  return m_device_id;
 }
 
 inline unsigned int ngp_cartridge::chip::num_blocks() const
@@ -72,9 +78,8 @@ inline const ngp_cartridge::chip::block& ngp_cartridge::chip::get_block(
 ////////////////////////////////////////////////////////////////////////////////
 
 
-ngp_cartridge::chip::block::block(unsigned int size,
-  address base_address, bool is_protected)
-  : m_size(size), m_base_address(base_address), m_is_protected(is_protected)
+ngp_cartridge::chip::block::block()
+  : m_size(0), m_base_address(0), m_is_protected(0)
 {
   // Nothing else to do
 }
@@ -91,7 +96,7 @@ inline unsigned int ngp_cartridge::chip::block::size() const
   return m_size;
 }
 
-inline address ngp_cartridge::chip::block::base_address() const
+inline address_t ngp_cartridge::chip::block::base_address() const
 {
   return m_base_address;
 }

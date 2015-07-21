@@ -6,15 +6,17 @@
 //  Copyright (c) 2015 7400 Circuits. All rights reserved.
 //
 
-#ifndef __FLASHMASTA_CARTRIDGES_IO_CARTRIDGE_IO_H__
-#define __FLASHMASTA_CARTRIDGES_IO_CARTRIDGE_IO_H__
+#ifndef __CARTRIDGE_IO_H__
+#define __CARTRIDGE_IO_H__
 
 #include <iostream>
-#include "../cartridge.h"
+#include "../cartridge/cartridge.h"
 
 class cartridge_io
 {
 public:
+  virtual ~cartridge_io();
+  
   virtual unsigned int read_bytes(unsigned int address, char* buffer, unsigned int n) = 0;
   virtual unsigned int write_bytes(unsigned int address, const char* buffer, unsigned int n) = 0;
   
@@ -24,4 +26,4 @@ public:
   virtual const cartridge* get_cartridge_info() = 0;
 };
 
-#endif
+#endif // __CARTRIDGE_IO_H__

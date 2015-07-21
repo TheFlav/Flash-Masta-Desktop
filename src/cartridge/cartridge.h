@@ -1,5 +1,7 @@
-#ifndef __FLASHMASTA_CARTRIDGES_CARTRIDGE_H__
-#define __FLASHMASTA_CARTRIDGES_CARTRIDGE_H__
+#ifndef __CARTRIDGE_H__
+#define __CARTRIDGE_H__
+
+#include "../common/types.h"
 
 /**
  * Abstract class representing a generic game cartridge for an unknown game
@@ -8,8 +10,6 @@
 class cartridge
 {
 public:
-  typedef unsigned int address;   //<! Data type representing a storage address
-  
   /**
    * Enumeration representing a system for which the game cartridge belongs.
    * Can be used to change how a segment of code processes a game cartridge.
@@ -21,14 +21,23 @@ public:
   };
   
   /**
-   * Designated constructor for the cartridge class. Initializes with cartridge
-   * storage capacity and base address.
-   *
-   * @param[in] size - The storage size of the cartridge in bytes.
-   * @param[in] base_address - The base memory address of the cartridge. Used in
-   *   memory address offsets.
+   * Designated constructor for the cartridge class. Initializes properties to the
+   * default value for each type.
    */
-  cartridge(unsigned int size, address base_address);
+  cartridge();
+  
+  /**
+   * Copy constructor for the cartridge class. Initializes properties to corresponding
+   * values of other object. Does nto modify the other object.
+   * 
+   * @param other - The cartridge to copy.
+   */
+  cartridge(const cartridge& other);
+  
+  /**
+   * Destructor for the cartridge class. Does nothing except exist for extendibility.
+   */
+  virtual ~cartridge();
   
   /**
    * Gets the storage capacity of the cartridge in bytes.
@@ -38,11 +47,11 @@ public:
   unsigned int size() const;
   
   /**
-   * Gets the starting address of the cartridge.
+   * Gets the starting address_t of the cartridge.
    *
-   * @return The starting address of the cartridge.
+   * @return The starting address_t of the cartridge.
    */
-  address base_address() const;
+  address_t base_address() const;
   
   /**
    * Gets game system for which the game cartridge is intended. This value can
@@ -53,9 +62,8 @@ public:
    */
   virtual system_type system() const = 0;
   
-protected:
-  const unsigned int m_size;    //<! The storage capacity of the cartridge
-  const address m_base_address; //<! The starting address of the cartridge
+  unsigned int m_size;    //<! The storage capacity of the cartridge
+  address_t m_base_address; //<! The starting address_t of the cartridge
 };
 
-#endif
+#endif // __CARTRIDGE_H__

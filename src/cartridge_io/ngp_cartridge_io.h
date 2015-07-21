@@ -6,11 +6,11 @@
 //  Copyright (c) 2015 7400 Circuits. All rights reserved.
 //
 
-#ifndef __FLASHMASTA_CARTRIDGES_IO_NGP_CARTRIDGE_IO_H__
-#define __FLASHMASTA_CARTRIDGES_IO_NGP_CARTRIDGE_IO_H__
+#ifndef __NGP_CARTRIDGE_IO_H__
+#define __NGP_CARTRIDGE_IO_H__
 
 #include "cartridge_io.h"
-#include "../ngp_cartridge.h"
+#include "../cartridge/ngp_cartridge.h"
 
 class ngp_cartridge_io: public cartridge_io
 {
@@ -30,4 +30,4 @@ protected:
   ngp_cartridge* m_cartridge;
 };
 
-#endif
+#endif // __NGP_CARTRIDGE_IO_H__
