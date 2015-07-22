@@ -21,25 +21,37 @@ ngp_cartridge_io::~ngp_cartridge_io()
 
 unsigned int ngp_cartridge_io::read_bytes(unsigned int address, char* buffer, unsigned int n)
 {
+  // TODO
+  address = address + 0;
+  buffer[0] = buffer[0] + 0;
+  n = n + 0;
   return 0;
 }
 
 unsigned int ngp_cartridge_io::write_bytes(unsigned int address, const char* buffer, unsigned int n)
 {
+  // TODO
+  address = address + 0 + buffer[0];
+  n = n + 0;
   return 0;
 }
 
 unsigned int ngp_cartridge_io::flash_from_stream(std::istream& in)
 {
+  // TODO
+  in.flags();
   return 0;
 }
 
 unsigned int ngp_cartridge_io::flash_to_stream(std::ostream& out)
 {
+  // TODO
+  out.flush();
   return 0;
 }
 
 const ngp_cartridge* ngp_cartridge_io::get_cartridge_info()
 {
+  // TODO
   return m_cartridge;
 }

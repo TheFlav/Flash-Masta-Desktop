@@ -1,9 +1,21 @@
 #ifndef __USB_COMMUNICATOR_H__
 #define __USB_COMMUNICATOR_H__
 
+#define TIMEOUT_UNSET_VALUE       -1
+#define CONFIGURATION_UNSET_VALUE -1
+#define INTERFACE_UNSET_VALUE     -1
+#define ENDPOINT_UNSET_VALUE      -1
+#define DESCRIPTION_UNSET_VALUE   NULL
+
 class usb_communicator
 {
 public:
+  typedef int timeout_t;
+  typedef int configuration_t;
+  typedef int interface_t;
+  typedef int endpoint_t;
+  typedef unsigned char data_t;
+  
   struct device_description;
   struct device_configuration;
   struct device_interface;
@@ -12,8 +24,12 @@ public:
   
   virtual ~usb_communicator();
   
-  virtual void open() = 0;
-  virtual void close() = 0;
+  /**
+   * Performs critical initialization that should not be performed
+   * in the constructor, such as fetch USB device information and
+   * construct device descriptors.
+   */
+  virtual void init() = 0;
   
   /**
    * Gets the number of miliseconds of no response to wait before
@@ -21,29 +37,56 @@ public:
    * 
    * @return The currenlty set timeout.
    */
-  virtual int timeout() const = 0;
+  virtual timeout_t timeout() const = 0;
   
-  virtual int input_endpoint() const = 0;
-  virtual int output_endpoint() const = 0;
+  /**
+   * Gets the configuration for this device to use.
+   * 
+   * @return The configuration this device is using.
+   */
+  virtual configuration_t configuration() const = 0;
+  
+  /**
+   * Gets the target interface to use for communication.
+   * 
+   * @return The number of the interface use for communication.
+   */
+  virtual interface_t interface() const = 0;
+  
+  virtual endpoint_t input_endpoint() const = 0;
+  virtual endpoint_t output_endpoint() const = 0;
+  virtual const device_description* get_device_description() const = 0;
   
   /**
    * Sets the maximum number of miliseconds to wait before giving up.
    * 
-   * @param timeout - Milliseconds until timeout
+   * @param timeout - Milliseconds until timeout.
    */
-  virtual void set_timeout(int timeout) = 0;
-  
-  virtual void set_input_endpoint(int input_endpoint) = 0;
-  virtual void set_output_endpoint(int output_endpoint) = 0;
-  virtual const device_description get_device_description() = 0;
+  virtual void set_timeout(timeout_t timeout) = 0;
   
   /**
-   * @brief bulk_transfer
-   * @param data - array of data to send
-   * @param num_bytes - number of bytes to transfer
-   * @return number of bytes transferred
+   * Sets the configuration for this device to use.
+   * 
+   * @param configuration - The configuration to use.
    */
-  virtual unsigned int bulk_transfer(unsigned char* data, unsigned int num_bytes) = 0;
+  virtual void set_configuration(configuration_t configuration) = 0;
+  
+  /**
+   * Sets the target interface to use for communication.
+   * 
+   * @param interface - The interface to use for communication.
+   */
+  virtual void set_interface(interface_t interface) = 0;
+  
+  virtual void set_input_endpoint(endpoint_t input_endpoint) = 0;
+  virtual void set_output_endpoint(endpoint_t output_endpoint) = 0;
+  
+  virtual void open() = 0;
+  virtual void close() = 0;
+  virtual unsigned int read(const data_t* data, unsigned int num_bytes) = 0;
+  virtual unsigned int read(const data_t* data, unsigned int num_bytes, timeout_t timeout) = 0;
+  virtual unsigned int write(data_t* buffer, unsigned int num_bytes) = 0;
+  virtual unsigned int write(data_t* buffer, unsigned int num_bytes, timeout_t timeout) = 0;
 };
 
 
@@ -93,7 +136,7 @@ struct usb_communicator::device_alt_setting
   device_alt_setting(const device_alt_setting& other);
   ~device_alt_setting();
   
-  int interface_num;
+  usb_communicator::interface_t interface_num;
   const unsigned int num_endpoints;
   device_endpoint** const endpoints;
 };
@@ -106,7 +149,7 @@ struct usb_communicator::device_endpoint
   device_endpoint(const device_endpoint& other);
   
   int desc_type;
-  int address;
+  usb_communicator::endpoint_t address;
 };
 
 #endif // __USB_COMMUNICATOR_H__
