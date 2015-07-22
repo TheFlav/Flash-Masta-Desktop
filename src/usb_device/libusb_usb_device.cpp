@@ -35,17 +35,19 @@ libusb_usb_device::libusb_usb_device(libusb_device* device)
     m_device_handle      (NULL),
     m_device_description (NULL)
 {
-  // Nothing else to do
+  // Increment the reference counter for the device
+  libusb_ref_device(m_device);
 }
 
 libusb_usb_device::~libusb_usb_device()
 {
-  // TODO: Placeholder
-  
   if (m_device_description != NULL)
   {
     delete m_device_description;
   }
+  
+  // Decrement the reference counter for the device
+  libusb_unref_device(m_device);
 }
 
 void libusb_usb_device::init()

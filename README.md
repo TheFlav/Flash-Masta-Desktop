@@ -66,6 +66,9 @@ in this directory build messages to communicate with the firmware on the
 LinkMasta and performing *libusb* library function calls to send and receive
 data via USB.
 
+**/src/test** - tracked
+Contains files and classes for unit testing.
+
 **/src/hardware/AVR** - tracked
 Contains some header files used by the original LinkMasta. These files actually
 contain a lot of source code despite their header status, these functions

@@ -31,9 +31,9 @@ public:
 
   void                  open();
   void                  close();
-  unsigned int          read(const data_t* data, unsigned int num_bytes) = 0;
+  unsigned int          read(const data_t* data, unsigned int num_bytes);
   unsigned int          read(const data_t* data, unsigned int num_bytes, timeout_t timeout);
-  unsigned int          write(data_t* buffer, unsigned int num_bytes) = 0;
+  unsigned int          write(data_t* buffer, unsigned int num_bytes);
   unsigned int          write(data_t* buffer, unsigned int num_bytes, timeout_t timeout);
   
 private:
