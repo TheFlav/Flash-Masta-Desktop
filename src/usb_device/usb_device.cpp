@@ -1,15 +1,15 @@
-#include "usb_communicator.h"
+#include "usb_device.h"
 #include <stddef.h>
 
-typedef usb_communicator::device_description device_description;
-typedef usb_communicator::device_configuration device_configuration;
-typedef usb_communicator::device_interface device_interface;
-typedef usb_communicator::device_alt_setting device_alt_setting;
-typedef usb_communicator::device_endpoint device_endpoint;
+typedef usb_device::device_description device_description;
+typedef usb_device::device_configuration device_configuration;
+typedef usb_device::device_interface device_interface;
+typedef usb_device::device_alt_setting device_alt_setting;
+typedef usb_device::device_endpoint device_endpoint;
 
 
 
-usb_communicator::~usb_communicator()
+usb_device::~usb_device()
 {
   // Nothing else to do
 }

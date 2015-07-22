@@ -1,7 +1,7 @@
-#ifndef __LIBUSB_COMMUNICATOR_H__
-#define __LIBUSB_COMMUNICATOR_H__
+#ifndef __LIBUSB_USB_DEVICE_H__
+#define __LIBUSB_USB_DEVICE_H__
 
-#include "usb_communicator.h"
+#include "usb_device.h"
 
 struct libusb_device;
 struct libusb_device_handle;
@@ -9,11 +9,11 @@ struct libusb_config_descriptor;
 struct libusb_interface;
 struct libusb_interface_descriptor;
 
-class libusb_communicator : public usb_communicator
+class libusb_usb_device : public usb_device
 {
 public:
-  libusb_communicator(libusb_device* device);
-  ~libusb_communicator();
+  libusb_usb_device(libusb_device* device);
+  ~libusb_usb_device();
   void                  init();
   
   timeout_t             timeout() const;

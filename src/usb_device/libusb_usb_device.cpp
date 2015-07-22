@@ -1,22 +1,22 @@
-#include "libusb_communicator.h"
+#include "libusb_usb_device.h"
 #include "libusb-1.0/libusb.h"
 #include <stdexcept>
 #include <string>
 
-typedef libusb_communicator::timeout_t            timeout_t;
-typedef libusb_communicator::configuration_t      configuration_t;
-typedef libusb_communicator::interface_t          interface_t;
-typedef libusb_communicator::endpoint_t           endpoint_t;
-typedef libusb_communicator::data_t               data_t;
+typedef libusb_usb_device::timeout_t            timeout_t;
+typedef libusb_usb_device::configuration_t      configuration_t;
+typedef libusb_usb_device::interface_t          interface_t;
+typedef libusb_usb_device::endpoint_t           endpoint_t;
+typedef libusb_usb_device::data_t               data_t;
 
-typedef libusb_communicator::device_description   device_description;
-typedef libusb_communicator::device_configuration device_configuration;
-typedef libusb_communicator::device_interface     device_interface;
-typedef libusb_communicator::device_alt_setting   device_alt_setting;
-typedef libusb_communicator::device_endpoint      device_endpoint;
+typedef libusb_usb_device::device_description   device_description;
+typedef libusb_usb_device::device_configuration device_configuration;
+typedef libusb_usb_device::device_interface     device_interface;
+typedef libusb_usb_device::device_alt_setting   device_alt_setting;
+typedef libusb_usb_device::device_endpoint      device_endpoint;
 
 
-libusb_communicator::libusb_communicator(libusb_device* device)
+libusb_usb_device::libusb_usb_device(libusb_device* device)
   : m_was_initialized    (false),
     m_is_open            (false),
     m_kernel_was_attached(false),
@@ -38,7 +38,7 @@ libusb_communicator::libusb_communicator(libusb_device* device)
   // Nothing else to do
 }
 
-libusb_communicator::~libusb_communicator()
+libusb_usb_device::~libusb_usb_device()
 {
   // TODO: Placeholder
   
@@ -48,7 +48,7 @@ libusb_communicator::~libusb_communicator()
   }
 }
 
-void libusb_communicator::init()
+void libusb_usb_device::init()
 {
   // Build device description
   m_device_description = build_device_description();
@@ -60,39 +60,39 @@ void libusb_communicator::init()
 
 
 
-inline timeout_t libusb_communicator::timeout() const
+inline timeout_t libusb_usb_device::timeout() const
 {
   return (timeout_t) (m_timeout_set ? m_timeout : TIMEOUT_UNSET_VALUE);
 }
 
-inline configuration_t libusb_communicator::configuration() const
+inline configuration_t libusb_usb_device::configuration() const
 {
   return (configuration_t) (m_configuration_set ? m_configuration : CONFIGURATION_UNSET_VALUE);
 }
 
-inline interface_t libusb_communicator::interface() const
+inline interface_t libusb_usb_device::interface() const
 {
   return (interface_t) (m_interface_set ? m_interface : INTERFACE_UNSET_VALUE);
 }
 
-inline endpoint_t libusb_communicator::input_endpoint() const
+inline endpoint_t libusb_usb_device::input_endpoint() const
 {
   return (endpoint_t) (m_input_endpoint_set ? m_input_endpoint : ENDPOINT_UNSET_VALUE);
 }
 
-inline endpoint_t libusb_communicator::output_endpoint() const
+inline endpoint_t libusb_usb_device::output_endpoint() const
 {
   return (endpoint_t) (m_output_endpoint_set ? m_output_endpoint : ENDPOINT_UNSET_VALUE);
 }
 
-inline const device_description* libusb_communicator::get_device_description() const
+inline const device_description* libusb_usb_device::get_device_description() const
 {
   return m_device_description;
 }
 
 
 
-void libusb_communicator::set_timeout(timeout_t timeout)
+void libusb_usb_device::set_timeout(timeout_t timeout)
 {
   // Validate input
   if (timeout < 0)
@@ -105,19 +105,19 @@ void libusb_communicator::set_timeout(timeout_t timeout)
   m_timeout_set = true;
 }
 
-void libusb_communicator::set_configuration(configuration_t configuration)
+void libusb_usb_device::set_configuration(configuration_t configuration)
 {
   m_configuration = (unsigned int) configuration;
   m_configuration_set = true;
 }
 
-void libusb_communicator::set_interface(interface_t interface)
+void libusb_usb_device::set_interface(interface_t interface)
 {
   m_interface = (unsigned int) interface;
   m_interface_set = true;
 }
 
-void libusb_communicator::set_input_endpoint(endpoint_t input_endpoint)
+void libusb_usb_device::set_input_endpoint(endpoint_t input_endpoint)
 {
   // Validate input
   if (input_endpoint < 0 || input_endpoint > 255)
@@ -130,7 +130,7 @@ void libusb_communicator::set_input_endpoint(endpoint_t input_endpoint)
   m_input_endpoint_set = true;
 }
 
-void libusb_communicator::set_output_endpoint(endpoint_t output_endpoint)
+void libusb_usb_device::set_output_endpoint(endpoint_t output_endpoint)
 {
   // Validate input
   if (output_endpoint < 0 || output_endpoint > 255)
@@ -145,7 +145,7 @@ void libusb_communicator::set_output_endpoint(endpoint_t output_endpoint)
 
 
 
-void libusb_communicator::open()
+void libusb_usb_device::open()
 {
   if (m_is_open)
   {
@@ -194,7 +194,7 @@ void libusb_communicator::open()
   m_is_open = true;
 }
 
-void libusb_communicator::close()
+void libusb_usb_device::close()
 {
   if (!m_is_open)
   {
@@ -231,12 +231,12 @@ void libusb_communicator::close()
   m_device_handle = NULL;
 }
 
-unsigned int libusb_communicator::read(const data_t*data, unsigned int num_bytes)
+unsigned int libusb_usb_device::read(const data_t*data, unsigned int num_bytes)
 {
   return read(data, num_bytes, m_timeout);
 }
 
-unsigned int libusb_communicator::read(const data_t* data, unsigned int num_bytes, timeout_t timeout)
+unsigned int libusb_usb_device::read(const data_t* data, unsigned int num_bytes, timeout_t timeout)
 {
   if (!m_was_initialized || !m_is_open)
   {
@@ -275,12 +275,12 @@ unsigned int libusb_communicator::read(const data_t* data, unsigned int num_byte
   return (unsigned int) bytes_read;
 }
 
-unsigned int libusb_communicator::write(data_t *buffer, unsigned int num_bytes)
+unsigned int libusb_usb_device::write(data_t *buffer, unsigned int num_bytes)
 {
   return write(buffer, num_bytes, m_timeout);
 }
 
-unsigned int libusb_communicator::write(data_t *buffer, unsigned int num_bytes, timeout_t timeout)
+unsigned int libusb_usb_device::write(data_t *buffer, unsigned int num_bytes, timeout_t timeout)
 {
   if (!m_was_initialized || !m_is_open)
   {
@@ -311,7 +311,7 @@ unsigned int libusb_communicator::write(data_t *buffer, unsigned int num_bytes, 
 
 
 
-device_description* libusb_communicator::build_device_description()
+device_description* libusb_usb_device::build_device_description()
 {
   libusb_device_descriptor device_descriptor;
   unsigned int device_num_configurations;
@@ -348,7 +348,7 @@ device_description* libusb_communicator::build_device_description()
   return description;
 }
 
-device_configuration* libusb_communicator::build_device_config(unsigned int index)
+device_configuration* libusb_usb_device::build_device_config(unsigned int index)
 {
   libusb_config_descriptor* libusb_config;
   unsigned int config_num_interfaces;
@@ -377,7 +377,7 @@ device_configuration* libusb_communicator::build_device_config(unsigned int inde
   return configuration;
 }
 
-device_interface* libusb_communicator::build_device_interface(const libusb_config_descriptor* config, unsigned int index)
+device_interface* libusb_usb_device::build_device_interface(const libusb_config_descriptor* config, unsigned int index)
 {
   const libusb_interface* libusb_interface_;
   unsigned int interface_num_alt_settings;
@@ -400,7 +400,7 @@ device_interface* libusb_communicator::build_device_interface(const libusb_confi
   return interface;
 }
 
-device_alt_setting* libusb_communicator::build_device_alt_setting(const libusb_interface* interface, unsigned int index)
+device_alt_setting* libusb_usb_device::build_device_alt_setting(const libusb_interface* interface, unsigned int index)
 {
   const libusb_interface_descriptor* libusb_altsetting;
   unsigned int altsetting_num_endpoints;
@@ -424,7 +424,7 @@ device_alt_setting* libusb_communicator::build_device_alt_setting(const libusb_i
   return alt_setting;
 }
 
-device_endpoint* libusb_communicator::build_device_endpoint(const libusb_interface_descriptor* interface, unsigned int index)
+device_endpoint* libusb_usb_device::build_device_endpoint(const libusb_interface_descriptor* interface, unsigned int index)
 {
   const libusb_endpoint_descriptor* libusb_endpoint;
   
