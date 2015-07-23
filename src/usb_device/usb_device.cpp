@@ -66,7 +66,7 @@ device_configuration::device_configuration(unsigned int num_interfaces)
 }
 
 device_configuration::device_configuration(const device_configuration& other)
-  : num_interfaces(other.num_interfaces),
+  : config_id(other.config_id), num_interfaces(other.num_interfaces),
     interfaces(new device_interface*[other.num_interfaces])
 {
   unsigned int i;
@@ -172,7 +172,8 @@ device_endpoint::device_endpoint()
 }
 
 device_endpoint::device_endpoint(const device_endpoint& other)
-  : desc_type(other.desc_type), address(other.address)
+  : address(other.address), transfer_type(other.transfer_type),
+    direction(other.direction)
 {
   // Nothing else to do here
 }

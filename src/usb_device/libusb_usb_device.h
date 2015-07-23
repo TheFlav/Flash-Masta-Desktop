@@ -31,10 +31,10 @@ public:
 
   void                  open();
   void                  close();
-  unsigned int          read(const data_t* data, unsigned int num_bytes);
-  unsigned int          read(const data_t* data, unsigned int num_bytes, timeout_t timeout);
-  unsigned int          write(data_t* buffer, unsigned int num_bytes);
-  unsigned int          write(data_t* buffer, unsigned int num_bytes, timeout_t timeout);
+  unsigned int          read(data_t* data, unsigned int num_bytes);
+  unsigned int          read(data_t* data, unsigned int num_bytes, timeout_t timeout);
+  unsigned int          write(const data_t* buffer, unsigned int num_bytes);
+  unsigned int          write(const data_t* buffer, unsigned int num_bytes, timeout_t timeout);
   
 private:
   device_description*   build_device_description();
@@ -58,6 +58,7 @@ private:
   int                   m_interface;
   unsigned char         m_input_endpoint;
   unsigned char         m_output_endpoint;
+  unsigned int          m_alt_setting;
 
   libusb_device*        m_device;
   libusb_device_handle* m_device_handle;

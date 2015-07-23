@@ -23,14 +23,15 @@ libusb_usb_device::libusb_usb_device(libusb_device* device)
     m_timeout_set        (false),
     m_configuration_set  (false),
     m_interface_set      (false),
-    m_input_endpoint_set (0),
-    m_output_endpoint_set(0),
+    m_input_endpoint_set (false),
+    m_output_endpoint_set(false),
     m_timeout            (0),
     m_configuration      (0),
     m_old_configuration  (0),
     m_interface          (0),
     m_input_endpoint     (0),
     m_output_endpoint    (0),
+    m_alt_setting        (0),
     m_device             (device),
     m_device_handle      (NULL),
     m_device_description (NULL)
@@ -96,6 +97,11 @@ inline const device_description* libusb_usb_device::get_device_description() con
 
 void libusb_usb_device::set_timeout(timeout_t timeout)
 {
+  if (!m_was_initialized)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
   // Validate input
   if (timeout < 0)
   {
@@ -109,23 +115,159 @@ void libusb_usb_device::set_timeout(timeout_t timeout)
 
 void libusb_usb_device::set_configuration(configuration_t configuration)
 {
-  m_configuration = (unsigned int) configuration;
-  m_configuration_set = true;
+  if (!m_was_initialized)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
+  // Validate arguments
+  if (configuration < 0)
+  {
+    throw std::invalid_argument("Unexpected value " + std::to_string(configuration)
+                                + " for argument 1: Invalid configuration number.");
+  }
+  
+  const device_configuration* config = NULL;
+  
+  // Search for config in descriptor
+  for (unsigned int i = 0; i < m_device_description->num_configurations; ++i)
+  {
+    if (m_device_description->configurations[i]->config_id == configuration)
+    {
+      config = m_device_description->configurations[i];
+      configuration = i;
+    }
+  }
+  
+  // Validate arguments
+  if (config == NULL)
+  {
+    throw std::invalid_argument("Unexpected value " + std::to_string(configuration)
+                                + " for argument 1: Invalid configuration number.");
+  }
+  
+  // Only change configuration if new value differs from old value
+  if (!m_configuration_set || m_configuration != (unsigned int) configuration)
+  {
+    m_configuration = (unsigned int) configuration;
+    m_configuration_set = true;
+    m_interface_set = false;
+    
+    // Switch device's current configuration
+    if (m_is_open)
+    {
+      libusb_set_configuration(m_device_handle, m_device_description->configurations[m_configuration]->config_id);
+    }
+  }
 }
 
 void libusb_usb_device::set_interface(interface_t interface)
 {
-  m_interface = (unsigned int) interface;
-  m_interface_set = true;
+  if (!m_was_initialized)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  else if (!m_configuration_set)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
+  // Validate arguments
+  if (interface > m_device_description->configurations[m_configuration]->num_interfaces)
+  {
+    throw std::invalid_argument("Unexpected value " + std::to_string(interface)
+                                + " for argument 1: Invalid interface number.");
+  }
+  
+  // Claim interface if applicable
+  if (m_is_open)
+  {
+    // Release old interface if one was previously claimed
+    if (m_interface_set)
+    {
+      if (libusb_release_interface(m_device_handle, m_interface) != 0)
+      {
+        throw std::runtime_error("ERROR");
+      }
+    }
+    else
+    {
+      m_interface_set = true;
+    }
+    
+    m_interface = (unsigned int) interface;
+    
+    if (libusb_claim_interface(m_device_handle, m_interface) != 0)
+    {
+      throw std::runtime_error("ERROR");
+    }
+  }
+  else
+  {
+    m_interface_set = true;
+    m_interface = (unsigned int) interface;
+  }
+  
+  
+  // Automatically set endpoints if unset
+  if (!m_input_endpoint_set|| !m_output_endpoint_set)
+  {
+    const device_alt_setting* alt_setting = m_device_description->
+      configurations[m_configuration]->interfaces[m_interface]->
+      alt_settings[m_alt_setting];
+    
+    unsigned int num_endpoints = alt_setting->num_endpoints;
+    
+    for (unsigned int i = 0; i < num_endpoints && (!m_input_endpoint_set || !m_output_endpoint_set); ++i)
+    {
+      if (alt_setting->endpoints[i]->transfer_type != ENDPOINT_TYPE_BULK)
+      {
+        continue; 
+      }
+      if (alt_setting->endpoints[i]->direction == ENDPOINT_DIRECTION_OUT && !m_output_endpoint_set)
+      {
+        m_output_endpoint_set = true;
+        m_output_endpoint = alt_setting->endpoints[i]->address;
+      }
+      else if (alt_setting->endpoints[i]->direction == ENDPOINT_DIRECTION_IN && !m_input_endpoint_set)
+      {
+        m_input_endpoint_set = true;
+        m_input_endpoint = alt_setting->endpoints[i]->address;
+      }
+    }
+  }
 }
 
 void libusb_usb_device::set_input_endpoint(endpoint_t input_endpoint)
 {
+  if (!m_was_initialized)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  else if (!m_configuration_set)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  else if (!m_interface_set)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
   // Validate input
   if (input_endpoint < 0 || input_endpoint > 255)
   {
     throw std::invalid_argument("Unexpected value " + std::to_string(input_endpoint)
                                 + " for argument 1: expected value between 0 and 255.");
+  }
+  else if ((input_endpoint & 0x70) != 0)
+  {
+    throw std::invalid_argument("Unexpected value " + std::to_string(input_endpoint)
+                                + " for argument 1: invaild endpoint address.");
+  }
+  else if ((input_endpoint & LIBUSB_ENDPOINT_IN) == 0)
+  {
+    throw std::invalid_argument("Unexpected value " + std::to_string(input_endpoint)
+                                + " for argument 1: endpoint address does not indicate input.");
   }
   
   m_input_endpoint = (unsigned char) input_endpoint;
@@ -134,11 +276,34 @@ void libusb_usb_device::set_input_endpoint(endpoint_t input_endpoint)
 
 void libusb_usb_device::set_output_endpoint(endpoint_t output_endpoint)
 {
+  if (!m_was_initialized)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  else if (!m_configuration_set)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  else if (!m_interface_set)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
   // Validate input
   if (output_endpoint < 0 || output_endpoint > 255)
   {
     throw std::invalid_argument("Unexpected value " + std::to_string(output_endpoint)
-                                + " for argument 1: expected value between 0 and 255");
+                                + " for argument 1: expected value between 0 and 255.");
+  }
+  else if ((output_endpoint & 0x70) != 0)
+  {
+    throw std::invalid_argument("Unexpected value " + std::to_string(output_endpoint)
+                                + " for argument 1: invaild endpoint address.");
+  }
+  else if ((output_endpoint & LIBUSB_ENDPOINT_IN) != 0)
+  {
+    throw std::invalid_argument("Unexpected value " + std::to_string(output_endpoint)
+                                + " for argument 1: endpoint address does not indicate output.");
   }
   
   m_output_endpoint = (unsigned char) output_endpoint;
@@ -158,7 +323,7 @@ void libusb_usb_device::open()
   // Attempt to open device
   if (libusb_open(m_device, &m_device_handle) != 0)
   {
-    // TODO: Throw exception
+    throw std::runtime_error("ERROR");
   }
   
   // Attempt to detach the OS kernel driver if it is attached
@@ -166,7 +331,7 @@ void libusb_usb_device::open()
   {
     if (libusb_detach_kernel_driver(m_device_handle, m_interface) != 0)
     {
-      // TODO: Throw exception
+      throw std::runtime_error("ERROR");
     }
     m_kernel_was_attached = true;
   }
@@ -178,19 +343,43 @@ void libusb_usb_device::open()
   // Attempt to retrieve the current configuration so we can restore it later
   if (libusb_get_configuration(m_device_handle, &m_old_configuration) != 0)
   {
-    // TODO: Throw exception
-  }  
+    throw std::runtime_error("ERROR");
+  }
+  
+  // Update m_old_configuration to be index of configuration
+  for (unsigned int i = 0; i < m_device_description->num_configurations; ++i)
+  {
+    if (m_device_description->configurations[i]->config_id == m_old_configuration)
+    {
+      m_old_configuration = i;
+      break;
+    }
+  }
   
   // Attempt to set the configuration
-  if (libusb_set_configuration(m_device_handle, m_configuration) != 0)
+  if (m_configuration_set)
   {
-    // TODO: Throw exception
+    if (m_configuration != m_old_configuration)
+    {
+      if (libusb_set_configuration(m_device_handle, m_device_description->configurations[m_configuration]->config_id) != 0)
+      {
+        throw std::runtime_error("ERROR");
+      }
+    }
+  }
+  else
+  {
+    m_configuration_set = true;
+    m_configuration = m_old_configuration;
   }
   
   // Attempt to claim the desired interface
-  if (libusb_claim_interface(m_device_handle, m_interface) != 0)
+  if (m_interface_set)
   {
-    // TODO: Throw exception
+    if (libusb_claim_interface(m_device_handle, m_interface) != 0)
+    {
+      throw std::runtime_error("ERROR");
+    }
   }
   
   m_is_open = true;
@@ -207,15 +396,28 @@ void libusb_usb_device::close()
   m_is_open = false;
   
   // Attempt to release the claim on the interface
-  if (libusb_release_interface(m_device_handle, m_interface) != 0)
+  if (m_interface_set)
   {
-    // TODO: Throw exception
+    if (libusb_release_interface(m_device_handle, m_interface) != 0)
+    {
+      throw std::runtime_error("ERROR");
+    }
+    else
+    {
+      m_interface_set = false;
+      m_input_endpoint_set = false;
+      m_output_endpoint_set = false;
+    }
   }
   
   // Attempt to reset the configuration to what it was previously
-  if (libusb_set_configuration(m_device_handle, m_old_configuration) != 0)
+  if (libusb_set_configuration(m_device_handle, m_device_description->configurations[m_old_configuration]->config_id) != 0)
   {
-    // TODO: Throw exception
+    throw std::runtime_error("ERROR");
+  }
+  else
+  {
+    m_configuration_set = false;
   }
   
   // Attempt to reattach the kernel driver
@@ -223,7 +425,7 @@ void libusb_usb_device::close()
   {
     if (libusb_attach_kernel_driver(m_device_handle, m_interface) != 0)
     {
-      // TODO: Throw exception
+      throw std::runtime_error("ERROR");
     }
   }
   
@@ -233,16 +435,51 @@ void libusb_usb_device::close()
   m_device_handle = NULL;
 }
 
-unsigned int libusb_usb_device::read(const data_t*data, unsigned int num_bytes)
+unsigned int libusb_usb_device::read(data_t *buffer, unsigned int num_bytes)
 {
-  return read(data, num_bytes, m_timeout);
+  return read(buffer, num_bytes, m_timeout);
 }
 
-unsigned int libusb_usb_device::read(const data_t* data, unsigned int num_bytes, timeout_t timeout)
+unsigned int libusb_usb_device::read(data_t *buffer, unsigned int num_bytes, timeout_t timeout)
 {
-  if (!m_was_initialized || !m_is_open)
+  if (!m_was_initialized || !m_is_open || !m_configuration_set || !m_interface_set || !m_output_endpoint_set)
   {
-    // TODO: Throw exception
+    throw std::runtime_error("ERROR");
+  }
+  
+  if (timeout < 0)
+  {
+    throw std::invalid_argument("Unexpected value " + std::to_string(timeout)
+                                + " for argument 3: expected value greater than 0.");
+  }
+  
+  int bytes_written = 0;
+  
+  int error = libusb_bulk_transfer(m_device_handle, m_input_endpoint, buffer, num_bytes, &bytes_written, (unsigned int) timeout);
+  if (error != 0)
+  {
+    throw std::runtime_error("ERROR " + std::to_string(error));
+  }
+  
+  // Adjust number of bytes read to conform to the return type
+  if (bytes_written < 0)
+  {
+    bytes_written = 0;
+  }
+  
+  return (unsigned int) bytes_written;
+}
+
+unsigned int libusb_usb_device::write(const data_t* data, unsigned int num_bytes)
+{
+  return write(data, num_bytes, m_timeout);
+}
+
+unsigned int libusb_usb_device::write(const data_t* data, unsigned int num_bytes, timeout_t timeout)
+{
+  if (!m_was_initialized || !m_is_open || !m_configuration_set || !m_interface_set || !m_input_endpoint_set)
+  {
+    throw std::runtime_error("ERROR");
   }
   
   if (timeout < 0)
@@ -262,8 +499,8 @@ unsigned int libusb_usb_device::read(const data_t* data, unsigned int num_bytes,
   
   if (libusb_bulk_transfer(m_device_handle, m_output_endpoint, data_writable, num_bytes, &bytes_read, (unsigned int) timeout) != 0)
   {
-    // TODO: Throw exception
     delete [] data_writable;
+    throw std::runtime_error("ERROR");
   }
   
   delete [] data_writable;
@@ -275,40 +512,6 @@ unsigned int libusb_usb_device::read(const data_t* data, unsigned int num_bytes,
   }
   
   return (unsigned int) bytes_read;
-}
-
-unsigned int libusb_usb_device::write(data_t *buffer, unsigned int num_bytes)
-{
-  return write(buffer, num_bytes, m_timeout);
-}
-
-unsigned int libusb_usb_device::write(data_t *buffer, unsigned int num_bytes, timeout_t timeout)
-{
-  if (!m_was_initialized || !m_is_open)
-  {
-    // TODO: Throw exception
-  }
-  
-  if (timeout < 0)
-  {
-    throw std::invalid_argument("Unexpected value " + std::to_string(timeout)
-                                + " for argument 3: expected value greater than 0.");
-  }
-  
-  int bytes_written = 0;
-  
-  if (libusb_bulk_transfer(m_device_handle, m_input_endpoint, buffer, num_bytes, &bytes_written, (unsigned int) timeout) != 0)
-  {
-    // TODO: Throw exception
-  }
-  
-  // Adjust number of bytes read to conform to the return type
-  if (bytes_written < 0)
-  {
-    bytes_written = 0;
-  }
-  
-  return (unsigned int) bytes_written;
 }
 
 
@@ -366,6 +569,7 @@ device_configuration* libusb_usb_device::build_device_config(unsigned int index)
   
   // Create config and fill with information
   device_configuration* configuration = new device_configuration(config_num_interfaces);
+  configuration->config_id = libusb_config->bConfigurationValue;
   
   // Fetch remainder of config info
   unsigned int i;
@@ -436,7 +640,36 @@ device_endpoint* libusb_usb_device::build_device_endpoint(const libusb_interface
   // Create endpoint and will with information
   device_endpoint* endpoint = new device_endpoint();
   endpoint->address = libusb_endpoint->bEndpointAddress;
-  endpoint->desc_type = libusb_endpoint->bDescriptorType;
+  
+  switch (endpoint->address & LIBUSB_ENDPOINT_IN)
+  {
+  case LIBUSB_ENDPOINT_IN:
+    endpoint->direction = ENDPOINT_DIRECTION_IN;
+    break;
+  case LIBUSB_ENDPOINT_OUT:
+    endpoint->direction = ENDPOINT_DIRECTION_OUT;
+    break;
+  default:
+    break;
+  }
+  
+  switch (libusb_endpoint->bmAttributes & 0x03)
+  {
+  case 0:
+    endpoint->transfer_type = ENDPOINT_TYPE_CONTROL;
+    break;
+  case 1:
+    endpoint->transfer_type = ENDPOINT_TYPE_ISOCHRONOUS;
+    break;
+  case 2:
+    endpoint->transfer_type = ENDPOINT_TYPE_BULK;
+    break;
+  case 3:
+    endpoint->transfer_type = ENDPOINT_TYPE_INTERRUPT;
+    break;
+  default:
+    break;
+  }
   
   return endpoint;
 }

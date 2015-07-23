@@ -22,6 +22,20 @@ public:
   struct device_alt_setting;
   struct device_endpoint;
   
+  enum endpoint_transfer_type
+  {
+    ENDPOINT_TYPE_CONTROL,
+    ENDPOINT_TYPE_ISOCHRONOUS,
+    ENDPOINT_TYPE_BULK,
+    ENDPOINT_TYPE_INTERRUPT
+  };
+  
+  enum endpoint_direction
+  {
+    ENDPOINT_DIRECTION_IN,
+    ENDPOINT_DIRECTION_OUT
+  };
+  
   virtual ~usb_device();
   
   /**
@@ -83,10 +97,10 @@ public:
   
   virtual void open() = 0;
   virtual void close() = 0;
-  virtual unsigned int read(const data_t* data, unsigned int num_bytes) = 0;
-  virtual unsigned int read(const data_t* data, unsigned int num_bytes, timeout_t timeout) = 0;
-  virtual unsigned int write(data_t* buffer, unsigned int num_bytes) = 0;
-  virtual unsigned int write(data_t* buffer, unsigned int num_bytes, timeout_t timeout) = 0;
+  virtual unsigned int read(data_t* data, unsigned int num_bytes) = 0;
+  virtual unsigned int read(data_t* data, unsigned int num_bytes, timeout_t timeout) = 0;
+  virtual unsigned int write(const data_t* buffer, unsigned int num_bytes) = 0;
+  virtual unsigned int write(const data_t* buffer, unsigned int num_bytes, timeout_t timeout) = 0;
 };
 
 
@@ -112,6 +126,7 @@ struct usb_device::device_configuration
   device_configuration(const device_configuration& other);
   ~device_configuration();
   
+  unsigned int config_id;
   const unsigned int num_interfaces;
   device_interface** const interfaces;
 };
@@ -148,8 +163,9 @@ struct usb_device::device_endpoint
   device_endpoint();
   device_endpoint(const device_endpoint& other);
   
-  int desc_type;
   usb_device::endpoint_t address;
+  usb_device::endpoint_transfer_type transfer_type;
+  usb_device::endpoint_direction direction;
 };
 
 #endif // __USB_COMMUNICATOR_H__
