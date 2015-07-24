@@ -60,7 +60,7 @@ private:
   unsigned char         m_output_endpoint;
   unsigned int          m_alt_setting;
 
-  libusb_device*        m_device;
+  libusb_device* const  m_device;
   libusb_device_handle* m_device_handle;
   device_description*   m_device_description;
 };

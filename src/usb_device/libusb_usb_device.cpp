@@ -42,9 +42,19 @@ libusb_usb_device::libusb_usb_device(libusb_device* device)
 
 libusb_usb_device::~libusb_usb_device()
 {
-  if (m_device_description != NULL)
+  // Clean up results of being initialized
+  if (m_was_initialized)
   {
-    delete m_device_description;
+    if (m_device_description != NULL)
+    {
+      delete m_device_description;
+    }
+  }
+  
+  // Close connection if opened
+  if (m_is_open)
+  {
+    close();
   }
   
   // Decrement the reference counter for the device
