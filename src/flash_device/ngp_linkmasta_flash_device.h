@@ -25,6 +25,7 @@ public:
   // Getters
   bool                  is_open() const;
   timeout_t             timeout() const;
+  version_t             firmware_version();
   
   // Setters
   void                  set_timeout(timeout_t timeout);
@@ -32,9 +33,14 @@ public:
   // Operations
   void                  open();
   void                  close();
+  unsigned int          read(address_t start_address, data_t* buffer, unsigned int num_bytes);
+  unsigned int          read(address_t start_address, data_t* buffer, unsigned int num_bytes, timeout_t timeout);
+//  unsigned int          write(address_t start_address, data_t* buffer, unsigned int num_bytes);
+//  unsigned int          write(address_t start_address, data_t* buffer, unsigned int num_bytes, timeout_t timeout);
   
   
 private:
+  void                  fetch_firmware_version();
   
   // Resources
   usb_device* const     m_usb_device;
@@ -42,6 +48,11 @@ private:
   // Status flags
   bool                  m_was_init;
   bool                  m_is_open;
+  bool                  m_firmware_version_set;
+  
+  // Cached values
+  unsigned int          m_firmware_major_version;
+  unsigned int          m_firmware_minor_version;
 };
 
 #endif /* defined(__ngp_linkmasta_flash_device_H__) */

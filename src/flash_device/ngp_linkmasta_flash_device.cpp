@@ -13,6 +13,7 @@
 
 
 typedef ngp_linkmasta_flash_device::timeout_t timeout_t;
+typedef ngp_linkmasta_flash_device::version_t version_t;
 
 
 
@@ -32,7 +33,8 @@ typedef ngp_linkmasta_flash_device::timeout_t timeout_t;
 
 ngp_linkmasta_flash_device::ngp_linkmasta_flash_device(usb_device* usb_device)
   : m_usb_device(usb_device),
-    m_was_init(false), m_is_open(false)
+    m_was_init(false), m_is_open(false), m_firmware_version_set(false),
+    m_firmware_major_version(0), m_firmware_minor_version(0)
 {
   // Nothing else to do
 }
@@ -98,6 +100,21 @@ inline timeout_t ngp_linkmasta_flash_device::timeout() const
   return m_usb_device->timeout();
 }
 
+version_t ngp_linkmasta_flash_device::firmware_version()
+{
+  if (!m_was_init || !m_is_open)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
+  if (!m_firmware_version_set)
+  {
+    fetch_firmware_version();
+  }
+  
+  return std::to_string(m_firmware_major_version) + "."
+         + std::to_string(m_firmware_minor_version);
+}
 
 
 
@@ -151,4 +168,126 @@ void ngp_linkmasta_flash_device::close()
   
   m_is_open = false;
 }
+
+unsigned int ngp_linkmasta_flash_device::read(address_t start_address, data_t *buffer, unsigned int num_bytes)
+{
+  return read(start_address, buffer, num_bytes, timeout());
+}
+
+unsigned int ngp_linkmasta_flash_device::read(address_t start_address, data_t *buffer, unsigned int num_bytes, timeout_t timeout)
+{
+  if (!m_was_init || !m_is_open)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
+  data_t   _buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
+  int      mode;
+  uint8_t  chip;
+  uint32_t address;
+  
+  // Determine mode based on number of bytes to fetch
+  if (num_bytes == 1)
+    mode = 1;
+  else if (num_bytes <= 64)
+    mode = 2;
+  else
+    mode = 3;
+  
+  // Calculate address based on number of chips
+  // TODO
+  chip = 0;
+  address = (uint32_t) start_address;
+  
+  // Compose read byte command
+  switch (mode)
+  {
+  case 1:
+    build_read_command(_buffer, address, chip);
+    break;
+    
+  case 2:
+    build_read64_command(_buffer, address, chip);
+    break;
+    
+  case 3:
+    build_read64xN_command(_buffer, address, chip, num_bytes / 64 + (num_bytes % 64 == 0 ? 0 : 1));
+    break;
+  }
+  
+  // Send command to device
+  m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout);
+  
+  // Process response
+  switch (mode)
+  {
+  case 1:
+    // Read response
+    if (m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout) != NGP_LINKMASTA_USB_RXTX_SIZE)
+    {
+      throw std::runtime_error("ERROR"); // TODO
+    }
+    get_read_reply(_buffer, &address, buffer);
+    break;
+    
+  case 2:
+  case 3:
+    // Fetch 64-byte blocks
+    for (unsigned int i = 0;
+         i < num_bytes && num_bytes - i >= NGP_LINKMASTA_USB_RXTX_SIZE;
+         i += NGP_LINKMASTA_USB_RXTX_SIZE)
+    {
+      if (m_usb_device->read(buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout) != NGP_LINKMASTA_USB_RXTX_SIZE)
+      {
+        throw std::runtime_error("ERROR"); // TODO
+      }
+    }
+    
+    if (num_bytes % NGP_LINKMASTA_USB_RXTX_SIZE == 0)
+    {
+      break;
+    }
+    
+    // Fetch remainder of bytes
+    if (m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout) != NGP_LINKMASTA_USB_RXTX_SIZE)
+    {
+      throw std::runtime_error("ERROR"); // TODO
+    }
+    for (unsigned int i = 0; i < num_bytes % NGP_LINKMASTA_USB_RXTX_SIZE; ++i)
+    {
+      buffer[num_bytes / NGP_LINKMASTA_USB_RXTX_SIZE + i] = _buffer[i];
+    }
+    break;
+  }
+  
+  return num_bytes;
+}
+
+
+
+void ngp_linkmasta_flash_device::fetch_firmware_version()
+{
+  data_t buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
+  build_getversion_command(buffer);
+  
+  unsigned int num_bytes;
+  
+  // Send command
+  num_bytes = m_usb_device->write(buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+  
+  // Fetch reply
+  num_bytes = m_usb_device->read(buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+  if (num_bytes != NGP_LINKMASTA_USB_RXTX_SIZE)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
+  uint8_t majVer, minVer;
+  get_getversion_reply(buffer, &majVer, &minVer);
+  
+  m_firmware_major_version = (unsigned int) majVer;
+  m_firmware_major_version = (unsigned int) minVer;
+  m_firmware_version_set = true;
+}
+
 
