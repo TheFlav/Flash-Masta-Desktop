@@ -24,12 +24,8 @@
 #define MSG_FLASHWRITE32_CMD        0x05
 #define MSG_FLASHWRITE_N_CMD        0x06
 #define MSG_FLASHWRITE64xN_CMD      0x07
-#define MSG_WRITE64xN_REPLY         0x08
 #define MSG_BLINK_LED               0x09
 #define MSG_SPI_SEND_RECV_CMD       0x0A
-
-#define MSG_RESULT_FAIL             0x10
-#define MSG_RESULT_SUCCESS          0x11
 
 #define MSG_TYPE_OFFSET             0
 
@@ -108,7 +104,7 @@ void build_write_command(uint8_t *buf, uint32_t addr_host, uint8_t data, uint8_t
 #endif
 }
 
-void build_flash_write_N_command(uint8_t *buf, uint32_t addr_host, uint8_t *data, uint8_t chip, uint8_t n, uint8_t uBypassMode)
+void build_flash_write_N_command(uint8_t *buf, uint32_t addr_host, const uint8_t *data, uint8_t chip, uint8_t n, uint8_t uBypassMode)
 {
   buf[MSG_TYPE_OFFSET] = MSG_FLASHWRITE_N_CMD;
   buf[MSG_FWRITE_BYTE_COUNT] = n;
@@ -129,7 +125,7 @@ void build_flash_write_N_command(uint8_t *buf, uint32_t addr_host, uint8_t *data
     buf[MSG_FWRITE_PAYLOAD_OFFSET+i] = data[i];
 }
 
-void build_flash_write_32_command(uint8_t *buf, uint32_t addr_host, uint8_t *data, uint8_t chip, uint8_t uBypassMode)
+void build_flash_write_32_command(uint8_t *buf, uint32_t addr_host, const uint8_t *data, uint8_t chip, uint8_t uBypassMode)
 {
   buf[MSG_TYPE_OFFSET] = MSG_FLASHWRITE32_CMD;
   
@@ -162,7 +158,7 @@ void build_flash_write64xN_command(uint8_t *buf, uint32_t addr_host, uint8_t chi
   buf[MSG_FWRITE_UBYPASS_MODE] = uBypassMode;
 }
 
-void build_flash_write64xN_data_packet(uint8_t *buf, uint8_t *data)
+void build_flash_write64xN_data_packet(uint8_t *buf, const uint8_t *data)
 {
   int i;
   for(i=0;i<64;i++)

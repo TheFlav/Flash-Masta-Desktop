@@ -12,6 +12,7 @@
 #include "flash_device.h"
 
 class usb_device;
+class ngp_cartridge;
 
 class ngp_linkmasta_flash_device: public flash_device
 {
@@ -35,8 +36,10 @@ public:
   void                  close();
   unsigned int          read(address_t start_address, data_t* buffer, unsigned int num_bytes);
   unsigned int          read(address_t start_address, data_t* buffer, unsigned int num_bytes, timeout_t timeout);
-//  unsigned int          write(address_t start_address, data_t* buffer, unsigned int num_bytes);
-//  unsigned int          write(address_t start_address, data_t* buffer, unsigned int num_bytes, timeout_t timeout);
+  unsigned int          read(address_t start_address, data_t* buffer, unsigned int num_bytes, timeout_t timeout, unsigned int chip);
+  unsigned int          write(address_t start_address, const data_t* buffer, unsigned int num_bytes);
+  unsigned int          write(address_t start_address, const data_t* buffer, unsigned int num_bytes, timeout_t timeout);
+  unsigned int          write(address_t start_address, const data_t* buffer, unsigned int num_bytes, timeout_t timeout, unsigned int chip);
   
   
 private:
@@ -53,6 +56,7 @@ private:
   // Cached values
   unsigned int          m_firmware_major_version;
   unsigned int          m_firmware_minor_version;
+  ngp_cartridge*        m_cartridge;
 };
 
 #endif /* defined(__ngp_linkmasta_flash_device_H__) */

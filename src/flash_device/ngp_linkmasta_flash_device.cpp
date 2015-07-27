@@ -8,12 +8,14 @@
 
 #include "ngp_linkmasta_flash_device.h"
 #include "usb_device/usb_device.h"
+#include "cartridge/ngp_cartridge.h"
 #include "ngp_linkmasta_messages.h"
 
 
 
 typedef ngp_linkmasta_flash_device::timeout_t timeout_t;
 typedef ngp_linkmasta_flash_device::version_t version_t;
+typedef ngp_cartridge::chip_index             chip_index;
 
 
 
@@ -34,7 +36,7 @@ typedef ngp_linkmasta_flash_device::version_t version_t;
 ngp_linkmasta_flash_device::ngp_linkmasta_flash_device(usb_device* usb_device)
   : m_usb_device(usb_device),
     m_was_init(false), m_is_open(false), m_firmware_version_set(false),
-    m_firmware_major_version(0), m_firmware_minor_version(0)
+    m_firmware_major_version(0), m_firmware_minor_version(0), m_cartridge(NULL)
 {
   // Nothing else to do
 }
@@ -176,15 +178,60 @@ unsigned int ngp_linkmasta_flash_device::read(address_t start_address, data_t *b
 
 unsigned int ngp_linkmasta_flash_device::read(address_t start_address, data_t *buffer, unsigned int num_bytes, timeout_t timeout)
 {
-  if (!m_was_init || !m_is_open)
+  unsigned int total_bytes_written = 0;
+  address_t lower_bound;
+  address_t upper_bound;
+  
+  // Split request up across chips
+  for (chip_index i = 0; i < m_cartridge->num_chips(); ++i)
   {
-    throw std::runtime_error("ERROR");
+    const ngp_cartridge::chip* chip = m_cartridge->get_chip(i);
+    
+    // Does requested address range intersect with chip's address range?
+    if (chip->base_address() < start_address + num_bytes
+        && chip->base_address() + chip->size() > start_address)
+    {
+      lower_bound = (chip->base_address() < start_address
+                     ? start_address
+                     : chip->base_address());
+      upper_bound = (chip->base_address() + chip->size() > start_address + num_bytes
+                     ? start_address + num_bytes
+                     : chip->base_address() + chip->size());
+      
+      // Read data from this chip
+      total_bytes_written += read(lower_bound - chip->base_address(),
+                                  &buffer[lower_bound - start_address],
+                                  upper_bound - lower_bound,
+                                  timeout,
+                                  i);
+    }
   }
   
+  return total_bytes_written;
+}
+
+unsigned int ngp_linkmasta_flash_device::read(address_t start_address, data_t *buffer, unsigned int num_bytes, timeout_t timeout, unsigned int chip)
+{
+  // Make sure we are in a ready state
+  if (!m_was_init || !m_is_open)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  // Validate parametersa against with known cartridge info
+  if (chip >= m_cartridge->num_chips())
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  if (start_address >= m_cartridge->get_chip(chip)->size()
+      || start_address + num_bytes > m_cartridge->get_chip(chip)->size())
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  // Some working variables
   data_t   _buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
   int      mode;
-  uint8_t  chip;
-  uint32_t address;
   
   // Determine mode based on number of bytes to fetch
   if (num_bytes == 1)
@@ -194,25 +241,20 @@ unsigned int ngp_linkmasta_flash_device::read(address_t start_address, data_t *b
   else
     mode = 3;
   
-  // Calculate address based on number of chips
-  // TODO
-  chip = 0;
-  address = (uint32_t) start_address;
-  
   // Compose read byte command
   switch (mode)
   {
-  case 1:
-    build_read_command(_buffer, address, chip);
-    break;
-    
-  case 2:
-    build_read64_command(_buffer, address, chip);
-    break;
-    
-  case 3:
-    build_read64xN_command(_buffer, address, chip, num_bytes / 64 + (num_bytes % 64 == 0 ? 0 : 1));
-    break;
+    case 1:
+      build_read_command(_buffer, start_address, chip);
+      break;
+      
+    case 2:
+      build_read64_command(_buffer, start_address, chip);
+      break;
+      
+    case 3:
+      build_read64xN_command(_buffer, start_address, chip, num_bytes / 64 + (num_bytes % 64 == 0 ? 0 : 1));
+      break;
   }
   
   // Send command to device
@@ -221,43 +263,177 @@ unsigned int ngp_linkmasta_flash_device::read(address_t start_address, data_t *b
   // Process response
   switch (mode)
   {
-  case 1:
-    // Read response
-    if (m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout) != NGP_LINKMASTA_USB_RXTX_SIZE)
-    {
-      throw std::runtime_error("ERROR"); // TODO
-    }
-    get_read_reply(_buffer, &address, buffer);
-    break;
-    
-  case 2:
-  case 3:
-    // Fetch 64-byte blocks
-    for (unsigned int i = 0;
-         i < num_bytes && num_bytes - i >= NGP_LINKMASTA_USB_RXTX_SIZE;
-         i += NGP_LINKMASTA_USB_RXTX_SIZE)
-    {
-      if (m_usb_device->read(buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout) != NGP_LINKMASTA_USB_RXTX_SIZE)
+    case 1:
+      // Read response
+      if (m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout) != NGP_LINKMASTA_USB_RXTX_SIZE)
       {
         throw std::runtime_error("ERROR"); // TODO
       }
-    }
-    
-    if (num_bytes % NGP_LINKMASTA_USB_RXTX_SIZE == 0)
-    {
+      get_read_reply(_buffer, &start_address, buffer);
       break;
+      
+    case 2:
+    case 3:
+      // Fetch 64-byte blocks
+      for (unsigned int i = 0;
+           i < num_bytes && num_bytes - i >= NGP_LINKMASTA_USB_RXTX_SIZE;
+           i += NGP_LINKMASTA_USB_RXTX_SIZE)
+      {
+        if (m_usb_device->read(buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout) != NGP_LINKMASTA_USB_RXTX_SIZE)
+        {
+          throw std::runtime_error("ERROR"); // TODO
+        }
+      }
+      
+      if (num_bytes % NGP_LINKMASTA_USB_RXTX_SIZE == 0)
+      {
+        break;
+      }
+      
+      // Fetch remainder of bytes
+      if (m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout) != NGP_LINKMASTA_USB_RXTX_SIZE)
+      {
+        throw std::runtime_error("ERROR"); // TODO
+      }
+      for (unsigned int i = 0; i < num_bytes % NGP_LINKMASTA_USB_RXTX_SIZE; ++i)
+      {
+        buffer[num_bytes / NGP_LINKMASTA_USB_RXTX_SIZE + i] = _buffer[i];
+      }
+      break;
+  }
+  
+  return num_bytes;
+}
+
+unsigned int ngp_linkmasta_flash_device::write(address_t start_address, const data_t *buffer, unsigned int num_bytes)
+{
+  return write(start_address, buffer, num_bytes, timeout());
+}
+
+unsigned int ngp_linkmasta_flash_device::write(address_t start_address, const data_t *buffer, unsigned int num_bytes, timeout_t timeout)
+{
+  unsigned int total_bytes_written = 0;
+  address_t lower_bound;
+  address_t upper_bound;
+  
+  // Split request up across chips
+  for (chip_index i = 0; i < m_cartridge->num_chips(); ++i)
+  {
+    const ngp_cartridge::chip* chip = m_cartridge->get_chip(i);
+    
+    // Does requested address range intersect with chip's address range?
+    if (chip->base_address() < start_address + num_bytes
+        && chip->base_address() + chip->size() > start_address)
+    {
+      lower_bound = (chip->base_address() < start_address
+                     ? start_address
+                     : chip->base_address());
+      upper_bound = (chip->base_address() + chip->size() > start_address + num_bytes
+                     ? start_address + num_bytes
+                     : chip->base_address() + chip->size());
+      
+      // Read data from this chip
+      total_bytes_written += write(lower_bound - chip->base_address(),
+                                  &buffer[lower_bound - start_address],
+                                  upper_bound - lower_bound,
+                                  timeout,
+                                  i);
+    }
+  }
+  
+  return total_bytes_written;
+}
+
+unsigned int ngp_linkmasta_flash_device::write(address_t start_address, const data_t *buffer, unsigned int num_bytes, timeout_t timeout, unsigned int chip)
+{
+  if (!m_was_init || !m_is_open)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
+  // Validate parametersa against with known cartridge info
+  if (chip >= m_cartridge->num_chips())
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  if (start_address >= m_cartridge->get_chip(chip)->size()
+      || start_address + num_bytes > m_cartridge->get_chip(chip)->size())
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  // Some working variables
+  data_t   _buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
+  unsigned int offset;
+  bool     bypassMode;
+  uint8_t  result;
+  
+  offset = 0;
+  bypassMode = false;
+  
+  // Inform device of incoming data
+  if (num_bytes / NGP_LINKMASTA_USB_RXTX_SIZE >= 1)
+  {
+    unsigned int num_packets = num_bytes / NGP_LINKMASTA_USB_RXTX_SIZE;
+    build_flash_write64xN_command(_buffer, start_address + offset, chip, num_packets, bypassMode);
+    m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout);
+    
+    // Send chunks of 64 bytes to device
+    for (offset = 0;
+         offset < num_packets * NGP_LINKMASTA_USB_RXTX_SIZE;
+         offset += NGP_LINKMASTA_USB_RXTX_SIZE)
+    {
+      build_flash_write64xN_data_packet(_buffer, &buffer[offset]);
+      m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout);
     }
     
-    // Fetch remainder of bytes
-    if (m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout) != NGP_LINKMASTA_USB_RXTX_SIZE)
+    // Verify that operaton worked
+    uint8_t packets_processed;
+    m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout);
+    get_flash_write64xN_reply(_buffer, &result, &packets_processed);
+    
+    if(result != MSG_WRITE64xN_REPLY)
     {
       throw std::runtime_error("ERROR"); // TODO
     }
-    for (unsigned int i = 0; i < num_bytes % NGP_LINKMASTA_USB_RXTX_SIZE; ++i)
+    if(packets_processed != num_packets)
     {
-      buffer[num_bytes / NGP_LINKMASTA_USB_RXTX_SIZE + i] = _buffer[i];
+      throw std::runtime_error("ERROR"); // TODO
     }
-    break;
+  }
+  
+  // If at least 32 bytes remain, write them
+  if (num_bytes - offset >= NGP_LINKMASTA_USB_RXTX_SIZE / 2)
+  {
+    build_flash_write_32_command(_buffer, start_address + offset, &buffer[offset], chip, bypassMode);
+    m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout);
+    
+    // Verify that operation worked
+    m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout);
+    get_result_reply(_buffer, &result);
+    if (result != MSG_RESULT_SUCCESS)
+    {
+      throw std::runtime_error("ERROR"); // TODO
+    }
+    
+    offset += NGP_LINKMASTA_USB_RXTX_SIZE / 2;
+  }
+  
+  // If any bytes remain, write them
+  if (num_bytes - offset > 0)
+  {
+    build_flash_write_N_command(_buffer, start_address + offset, &buffer[offset], chip, num_bytes - offset, bypassMode);
+    m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout);
+    
+    // Verify that operation worked
+    m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE, timeout);
+    get_result_reply(_buffer, &result);
+    if (result != MSG_RESULT_SUCCESS)
+    {
+      throw std::runtime_error("ERROR"); // TODO
+    }
+    
+    offset += num_bytes - offset;
   }
   
   return num_bytes;

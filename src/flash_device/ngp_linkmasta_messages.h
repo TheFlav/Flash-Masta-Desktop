@@ -11,15 +11,19 @@
 
 #include <stdint.h>
 
+#define MSG_WRITE64xN_REPLY         0x08
+#define MSG_RESULT_FAIL             0x10
+#define MSG_RESULT_SUCCESS          0x11
+
 void build_blink_led_command(uint8_t *buf, uint8_t blinkCount);
 void build_getversion_command(uint8_t *buf);
 void build_getversion_reply(uint8_t *buf, uint8_t majVer, uint8_t minVer);
 void get_getversion_reply(uint8_t *buf, uint8_t *majVer, uint8_t *minVer);
 void build_write_command(uint8_t *buf, uint32_t addr_host, uint8_t data, uint8_t chip);
-void build_flash_write_N_command(uint8_t *buf, uint32_t addr_host, uint8_t *data, uint8_t chip, uint8_t n, uint8_t uBypassMode);
-void build_flash_write_32_command(uint8_t *buf, uint32_t addr_host, uint8_t *data, uint8_t chip, uint8_t uBypassMode);
+void build_flash_write_N_command(uint8_t *buf, uint32_t addr_host, const uint8_t *data, uint8_t chip, uint8_t n, uint8_t uBypassMode);
+void build_flash_write_32_command(uint8_t *buf, uint32_t addr_host, const uint8_t *data, uint8_t chip, uint8_t uBypassMode);
 void build_flash_write64xN_command(uint8_t *buf, uint32_t addr_host, uint8_t chip, uint8_t n, uint8_t uBypassMode);
-void build_flash_write64xN_data_packet(uint8_t *buf, uint8_t *data);
+void build_flash_write64xN_data_packet(uint8_t *buf, const uint8_t *data);
 void build_read_command(uint8_t *buf, uint32_t addr_host, uint8_t chip);
 void build_read64xN_command(uint8_t *buf, uint32_t addr_host, uint8_t chip, uint8_t n);
 void build_SPI_send_recv_command(uint8_t *buf, uint8_t data);
