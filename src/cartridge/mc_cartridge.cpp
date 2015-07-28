@@ -20,7 +20,7 @@ mc_cartridge::~mc_cartridge()
   // Nothing else to do
 }
 
-inline unsigned int mc_cartridge::num_chips() const
+unsigned int mc_cartridge::num_chips() const
 {
   return m_num_chips;
 }
@@ -44,12 +44,12 @@ mc_cartridge::chip::~chip()
   // Nothing else to do
 }
 
-inline unsigned int mc_cartridge::chip::size() const
+unsigned int mc_cartridge::chip::size() const
 {
   return m_size;
 }
 
-inline address_t mc_cartridge::chip::base_address() const
+address_t mc_cartridge::chip::base_address() const
 {
   return m_base_address;
 }

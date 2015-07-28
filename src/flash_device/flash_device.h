@@ -22,6 +22,7 @@ public:
   typedef int              vendor_t;
   typedef int              product_t;
   typedef std::string      version_t;
+  typedef unsigned int     chip_index;
   
   virtual                  ~flash_device() {};
   virtual void             init() = 0;
@@ -34,12 +35,10 @@ public:
   
   virtual void             open() = 0;
   virtual void             close() = 0;
-  virtual unsigned int     read(address_t start_address, data_t* buffer, unsigned int num_bytes) = 0;
-  virtual unsigned int     read(address_t start_address, data_t* buffer, unsigned int num_bytes, timeout_t timeout) = 0;
-  virtual unsigned int     write(address_t start_address, const data_t* buffer, unsigned int num_bytes) = 0;
-  virtual unsigned int     write(address_t start_address, const data_t* buffer, unsigned int num_bytes, timeout_t timeout) = 0;
-//virtual bool             test_cartridge() = 0;
-//virtual const cartridge* get_cartridge() = 0;
+  virtual unsigned int     read(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes) = 0;
+  virtual unsigned int     read(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes, timeout_t timeout) = 0;
+  virtual unsigned int     write(chip_index chip, address_t start_address, const data_t* buffer, unsigned int num_bytes) = 0;
+  virtual unsigned int     write(chip_index chip, address_t start_address, const data_t* buffer, unsigned int num_bytes, timeout_t timeout) = 0;
 };
 
 #endif /* defined(__FLASH_DEVICE_H__) */

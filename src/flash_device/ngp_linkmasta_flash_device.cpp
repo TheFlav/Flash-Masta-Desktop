@@ -13,9 +13,9 @@
 
 
 
-typedef ngp_linkmasta_flash_device::timeout_t timeout_t;
-typedef ngp_linkmasta_flash_device::version_t version_t;
-typedef ngp_cartridge::chip_index             chip_index;
+typedef ngp_linkmasta_flash_device::timeout_t  timeout_t;
+typedef ngp_linkmasta_flash_device::version_t  version_t;
+typedef ngp_linkmasta_flash_device::chip_index chip_index;
 
 
 
@@ -36,7 +36,7 @@ typedef ngp_cartridge::chip_index             chip_index;
 ngp_linkmasta_flash_device::ngp_linkmasta_flash_device(usb_device* usb_device)
   : m_usb_device(usb_device),
     m_was_init(false), m_is_open(false), m_firmware_version_set(false),
-    m_firmware_major_version(0), m_firmware_minor_version(0), m_cartridge(NULL)
+    m_firmware_major_version(0), m_firmware_minor_version(0)
 {
   // Nothing else to do
 }
@@ -171,60 +171,15 @@ void ngp_linkmasta_flash_device::close()
   m_is_open = false;
 }
 
-unsigned int ngp_linkmasta_flash_device::read(address_t start_address, data_t *buffer, unsigned int num_bytes)
+unsigned int ngp_linkmasta_flash_device::read(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes)
 {
-  return read(start_address, buffer, num_bytes, timeout());
+  return read(chip, start_address, buffer, num_bytes, timeout());
 }
 
-unsigned int ngp_linkmasta_flash_device::read(address_t start_address, data_t *buffer, unsigned int num_bytes, timeout_t timeout)
-{
-  unsigned int total_bytes_written = 0;
-  address_t lower_bound;
-  address_t upper_bound;
-  
-  // Split request up across chips
-  for (chip_index i = 0; i < m_cartridge->num_chips(); ++i)
-  {
-    const ngp_cartridge::chip* chip = m_cartridge->get_chip(i);
-    
-    // Does requested address range intersect with chip's address range?
-    if (chip->base_address() < start_address + num_bytes
-        && chip->base_address() + chip->size() > start_address)
-    {
-      lower_bound = (chip->base_address() < start_address
-                     ? start_address
-                     : chip->base_address());
-      upper_bound = (chip->base_address() + chip->size() > start_address + num_bytes
-                     ? start_address + num_bytes
-                     : chip->base_address() + chip->size());
-      
-      // Read data from this chip
-      total_bytes_written += read(lower_bound - chip->base_address(),
-                                  &buffer[lower_bound - start_address],
-                                  upper_bound - lower_bound,
-                                  timeout,
-                                  i);
-    }
-  }
-  
-  return total_bytes_written;
-}
-
-unsigned int ngp_linkmasta_flash_device::read(address_t start_address, data_t *buffer, unsigned int num_bytes, timeout_t timeout, unsigned int chip)
+unsigned int ngp_linkmasta_flash_device::read(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes, timeout_t timeout)
 {
   // Make sure we are in a ready state
   if (!m_was_init || !m_is_open)
-  {
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  
-  // Validate parametersa against with known cartridge info
-  if (chip >= m_cartridge->num_chips())
-  {
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  if (start_address >= m_cartridge->get_chip(chip)->size()
-      || start_address + num_bytes > m_cartridge->get_chip(chip)->size())
   {
     throw std::runtime_error("ERROR"); // TODO
   }
@@ -305,61 +260,16 @@ unsigned int ngp_linkmasta_flash_device::read(address_t start_address, data_t *b
   return num_bytes;
 }
 
-unsigned int ngp_linkmasta_flash_device::write(address_t start_address, const data_t *buffer, unsigned int num_bytes)
+unsigned int ngp_linkmasta_flash_device::write(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes)
 {
-  return write(start_address, buffer, num_bytes, timeout());
+  return write(chip, start_address, buffer, num_bytes, timeout());
 }
 
-unsigned int ngp_linkmasta_flash_device::write(address_t start_address, const data_t *buffer, unsigned int num_bytes, timeout_t timeout)
-{
-  unsigned int total_bytes_written = 0;
-  address_t lower_bound;
-  address_t upper_bound;
-  
-  // Split request up across chips
-  for (chip_index i = 0; i < m_cartridge->num_chips(); ++i)
-  {
-    const ngp_cartridge::chip* chip = m_cartridge->get_chip(i);
-    
-    // Does requested address range intersect with chip's address range?
-    if (chip->base_address() < start_address + num_bytes
-        && chip->base_address() + chip->size() > start_address)
-    {
-      lower_bound = (chip->base_address() < start_address
-                     ? start_address
-                     : chip->base_address());
-      upper_bound = (chip->base_address() + chip->size() > start_address + num_bytes
-                     ? start_address + num_bytes
-                     : chip->base_address() + chip->size());
-      
-      // Read data from this chip
-      total_bytes_written += write(lower_bound - chip->base_address(),
-                                  &buffer[lower_bound - start_address],
-                                  upper_bound - lower_bound,
-                                  timeout,
-                                  i);
-    }
-  }
-  
-  return total_bytes_written;
-}
-
-unsigned int ngp_linkmasta_flash_device::write(address_t start_address, const data_t *buffer, unsigned int num_bytes, timeout_t timeout, unsigned int chip)
+unsigned int ngp_linkmasta_flash_device::write(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes, timeout_t timeout)
 {
   if (!m_was_init || !m_is_open)
   {
     throw std::runtime_error("ERROR");
-  }
-  
-  // Validate parametersa against with known cartridge info
-  if (chip >= m_cartridge->num_chips())
-  {
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  if (start_address >= m_cartridge->get_chip(chip)->size()
-      || start_address + num_bytes > m_cartridge->get_chip(chip)->size())
-  {
-    throw std::runtime_error("ERROR"); // TODO
   }
   
   // Some working variables

@@ -17,12 +17,12 @@ cartridge::~cartridge()
   // Nothing else to do
 }
 
-inline unsigned int cartridge::size() const
+unsigned int cartridge::size() const
 {
   return m_size;
 }
 
-inline address_t cartridge::base_address() const
+address_t cartridge::base_address() const
 {
   return m_base_address;
 }

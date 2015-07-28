@@ -50,22 +50,22 @@ ngp_cartridge::chip::chip(const chip& other)
   // Nothing else to do
 }
 
-inline unsigned int ngp_cartridge::chip::manufacturer_id() const
+unsigned int ngp_cartridge::chip::manufacturer_id() const
 {
   return m_manufacturer_id;
 }
 
-inline unsigned int ngp_cartridge::chip::device_id() const
+unsigned int ngp_cartridge::chip::device_id() const
 {
   return m_device_id;
 }
 
-inline unsigned int ngp_cartridge::chip::num_blocks() const
+unsigned int ngp_cartridge::chip::num_blocks() const
 {
   return m_num_blocks;
 }
 
-inline const ngp_cartridge::chip::block& ngp_cartridge::chip::get_block(
+const ngp_cartridge::chip::block& ngp_cartridge::chip::get_block(
   block_index block) const
 {
   return m_blocks[block];
@@ -91,17 +91,17 @@ ngp_cartridge::chip::block::block(const block& other)
   // Nothing else to do
 }
 
-inline unsigned int ngp_cartridge::chip::block::size() const
+unsigned int ngp_cartridge::chip::block::size() const
 {
   return m_size;
 }
 
-inline address_t ngp_cartridge::chip::block::base_address() const
+address_t ngp_cartridge::chip::block::base_address() const
 {
   return m_base_address;
 }
 
-inline bool ngp_cartridge::chip::block::is_protected() const
+bool ngp_cartridge::chip::block::is_protected() const
 {
   return m_is_protected;
 }
