@@ -6,16 +6,16 @@
 //  Copyright (c) 2015 7400 Circuits. All rights reserved.
 //
 
-#include "ngp_linkmasta_flash_device.h"
+#include "ngp_linkmasta_device.h"
 #include "usb_device/usb_device.h"
 #include "cartridge/ngp_cartridge.h"
 #include "ngp_linkmasta_messages.h"
 
 
 
-typedef ngp_linkmasta_flash_device::timeout_t  timeout_t;
-typedef ngp_linkmasta_flash_device::version_t  version_t;
-typedef ngp_linkmasta_flash_device::chip_index chip_index;
+typedef ngp_linkmasta_device::timeout_t  timeout_t;
+typedef ngp_linkmasta_device::version_t  version_t;
+typedef ngp_linkmasta_device::chip_index chip_index;
 
 
 
@@ -33,7 +33,7 @@ typedef ngp_linkmasta_flash_device::chip_index chip_index;
 
 // CONSTRUCTORS, INITIALIZERS, AND DESTRUCTORS
 
-ngp_linkmasta_flash_device::ngp_linkmasta_flash_device(usb_device* usb_device)
+ngp_linkmasta_device::ngp_linkmasta_device(usb_device* usb_device)
   : m_usb_device(usb_device),
     m_was_init(false), m_is_open(false), m_firmware_version_set(false),
     m_firmware_major_version(0), m_firmware_minor_version(0)
@@ -41,7 +41,7 @@ ngp_linkmasta_flash_device::ngp_linkmasta_flash_device(usb_device* usb_device)
   // Nothing else to do
 }
 
-ngp_linkmasta_flash_device::~ngp_linkmasta_flash_device()
+ngp_linkmasta_device::~ngp_linkmasta_device()
 {
   if (m_is_open)
   {
@@ -54,7 +54,7 @@ ngp_linkmasta_flash_device::~ngp_linkmasta_flash_device()
   }
 }
 
-void ngp_linkmasta_flash_device::init()
+void ngp_linkmasta_device::init()
 {
   if (m_was_init)
   {
@@ -86,12 +86,12 @@ void ngp_linkmasta_flash_device::init()
 
 
 
-inline bool ngp_linkmasta_flash_device::is_open() const
+bool ngp_linkmasta_device::is_open() const
 {
   return m_is_open;
 }
 
-inline timeout_t ngp_linkmasta_flash_device::timeout() const
+timeout_t ngp_linkmasta_device::timeout() const
 {
   // Make sure object was initialized
   if (!m_was_init)
@@ -102,7 +102,7 @@ inline timeout_t ngp_linkmasta_flash_device::timeout() const
   return m_usb_device->timeout();
 }
 
-version_t ngp_linkmasta_flash_device::firmware_version()
+version_t ngp_linkmasta_device::firmware_version()
 {
   if (!m_was_init || !m_is_open)
   {
@@ -120,7 +120,7 @@ version_t ngp_linkmasta_flash_device::firmware_version()
 
 
 
-inline void ngp_linkmasta_flash_device::set_timeout(timeout_t timeout)
+inline void ngp_linkmasta_device::set_timeout(timeout_t timeout)
 {
   // Make sure object was initialized
   if (!m_was_init)
@@ -133,7 +133,7 @@ inline void ngp_linkmasta_flash_device::set_timeout(timeout_t timeout)
 
 
 
-void ngp_linkmasta_flash_device::open()
+void ngp_linkmasta_device::open()
 {
   // Make sure object was initialized
   if (!m_was_init)
@@ -152,7 +152,7 @@ void ngp_linkmasta_flash_device::open()
   m_is_open = true;
 }
 
-void ngp_linkmasta_flash_device::close()
+void ngp_linkmasta_device::close()
 {
   // Make sure object was initialized
   if (!m_was_init)
@@ -171,12 +171,12 @@ void ngp_linkmasta_flash_device::close()
   m_is_open = false;
 }
 
-unsigned int ngp_linkmasta_flash_device::read(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes)
+unsigned int ngp_linkmasta_device::read(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes)
 {
   return read(chip, start_address, buffer, num_bytes, timeout());
 }
 
-unsigned int ngp_linkmasta_flash_device::read(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes, timeout_t timeout)
+unsigned int ngp_linkmasta_device::read(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes, timeout_t timeout)
 {
   // Make sure we are in a ready state
   if (!m_was_init || !m_is_open)
@@ -260,12 +260,12 @@ unsigned int ngp_linkmasta_flash_device::read(chip_index chip, address_t start_a
   return num_bytes;
 }
 
-unsigned int ngp_linkmasta_flash_device::write(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes)
+unsigned int ngp_linkmasta_device::write(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes)
 {
   return write(chip, start_address, buffer, num_bytes, timeout());
 }
 
-unsigned int ngp_linkmasta_flash_device::write(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes, timeout_t timeout)
+unsigned int ngp_linkmasta_device::write(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes, timeout_t timeout)
 {
   if (!m_was_init || !m_is_open)
   {
@@ -351,7 +351,7 @@ unsigned int ngp_linkmasta_flash_device::write(chip_index chip, address_t start_
 
 
 
-void ngp_linkmasta_flash_device::fetch_firmware_version()
+void ngp_linkmasta_device::fetch_firmware_version()
 {
   data_t buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
   build_getversion_command(buffer);

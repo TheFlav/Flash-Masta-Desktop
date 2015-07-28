@@ -1,26 +1,26 @@
 //
-//  ngp_linkmasta_flash_device.h
+//  ngp_linkmasta_device.h
 //  FlashMasta
 //
 //  Created by Dan on 7/24/15.
 //  Copyright (c) 2015 7400 Circuits. All rights reserved.
 //
 
-#ifndef __NGP_LINKMASTA_FLASH_DEVICE_H__
-#define __NGP_LINKMASTA_FLASH_DEVICE_H__
+#ifndef __NGP_LINKMASTA_DEVICE_H__
+#define __NGP_LINKMASTA_DEVICE_H__
 
-#include "flash_device.h"
+#include "linkmasta_device.h"
 #include "cartridge/ngp_cartridge.h"
 
 class usb_device;
 
-class ngp_linkmasta_flash_device: public flash_device
+class ngp_linkmasta_device: public linkmasta_device
 {
 public:
   
   // Constructors, initializers, and destructors
-  /*constructor*/       ngp_linkmasta_flash_device(usb_device* usb_device);
-  /*destructor */       ~ngp_linkmasta_flash_device();
+  /*constructor*/       ngp_linkmasta_device(usb_device* usb_device);
+  /*destructor */       ~ngp_linkmasta_device();
   void                  init();
   
   // Getters
@@ -56,4 +56,4 @@ private:
   unsigned int          m_firmware_minor_version;
 };
 
-#endif /* defined(__NGP_LINKMASTA_FLASH_DEVICE_H__) */
+#endif /* defined(__NGP_LINKMASTA_DEVICE_H__) */

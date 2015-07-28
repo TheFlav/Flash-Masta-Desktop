@@ -63,6 +63,12 @@ libusb_usb_device::~libusb_usb_device()
 
 void libusb_usb_device::init()
 {
+  // Check if we were already initialized
+  if (m_was_initialized)
+  {
+    return;
+  }
+  
   // Build device description
   m_device_description = build_device_description();
   
