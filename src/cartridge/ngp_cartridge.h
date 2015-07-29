@@ -30,7 +30,7 @@ public:
 //void                  backup_cartridge_to_file(std::ofstream& fout);
   
 protected:
-  void                  build_destriptor();
+  void                  build_cartridge_destriptor();
   
 private:
   bool                  m_was_init;

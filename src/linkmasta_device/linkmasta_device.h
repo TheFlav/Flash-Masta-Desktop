@@ -33,10 +33,24 @@ public:
   
   virtual void             open() = 0;
   virtual void             close() = 0;
-  virtual unsigned int     read(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes) = 0;
-  virtual unsigned int     read(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes, timeout_t timeout) = 0;
-  virtual unsigned int     write(chip_index chip, address_t start_address, const data_t* buffer, unsigned int num_bytes) = 0;
-  virtual unsigned int     write(chip_index chip, address_t start_address, const data_t* buffer, unsigned int num_bytes, timeout_t timeout) = 0;
+  virtual data_t           read_byte(chip_index chip, address_t address) = 0;
+  virtual void             write_byte(chip_index chip, address_t address, data_t data) = 0;
+  
+  virtual bool             supports_read_bytes() const = 0;
+  virtual bool             supports_program_bytes() const = 0;
+  virtual bool             supports_erase_chip() const = 0;
+  virtual bool             supports_erase_chip_block() const = 0;
+  virtual bool             supports_read_manufacturer_id() const = 0;
+  virtual bool             supports_read_device_id() const = 0;
+  virtual bool             supports_read_block_protection() const = 0;
+  
+  virtual unsigned int     read_bytes(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes) = 0;
+  virtual unsigned int     program_bytes(chip_index chip, address_t start_address, const data_t* buffer, unsigned int num_bytes, bool bypass_mode) = 0;
+  virtual void             erase_chip(chip_index chip) = 0;
+  virtual void             erase_chip_block(chip_index chip, address_t block_address) = 0;
+  virtual unsigned int     read_manufacturer_id(chip_index chip) = 0;
+  virtual unsigned int     read_device_id(chip_index chip) = 0;
+  virtual bool             read_block_protection(chip_index chip, address_t block_address) = 0;
 };
 
 #endif /* defined(__LINKMASTSA_DEVICE_H__) */

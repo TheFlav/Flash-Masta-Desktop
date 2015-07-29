@@ -1,6 +1,12 @@
 #include "ngp_cartridge.h"
 #include "linkmasta_device/linkmasta_device.h"
 
+#define MAX_NUM_CHIPS 2
+
+#define WS1_ADDR      0x5555
+#define WS2_ADDR      0x2AAA
+#define WS3_ADDR      0x5555
+
 ngp_cartridge::ngp_cartridge(linkmasta_device* linkmasta)
   : m_was_init(false),
     m_linkmasta(linkmasta), m_descriptor(nullptr)
@@ -37,7 +43,10 @@ void ngp_cartridge::init()
   m_was_init = true;
   
   m_linkmasta->init();
-  build_destriptor();
+  m_linkmasta->open();
+  build_cartridge_destriptor();
+  m_linkmasta->close();
+
 }
 
 /*
@@ -45,7 +54,17 @@ void ngp_cartridge::restore_cartridge_from_file(std::ifstream& fin);
 void ngp_cartridge::backup_cartridge_to_file(std::ofstream& fout);
 */
 
-void ngp_cartridge::build_destriptor()
+void ngp_cartridge::build_cartridge_destriptor()
 {
-  
+  for (unsigned int chip = 0; chip < MAX_NUM_CHIPS; ++chip)
+  {
+    write_byte(ws1_addr, 0xAA, chip);
+    write_byte(ws2_addr, 0x55, chip);
+    write_byte(ws3_addr, 0xF0, chip);
+    
+    write_byte(ws1_addr, 0xAA, chip);
+    write_byte(ws2_addr, 0x55, chip);
+    write_byte(ws3_addr, 0x90, chip);
+
+  }
 }
