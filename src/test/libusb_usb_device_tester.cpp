@@ -35,7 +35,7 @@ bool libusb_usb_device_tester::prepare()
   // Get handle to USB device
   out << "Searching for linkmasta device..."; out.flush();
   m_handle = libusb_open_device_with_vid_pid(m_libusb, 0x20A0, 0x4178);
-  if (m_handle == NULL)
+  if (m_handle == nullptr)
   {
     err << endl;
     err << "ERROR: Unable to find linkmasta device or an error occured" << endl;
@@ -106,7 +106,7 @@ bool libusb_usb_device_tester::run_tests()
   try
   {
     desc = m_test_subject->get_device_description();
-    success = desc != NULL;
+    success = desc != nullptr;
   }
   catch (std::exception& e)
   {

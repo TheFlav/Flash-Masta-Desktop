@@ -33,8 +33,8 @@ libusb_usb_device::libusb_usb_device(libusb_device* device)
     m_output_endpoint    (0),
     m_alt_setting        (0),
     m_device             (device),
-    m_device_handle      (NULL),
-    m_device_description (NULL)
+    m_device_handle      (nullptr),
+    m_device_description (nullptr)
 {
   // Increment the reference counter for the device
   libusb_ref_device(m_device);
@@ -45,7 +45,7 @@ libusb_usb_device::~libusb_usb_device()
   // Clean up results of being initialized
   if (m_was_initialized)
   {
-    if (m_device_description != NULL)
+    if (m_device_description != nullptr)
     {
       delete m_device_description;
     }
@@ -143,7 +143,7 @@ void libusb_usb_device::set_configuration(configuration_t configuration)
                                 + " for argument 1: Invalid configuration number.");
   }
   
-  const device_configuration* config = NULL;
+  const device_configuration* config = nullptr;
   
   // Search for config in descriptor
   for (unsigned int i = 0; i < m_device_description->num_configurations; ++i)
@@ -156,7 +156,7 @@ void libusb_usb_device::set_configuration(configuration_t configuration)
   }
   
   // Validate arguments
-  if (config == NULL)
+  if (config == nullptr)
   {
     throw std::invalid_argument("Unexpected value " + std::to_string(configuration)
                                 + " for argument 1: Invalid configuration number.");
@@ -448,7 +448,7 @@ void libusb_usb_device::close()
   // Close the device
   libusb_close(m_device_handle);
   
-  m_device_handle = NULL;
+  m_device_handle = nullptr;
 }
 
 unsigned int libusb_usb_device::read(data_t *buffer, unsigned int num_bytes)
@@ -541,7 +541,7 @@ device_description* libusb_usb_device::build_device_description()
   if (libusb_get_device_descriptor(m_device, &device_descriptor) < 0)
   {
     // TODO: error occured
-    return NULL;
+    return nullptr;
   }
   
   device_num_configurations = device_descriptor.bNumConfigurations;
@@ -559,10 +559,10 @@ device_description* libusb_usb_device::build_device_description()
     description->configurations[i] = build_device_config(i);
     
     // Validate configuration
-    if (description->configurations[i] == NULL)
+    if (description->configurations[i] == nullptr)
     {
       delete description; // necessary to prevent memory leaks in the event of an error
-      return NULL;
+      return nullptr;
     }
   }
   
@@ -578,7 +578,7 @@ device_configuration* libusb_usb_device::build_device_config(unsigned int index)
   if (libusb_get_config_descriptor(m_device, index, &libusb_config) < 0)
   {
     // TODO: Error occured
-    return NULL;
+    return nullptr;
   }
   
   config_num_interfaces = libusb_config->bNumInterfaces;

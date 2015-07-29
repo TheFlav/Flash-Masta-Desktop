@@ -23,7 +23,7 @@ device_description::device_description(unsigned int num_configurations)
   unsigned int i;
   for (i = 0; i < this->num_configurations; ++i)
   {
-    configurations[i] = NULL;
+    configurations[i] = nullptr;
   }
 }
 
@@ -44,7 +44,7 @@ device_description::~device_description()
   unsigned int i;
   for (i = 0; i < num_configurations; ++i)
   {
-    if (configurations[i] != NULL)
+    if (configurations[i] != nullptr)
     {
       delete configurations[i];
     }
@@ -61,7 +61,7 @@ device_configuration::device_configuration(unsigned int num_interfaces)
   unsigned int i;
   for (i = 0; i < this->num_interfaces; ++i)
   {
-    interfaces[i] = NULL;
+    interfaces[i] = nullptr;
   }
 }
 
@@ -81,7 +81,7 @@ device_configuration::~device_configuration()
   unsigned int i;
   for (i = 0; i < num_interfaces; ++i)
   {
-    if (interfaces[i] != NULL)
+    if (interfaces[i] != nullptr)
     {
       delete interfaces[i];
     }
@@ -98,7 +98,7 @@ device_interface::device_interface(unsigned int num_alt_settings)
   unsigned int i;
   for (i = 0; i < this->num_alt_settings; ++i)
   {
-    alt_settings[i] = NULL;
+    alt_settings[i] = nullptr;
   }
 }
 
@@ -118,7 +118,7 @@ device_interface::~device_interface()
   unsigned int i;
   for (i = 0; i < num_alt_settings; ++i)
   {
-    if (alt_settings[i] != NULL)
+    if (alt_settings[i] != nullptr)
     {
       delete alt_settings[i];
     }
@@ -135,7 +135,7 @@ device_alt_setting::device_alt_setting(unsigned int num_endpoints)
   unsigned int i;
   for (i = 0; i < this->num_endpoints; ++i)
   {
-    endpoints[i] = NULL;
+    endpoints[i] = nullptr;
   }
 }
 
@@ -156,7 +156,7 @@ device_alt_setting::~device_alt_setting()
   unsigned int i;
   for (i = 0; i < num_endpoints; ++i)
   {
-    if (endpoints[i] != NULL)
+    if (endpoints[i] != nullptr)
     {
       delete endpoints[i];
     }

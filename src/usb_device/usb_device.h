@@ -5,7 +5,7 @@
 #define CONFIGURATION_UNSET_VALUE -1
 #define INTERFACE_UNSET_VALUE     -1
 #define ENDPOINT_UNSET_VALUE      -1
-#define DESCRIPTION_UNSET_VALUE   NULL
+#define DESCRIPTION_UNSET_VALUE   nullptr
 
 class usb_device
 {
