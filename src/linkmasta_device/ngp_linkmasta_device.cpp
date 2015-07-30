@@ -272,77 +272,53 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
   
   // Some working variables
   data_t   _buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
-  int      mode;
+  unsigned int offset = 0;
   
-  // Determine mode based on number of bytes to fetch
-  if (num_bytes == 1)
-    mode = 1;
-  else if (num_bytes <= 64)
-    mode = 2;
-  else
-    mode = 3;
   
-  // Compose read byte command
-  switch (mode)
+  // Get as many bytes of data as possible in packets of 64
+  if ((offset - num_bytes) / NGP_LINKMASTA_USB_RXTX_SIZE >= 1)
   {
-    case 1:
-      build_read_command(_buffer, start_address, chip);
-      break;
-      
-    case 2:
-      build_read64_command(_buffer, start_address, chip);
-      break;
-      
-    case 3:
-      build_read64xN_command(_buffer, start_address, chip, num_bytes / 64 + (num_bytes % 64 == 0 ? 0 : 1));
-      break;
-  }
-  
-  // Send command to device
-  m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
-  
-  // Process response
-  switch (mode)
-  {
-    case 1:
-      // Read response
-      if (m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE) != NGP_LINKMASTA_USB_RXTX_SIZE)
+    unsigned int num_packets = (num_bytes - offset) / NGP_LINKMASTA_USB_RXTX_SIZE;
+    build_read64xN_command(_buffer, start_address + offset, chip, num_packets);
+    m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+    
+    for (;
+         offset < num_packets * NGP_LINKMASTA_USB_RXTX_SIZE;
+         offset += NGP_LINKMASTA_USB_RXTX_SIZE)
+    {
+      // Get response from device and write directly to buffer
+      if (m_usb_device->read(&buffer[offset], NGP_LINKMASTA_USB_RXTX_SIZE) != NGP_LINKMASTA_USB_RXTX_SIZE)
       {
         throw std::runtime_error("ERROR"); // TODO
       }
-      get_read_reply(_buffer, &start_address, buffer);
-      break;
-      
-    case 2:
-    case 3:
-      // Fetch 64-byte blocks
-      for (unsigned int i = 0;
-           i < num_bytes && num_bytes - i >= NGP_LINKMASTA_USB_RXTX_SIZE;
-           i += NGP_LINKMASTA_USB_RXTX_SIZE)
-      {
-        if (m_usb_device->read(buffer, NGP_LINKMASTA_USB_RXTX_SIZE) != NGP_LINKMASTA_USB_RXTX_SIZE)
-        {
-          throw std::runtime_error("ERROR"); // TODO
-        }
-      }
-      
-      if (num_bytes % NGP_LINKMASTA_USB_RXTX_SIZE == 0)
-      {
-        break;
-      }
-      
-      // Fetch remainder of bytes
-      if (m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE) != NGP_LINKMASTA_USB_RXTX_SIZE)
-      {
-        throw std::runtime_error("ERROR"); // TODO
-      }
-      for (unsigned int i = 0; i < num_bytes % NGP_LINKMASTA_USB_RXTX_SIZE; ++i)
-      {
-        buffer[num_bytes / NGP_LINKMASTA_USB_RXTX_SIZE + i] = _buffer[i];
-      }
-      break;
+    }
   }
   
+  // Get any remaining bytes of data individually
+  if (num_bytes - offset > 0)
+  {
+    for (; offset < num_bytes; ++offset)
+    {
+      build_read_command(_buffer, start_address + offset, chip);
+      m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+      
+      m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+      
+      uint32_t address;
+      uint8_t  data;
+      if (get_read_reply(_buffer, &address, &data) == MSG_RESULT_SUCCESS)
+      {
+        buffer[offset] = data;
+      }
+      else
+      {
+        throw std::runtime_error("ERROR");
+      }
+    }
+  }
+  
+  // Yeah, yeah, yeah, I know, but exceptions get thrown if something goes wrong
+  // so don't judge me.
   return num_bytes;
 }
 
@@ -359,12 +335,11 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
   uint8_t  result;
   
   offset = 0;
-  bypassMode = false;
   
   // Inform device of incoming data
-  if (num_bytes / NGP_LINKMASTA_USB_RXTX_SIZE >= 1)
+  if ((num_bytes - offset) / NGP_LINKMASTA_USB_RXTX_SIZE >= 1)
   {
-    unsigned int num_packets = num_bytes / NGP_LINKMASTA_USB_RXTX_SIZE;
+    unsigned int num_packets = (num_bytes - offset) / NGP_LINKMASTA_USB_RXTX_SIZE;
     build_flash_write64xN_command(_buffer, start_address + offset, chip, num_packets, bypass_mode);
     m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
     

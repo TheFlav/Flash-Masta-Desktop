@@ -5,6 +5,7 @@
 #include <vector>
 
 class linkmasta_device;
+class ngp_chip;
 
 /**
  * Class representing a Neo Geo Pocket game cartridge. Stores information
@@ -13,6 +14,9 @@ class linkmasta_device;
  */
 class ngp_cartridge: public cartridge
 {
+private:
+  static const unsigned int MAX_NUM_CHIPS = 2;
+
 public:
   /**
    * Designated constructor for the ngp_cartridge. Initializes properties
@@ -31,12 +35,16 @@ public:
   
 protected:
   void                  build_cartridge_destriptor();
+  void                  build_chip_descriptor(unsigned int chip_i);
+  void                  build_block_descriptor(unsigned int chip_i, unsigned int block_i);
   
-private:
+private:  
   bool                  m_was_init;
   
   linkmasta_device*     m_linkmasta;
   cartridge_descriptor* m_descriptor;
+  unsigned int          m_num_chips;
+  ngp_chip*             m_chips[MAX_NUM_CHIPS];
 };
 
 #endif // __NGP_CARTRIDGE_H__

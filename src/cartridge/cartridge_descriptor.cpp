@@ -52,8 +52,8 @@ cartridge_descriptor::chip_descriptor::chip_descriptor(unsigned int num_blocks)
 }
 
 cartridge_descriptor::chip_descriptor::chip_descriptor(const chip_descriptor& other)
-  : chip_num(other.chip_num), vendor_id(other.vendor_id),
-    product_id(other.product_id), num_bytes(other.num_bytes),
+  : chip_num(other.chip_num), manufacturer_id(other.manufacturer_id),
+    device_id(other.device_id), num_bytes(other.num_bytes),
     num_blocks(other.num_blocks), blocks(new block_descriptor*[other.num_blocks])
 {
   for (unsigned int i = 0; i < num_blocks; ++i)

@@ -118,13 +118,6 @@ void libusb_usb_device::set_timeout(timeout_t timeout)
     throw std::runtime_error("ERROR");
   }
   
-  // Validate input
-  if (timeout < 0)
-  {
-    throw std::invalid_argument("Unexpected value " + std::to_string(timeout)
-                                + " for argument 1: expected value greater than 0.");
-  }
-  
   m_timeout = (unsigned int) timeout;
   m_timeout_set = true;
 }
@@ -134,13 +127,6 @@ void libusb_usb_device::set_configuration(configuration_t configuration)
   if (!m_was_initialized)
   {
     throw std::runtime_error("ERROR");
-  }
-  
-  // Validate arguments
-  if (configuration < 0)
-  {
-    throw std::invalid_argument("Unexpected value " + std::to_string(configuration)
-                                + " for argument 1: Invalid configuration number.");
   }
   
   const device_configuration* config = nullptr;
@@ -188,8 +174,21 @@ void libusb_usb_device::set_interface(interface_t interface)
     throw std::runtime_error("ERROR");
   }
   
+  const device_interface* inter = nullptr;
+  const device_configuration* config = m_device_description->configurations[m_configuration];
+  
+  // Search for interface in descriptor
+  for (unsigned int i = 0; i < config->num_interfaces; ++i)
+  {
+    if (config->interfaces[i]->interface_id == interface)
+    {
+      inter = config->interfaces[i];
+      interface = i;
+    }
+  }
+  
   // Validate arguments
-  if (interface > m_device_description->configurations[m_configuration]->num_interfaces)
+  if (inter== nullptr)
   {
     throw std::invalid_argument("Unexpected value " + std::to_string(interface)
                                 + " for argument 1: Invalid interface number.");
@@ -270,7 +269,7 @@ void libusb_usb_device::set_input_endpoint(endpoint_t input_endpoint)
   }
   
   // Validate input
-  if (input_endpoint < 0 || input_endpoint > 255)
+  if (input_endpoint > 255)
   {
     throw std::invalid_argument("Unexpected value " + std::to_string(input_endpoint)
                                 + " for argument 1: expected value between 0 and 255.");
@@ -306,7 +305,7 @@ void libusb_usb_device::set_output_endpoint(endpoint_t output_endpoint)
   }
   
   // Validate input
-  if (output_endpoint < 0 || output_endpoint > 255)
+  if (output_endpoint > 255)
   {
     throw std::invalid_argument("Unexpected value " + std::to_string(output_endpoint)
                                 + " for argument 1: expected value between 0 and 255.");
@@ -463,12 +462,6 @@ unsigned int libusb_usb_device::read(data_t *buffer, unsigned int num_bytes, tim
     throw std::runtime_error("ERROR");
   }
   
-  if (timeout < 0)
-  {
-    throw std::invalid_argument("Unexpected value " + std::to_string(timeout)
-                                + " for argument 3: expected value greater than 0.");
-  }
-  
   int bytes_written = 0;
   
   int error = libusb_bulk_transfer(m_device_handle, m_input_endpoint, buffer, num_bytes, &bytes_written, (unsigned int) timeout);
@@ -496,12 +489,6 @@ unsigned int libusb_usb_device::write(const data_t* data, unsigned int num_bytes
   if (!m_was_initialized || !m_is_open || !m_configuration_set || !m_interface_set || !m_input_endpoint_set)
   {
     throw std::runtime_error("ERROR");
-  }
-  
-  if (timeout < 0)
-  {
-    throw std::invalid_argument("Unexpected value " + std::to_string(timeout)
-                                + " for argument 3: expected value greater than 0.");
   }
   
   // Copy data array to new array that is writiable
@@ -619,6 +606,11 @@ device_interface* libusb_usb_device::build_device_interface(const libusb_config_
     interface->alt_settings[i] = build_device_alt_setting(libusb_interface_, i);
   }
   
+  if (interface->num_alt_settings > 0)
+  {
+    interface->interface_id = interface->alt_settings[0]->interface_id;
+  }
+  
   return interface;
 }
 
@@ -634,7 +626,8 @@ device_alt_setting* libusb_usb_device::build_device_alt_setting(const libusb_int
   
   // Create alt setting and fill with information
   device_alt_setting* alt_setting = new device_alt_setting(altsetting_num_endpoints);
-  alt_setting->interface_num = libusb_altsetting->bInterfaceNumber;
+  alt_setting->interface_id = libusb_altsetting->bInterfaceNumber;
+  alt_setting->alt_setting_id = libusb_altsetting->bAlternateSetting;
   
   // Fetch remainder of alt setting info
   unsigned int i;

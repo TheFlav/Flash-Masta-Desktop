@@ -18,7 +18,7 @@ class linkmasta_device
 {
 public:
   typedef unsigned char    data_t;
-  typedef int              timeout_t;
+  typedef unsigned int     timeout_t;
   typedef std::string      version_t;
   typedef unsigned int     chip_index;
   

@@ -48,8 +48,8 @@ struct cartridge_descriptor::chip_descriptor
   /* destructor       */    ~chip_descriptor();
   
   unsigned int              chip_num;
-  unsigned int              vendor_id;
-  unsigned int              product_id;
+  unsigned int              manufacturer_id;
+  unsigned int              device_id;
   unsigned int              num_bytes;
   const unsigned int        num_blocks;
   block_descriptor** const  blocks;

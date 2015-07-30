@@ -1,19 +1,20 @@
 #ifndef __USB_DEVICE_H__
 #define __USB_DEVICE_H__
 
-#define TIMEOUT_UNSET_VALUE       -1
-#define CONFIGURATION_UNSET_VALUE -1
-#define INTERFACE_UNSET_VALUE     -1
-#define ENDPOINT_UNSET_VALUE      -1
+#define TIMEOUT_UNSET_VALUE       ((timeout_t) 0xFFFFFFFF)
+#define CONFIGURATION_UNSET_VALUE ((configuration_t) 0xFFFFFFFF)
+#define INTERFACE_UNSET_VALUE     ((interface_t) 0xFFFFFFFF)
+#define ENDPOINT_UNSET_VALUE      ((endpoint_t) 0xFFFFFFFF)
 #define DESCRIPTION_UNSET_VALUE   nullptr
 
 class usb_device
 {
 public:
-  typedef int timeout_t;
-  typedef int configuration_t;
-  typedef int interface_t;
-  typedef int endpoint_t;
+  typedef unsigned int  timeout_t;
+  typedef unsigned int  configuration_t;
+  typedef unsigned int  interface_t;
+  typedef unsigned int  alt_setting_t;
+  typedef unsigned int  endpoint_t;
   typedef unsigned char data_t;
   
   struct device_description;
@@ -139,6 +140,7 @@ struct usb_device::device_interface
   device_interface(const device_interface& other);
   ~device_interface();
   
+  usb_device::interface_t interface_id;
   const unsigned int num_alt_settings;
   device_alt_setting** const alt_settings;
 };
@@ -151,7 +153,8 @@ struct usb_device::device_alt_setting
   device_alt_setting(const device_alt_setting& other);
   ~device_alt_setting();
   
-  usb_device::interface_t interface_num;
+  usb_device::interface_t interface_id;
+  usb_device::alt_setting_t alt_setting_id;
   const unsigned int num_endpoints;
   device_endpoint** const endpoints;
 };

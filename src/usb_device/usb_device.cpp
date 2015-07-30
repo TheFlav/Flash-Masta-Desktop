@@ -103,7 +103,8 @@ device_interface::device_interface(unsigned int num_alt_settings)
 }
 
 device_interface::device_interface(const device_interface& other)
-  : num_alt_settings(other.num_alt_settings),
+  : interface_id(other.interface_id),
+    num_alt_settings(other.num_alt_settings),
     alt_settings(new device_alt_setting*[other.num_alt_settings])
 {
   unsigned int i;
@@ -140,7 +141,8 @@ device_alt_setting::device_alt_setting(unsigned int num_endpoints)
 }
 
 device_alt_setting::device_alt_setting(const device_alt_setting& other)
-  : interface_num(other.interface_num),
+  : interface_id(other.interface_id),
+    alt_setting_id(other.alt_setting_id),
     num_endpoints(other.num_endpoints),
     endpoints(new device_endpoint*[other.num_endpoints])
 {

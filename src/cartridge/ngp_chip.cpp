@@ -24,12 +24,17 @@ const int BYPASS_SUPPORTERS[3] = {
   -1    /* sentinal value (end of array) */
 };
 
+typedef ngp_chip::data_t        data_t;
+typedef ngp_chip::chip_index_t  chip_index_t;
+typedef ngp_chip::manufact_id_t manufact_id_t;
+typedef ngp_chip::device_id_t   device_id_t;
+typedef ngp_chip::protect_t     protect_t;
+typedef ngp_chip::address_t     address_t;
 
 
-ngp_chip::ngp_chip(linkmasta_device* linkmasta_device, unsigned int chip_num)
-  : m_is_reset(true), m_is_in_autoselect(false), m_is_in_bypass(false),
-    m_is_in_erase(false), m_is_in_erase_suspend(false),
-    m_supports_bypass(false),
+
+ngp_chip::ngp_chip(linkmasta_device* linkmasta_device, chip_index_t chip_num)
+  : m_mode(READ), m_supports_bypass(false),
     m_linkmasta(linkmasta_device), m_chip_num(chip_num)
 {
   // Nothing else to do
@@ -42,12 +47,12 @@ ngp_chip::~ngp_chip()
 
 
 
-unsigned char ngp_chip::read(unsigned int address)
+data_t ngp_chip::read(address_t address)
 {
   return m_linkmasta->read_byte(m_chip_num, address);
 }
 
-void ngp_chip::write(unsigned int address, unsigned char data)
+void ngp_chip::write(address_t address, data_t data)
 {
   return m_linkmasta->write_byte(m_chip_num, address, data);
 }
@@ -56,26 +61,39 @@ void ngp_chip::write(unsigned int address, unsigned char data)
 
 void ngp_chip::reset()
 {
-  if (m_is_in_bypass)
+  if (is_erasing())
   {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  if (current_mode() == BYPASS)
+  {
+    // If we're in bypass mode, do something special to exit it
     write(ADDR_DONTCARE, 0x90);
     write(ADDR_DONTCARE, 0x00);
   }
   else
   {
+    // Send the reset command
     write(ADDR_DONTCARE, 0xF0);
   }
   
-  m_is_reset = true;
-  m_is_in_autoselect = false;
-  m_is_in_bypass = false;
+  // Update the cached mode
+  m_mode = READ;
 }
 
-unsigned int ngp_chip::get_manufacturer_id()
+manufact_id_t ngp_chip::get_manufacturer_id()
 {
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
   if (m_linkmasta->supports_read_manufacturer_id())
   {
-    if (!m_is_reset)
+    if (current_mode() != READ)
     {
       reset();
     }
@@ -84,7 +102,7 @@ unsigned int ngp_chip::get_manufacturer_id()
   }
   else
   {
-    if (!m_is_in_autoselect)
+    if (current_mode() != AUTOSELECT)
     {
       enter_autoselect();
     }
@@ -93,11 +111,17 @@ unsigned int ngp_chip::get_manufacturer_id()
   }
 }
 
-unsigned int ngp_chip::get_device_id()
+device_id_t ngp_chip::get_device_id()
 {
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
   if (m_linkmasta->supports_read_device_id())
   {
-    if (!m_is_reset)
+    if (current_mode() != READ)
     {
       reset();
     }
@@ -106,7 +130,7 @@ unsigned int ngp_chip::get_device_id()
   }
   else
   {
-    if (!m_is_in_autoselect)
+    if (current_mode() != AUTOSELECT)
     {
       enter_autoselect();
     }
@@ -115,12 +139,18 @@ unsigned int ngp_chip::get_device_id()
   }
 }
 
-unsigned int ngp_chip::get_block_protection(unsigned int sector_address)
+protect_t ngp_chip::get_block_protection(address_t sector_address)
 {
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
   if (m_linkmasta->supports_read_block_protection())
   {
     // Ensure the chip's been reset before passing control to Linkmasta
-    if (!m_is_reset)
+    if (current_mode() != READ)
     {
       reset();
     }
@@ -129,7 +159,7 @@ unsigned int ngp_chip::get_block_protection(unsigned int sector_address)
   }
   else
   {
-    if (!m_is_in_autoselect)
+    if (current_mode() != AUTOSELECT)
     {
       enter_autoselect();
     }
@@ -138,16 +168,22 @@ unsigned int ngp_chip::get_block_protection(unsigned int sector_address)
   }
 }
 
-void ngp_chip::program_byte(unsigned int address, unsigned char data)
+void ngp_chip::program_byte(address_t address, data_t data)
 {
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
   // Reset if in autoselect mode
-  if (!m_is_in_bypass && !m_is_reset)
+  if (current_mode() != BYPASS && current_mode() != READ)
   {
     reset();
   }
   
   // Write prefix based on whether or not in bypass mode
-  if (m_is_in_bypass)
+  if (current_mode() == BYPASS)
   {
     write(ADDR_DONTCARE, 0xA0);
   }
@@ -163,6 +199,12 @@ void ngp_chip::program_byte(unsigned int address, unsigned char data)
 
 void ngp_chip::unlock_bypass()
 {
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
   // Ensure that we actually support bypass mode before doing anything
   if (!supports_bypass())
   {
@@ -170,27 +212,32 @@ void ngp_chip::unlock_bypass()
   }
   
   // Reset the chip if necessary
-  if (!m_is_reset)
+  if (current_mode() != READ)
   {
     reset();
   }
   
   // Unlock bypass mode and update flags
-  if (!m_is_in_bypass)
+  if (current_mode() != BYPASS)
   {
     write(ADDR_COMMAND1, 0xAA);
     write(ADDR_COMMAND2, 0x55);
     write(ADDR_COMMAND3, 0x20);
     
-    m_is_reset = false;
-    m_is_in_bypass = true;
+    m_mode = BYPASS;
   }
 }
 
 void ngp_chip::erase_chip()
 {
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
   // Ensure chip has been reset
-  if (!m_is_reset)
+  if (current_mode() != READ)
   {
     reset();
   }
@@ -210,14 +257,19 @@ void ngp_chip::erase_chip()
     write(ADDR_COMMAND3, 0x10);
   }
   
-  m_is_in_erase = true;
-  m_is_in_erase_suspend = false;
+  m_mode = ERASE;
 }
 
-void ngp_chip::erase_block(unsigned int block_address)
+void ngp_chip::erase_block(address_t block_address)
 {
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
   // Ensure chip has been reset
-  if (!m_is_reset)
+  if (current_mode() != READ)
   {
     reset();
   }
@@ -228,7 +280,7 @@ void ngp_chip::erase_block(unsigned int block_address)
   }
   else
   {
-    // Send the sector nuke command sequence to chip
+    // Send the sector erase command sequence to chip
     write(ADDR_COMMAND1, 0xAA);
     write(ADDR_COMMAND2, 0x55);
     write(ADDR_COMMAND3, 0x80);
@@ -237,11 +289,15 @@ void ngp_chip::erase_block(unsigned int block_address)
     write((block_address & MASK_SECTOR), 0x30);
   }
   
-  m_is_in_erase = true;
-  m_is_in_erase_suspend = false;
+  m_mode = ERASE;
 }
 
 
+
+ngp_chip::chip_mode ngp_chip::current_mode() const
+{
+  return m_mode;
+}
 
 bool ngp_chip::supports_bypass() const
 {
@@ -250,8 +306,14 @@ bool ngp_chip::supports_bypass() const
 
 bool ngp_chip::test_bypass_support()
 {
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
   // Test against manufacturer id, device id, and some potentially custom data
-  if (!m_is_in_autoselect)
+  if (current_mode() != AUTOSELECT)
   {
     enter_autoselect();
   }
@@ -273,34 +335,35 @@ bool ngp_chip::test_bypass_support()
 
 bool ngp_chip::is_erasing() const
 {
-  return m_is_in_erase;
+  return (current_mode() == ERASE);
 }
 
 bool ngp_chip::test_erasing()
 {
-  if (!m_is_in_erase)
+  if (current_mode() != ERASE)
   {
     return false;
   }
   
   unsigned char result = read(ADDR_DONTCARE);
   
-  m_is_in_erase = (result != 0xFF);
-  
-  if (!is_erasing())
-  {
-    m_is_reset = true;
-  }
+  m_mode = (result == 0xFF ? READ : ERASE);
   
   return is_erasing();
 }
 
-void ngp_chip::program_bytes(unsigned int address, unsigned char* data, unsigned int num_bytes)
+void ngp_chip::program_bytes(address_t address, const data_t* data, unsigned int num_bytes)
 {
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
   if (m_linkmasta->supports_program_bytes())
   {
     // Ensure we're in default mode before passing command along to Linkmasta
-    if (!m_is_reset)
+    if (current_mode() != READ)
     {
       reset();
     }
@@ -313,11 +376,11 @@ void ngp_chip::program_bytes(unsigned int address, unsigned char* data, unsigned
     // Linkmasta does not support batch programming; do it manually
     
     // First, ensure we're in the correct mode
-    if (supports_bypass() && !m_is_in_bypass)
+    if (supports_bypass() && current_mode() != BYPASS)
     {
       unlock_bypass();
     }
-    else if (!supports_bypass() && !m_is_reset)
+    else if (!supports_bypass() && current_mode() != READ)
     {
       reset();
     }
@@ -330,10 +393,16 @@ void ngp_chip::program_bytes(unsigned int address, unsigned char* data, unsigned
   }
 }
 
-void ngp_chip::read_bytes(unsigned int address, unsigned char* data, unsigned int num_bytes)
+void ngp_chip::read_bytes(address_t address, data_t* data, unsigned int num_bytes)
 {
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
   // Ensure we're in read mode
-  if (!m_is_reset)
+  if (current_mode() != READ)
   {
     reset();
   }
@@ -360,7 +429,6 @@ void ngp_chip::enter_autoselect()
   write(ADDR_COMMAND1, 0xAA);
   write(ADDR_COMMAND2, 0x55);
   write(ADDR_COMMAND3, 0x90);
-  m_is_in_autoselect = true;
-  m_is_reset = false;
+  m_mode = AUTOSELECT;
 }
 

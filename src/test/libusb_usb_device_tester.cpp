@@ -131,14 +131,14 @@ bool libusb_usb_device_tester::run_tests()
     for (unsigned int j = 0; j < conf->num_interfaces; ++j)
     {
       const libusb_usb_device::device_interface* inter = conf->interfaces[j];
-      out << "      Interface " << j << endl;
+      out << "      Interface " << inter->interface_id << endl;
       out << "        Alt settings: " << inter->num_alt_settings << endl;
       
       for (unsigned int k = 0; k < inter->num_alt_settings; ++k)
       {
         const libusb_usb_device::device_alt_setting* alt = inter->alt_settings[k];
-        out << "        Alt setting " << k << endl;
-        out << "          Interface num: " << alt->interface_num << endl;
+        out << "        Alt setting " << alt->alt_setting_id << endl;
+        out << "          Interface num: " << alt->interface_id << endl;
         out << "          Endpoints:     " << alt->num_endpoints << endl;
         
         for (unsigned int l = 0; l < alt->num_endpoints; ++l)

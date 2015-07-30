@@ -14,41 +14,53 @@ class linkmasta_device;
 class ngp_chip
 {
 public:
-  /* constructor */       ngp_chip(linkmasta_device* linkmasta_device, unsigned int chip_num);
+  typedef unsigned char    data_t;
+  typedef unsigned int     chip_index_t;
+  typedef unsigned int     manufact_id_t;
+  typedef unsigned int     device_id_t;
+  typedef bool             protect_t;
+  typedef unsigned int     address_t;
+  
+  enum chip_mode
+  {
+    READ,
+    AUTOSELECT,
+    BYPASS,
+    ERASE
+  };
+  
+  /* constructor */       ngp_chip(linkmasta_device* linkmasta_device, chip_index_t chip_num);
   /* destructor  */       ~ngp_chip();
   
-  unsigned char           read(unsigned int address);
-  void                    write(unsigned int address, unsigned char data);
+  data_t                 read(address_t address);
+  void                    write(address_t address, data_t data);
   
   void                    reset();
-  unsigned int            get_manufacturer_id();
-  unsigned int            get_device_id();
-  unsigned int            get_block_protection(unsigned int sector_address);
-  void                    program_byte(unsigned int address, unsigned char data);
+  manufact_id_t           get_manufacturer_id();
+  device_id_t             get_device_id();
+  protect_t               get_block_protection(address_t sector_address);
+  void                    program_byte(address_t address, data_t data);
   void                    unlock_bypass();
   void                    erase_chip();
-  void                    erase_block(unsigned int block_address);
+  void                    erase_block(address_t block_address);
   
+  chip_mode               current_mode() const;
   bool                    supports_bypass() const;
   bool                    test_bypass_support();
   bool                    is_erasing() const;
   bool                    test_erasing();
-  void                    program_bytes(unsigned int address, unsigned char* data, unsigned int num_bytes);
-  void                    read_bytes(unsigned int address, unsigned char* data, unsigned int num_bytes);
+  void                    program_bytes(address_t address, const data_t* data, unsigned int num_bytes);
+  void                    read_bytes(address_t address, data_t* data, unsigned int num_bytes);
   
 private:
   void                    enter_autoselect();
   
-  bool                    m_is_reset;
-  bool                    m_is_in_autoselect;
-  bool                    m_is_in_bypass;
-  bool                    m_is_in_erase;
-  bool                    m_is_in_erase_suspend;
+  chip_mode               m_mode;
   
   bool                    m_supports_bypass;
   
   linkmasta_device* const m_linkmasta;
-  unsigned int const      m_chip_num;
+  chip_index_t const      m_chip_num;
 };
 
 #endif /* defined(__NGP_CHIP_H__) */
