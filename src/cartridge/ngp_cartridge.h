@@ -2,7 +2,6 @@
 #define __NGP_CARTRIDGE_H__
 
 #include "cartridge.h"
-#include <vector>
 
 class linkmasta_device;
 class ngp_chip;
@@ -30,8 +29,8 @@ public:
   const cartridge_descriptor* descriptor() const;
   
   void                  init();
-//void                  restore_cartridge_from_file(std::ifstream& fin);
-//void                  backup_cartridge_to_file(std::ofstream& fout);
+  void                  write_file_to_cartridge(std::ifstream& fin);
+  void                  write_cartridge_to_file(std::ofstream& fout);
   
 protected:
   void                  build_cartridge_destriptor();

@@ -352,7 +352,7 @@ bool ngp_chip::test_erasing()
   return is_erasing();
 }
 
-void ngp_chip::program_bytes(address_t address, const data_t* data, unsigned int num_bytes)
+unsigned int ngp_chip::program_bytes(address_t address, const data_t* data, unsigned int num_bytes)
 {
   if (is_erasing())
   {
@@ -369,7 +369,7 @@ void ngp_chip::program_bytes(address_t address, const data_t* data, unsigned int
     }
     
     // Use Linkmasta's built-in support for batch programming
-    m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, supports_bypass());
+    return m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, supports_bypass());
   }
   else
   {
@@ -390,10 +390,12 @@ void ngp_chip::program_bytes(address_t address, const data_t* data, unsigned int
     {
       program_byte(address, data[i]);
     }
+    
+    return num_bytes;
   }
 }
 
-void ngp_chip::read_bytes(address_t address, data_t* data, unsigned int num_bytes)
+unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int num_bytes)
 {
   if (is_erasing())
   {
@@ -410,7 +412,7 @@ void ngp_chip::read_bytes(address_t address, data_t* data, unsigned int num_byte
   if (m_linkmasta->supports_read_bytes())
   {
     // Use Linkmasta's built-in support for batch reads
-    m_linkmasta->read_bytes(m_chip_num, address, data, num_bytes);
+    return m_linkmasta->read_bytes(m_chip_num, address, data, num_bytes);
   }
   else
   {
@@ -419,6 +421,8 @@ void ngp_chip::read_bytes(address_t address, data_t* data, unsigned int num_byte
     {
       data[i] = read(address);
     }
+    
+    return num_bytes;
   }
 }
 

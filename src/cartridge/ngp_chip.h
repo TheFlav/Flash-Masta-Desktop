@@ -32,7 +32,7 @@ public:
   /* constructor */       ngp_chip(linkmasta_device* linkmasta_device, chip_index_t chip_num);
   /* destructor  */       ~ngp_chip();
   
-  data_t                 read(address_t address);
+  data_t                  read(address_t address);
   void                    write(address_t address, data_t data);
   
   void                    reset();
@@ -49,8 +49,8 @@ public:
   bool                    test_bypass_support();
   bool                    is_erasing() const;
   bool                    test_erasing();
-  void                    program_bytes(address_t address, const data_t* data, unsigned int num_bytes);
-  void                    read_bytes(address_t address, data_t* data, unsigned int num_bytes);
+  unsigned int            program_bytes(address_t address, const data_t* data, unsigned int num_bytes);
+  unsigned int            read_bytes(address_t address, data_t* data, unsigned int num_bytes);
   
 private:
   void                    enter_autoselect();

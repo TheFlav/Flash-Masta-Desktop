@@ -1,10 +1,11 @@
 #include "ngp_cartridge.h"
 #include "linkmasta_device/linkmasta_device.h"
 #include "ngp_chip.h"
+#include <fstream>
 
+using namespace std;
 
-
-#define DEFAULT_BLOCK_SIZE 0x2000
+#define DEFAULT_BLOCK_SIZE 0x10000
 
 
 
@@ -49,18 +50,223 @@ void ngp_cartridge::init()
     return;
   }
   
-  m_was_init = true;
-  
   m_linkmasta->init();
   m_linkmasta->open();
   build_cartridge_destriptor();
   m_linkmasta->close();
+
+  m_was_init = true;
 }
 
-/*
-void ngp_cartridge::restore_cartridge_from_file(std::ifstream& fin);
-void ngp_cartridge::backup_cartridge_to_file(std::ofstream& fout);
-*/
+
+void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin)
+{
+  // Ensure class was intiialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  // Determine the total number of bytes to write
+  fin.seekg(0, fin.end);
+  unsigned int bytes_written = 0;
+  unsigned int bytes_total = fin.peek();
+  fin.seekg(0, fin.beg);
+  
+  // Ensure file will fit
+  if (bytes_total > descriptor()->num_bytes)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  // Initialize markers
+  unsigned int curr_chip = 0;
+  unsigned int curr_block = 0;
+  
+  // Allocate a buffer with max size of a block
+  const unsigned int BUFFER_MAX_SIZE = DEFAULT_BLOCK_SIZE;
+  unsigned int       buffer_size = 0;
+  unsigned char*     buffer = new unsigned char[BUFFER_MAX_SIZE];
+  
+  // Begin writing data block-by-block
+  try
+  {
+    // Open connection to NGP chip
+    m_linkmasta->open();
+    
+    while (bytes_written < bytes_total)
+    {
+      // Calcualte number of expected bytes
+      unsigned bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
+      if (bytes_expected > bytes_total - bytes_written)
+      {
+        bytes_expected = bytes_total - bytes_written;
+      }
+      
+      // Attempt to read bytes from file
+      buffer_size = (unsigned int) fin.readsome((char*) buffer, bytes_expected);
+      
+      // Check for errors
+      if (buffer_size != bytes_expected)
+      {
+        throw std::runtime_error("ERROR");
+      }
+      if (!fin.good() && (buffer_size + bytes_written) < bytes_total)
+      {
+        throw std::runtime_error("ERROR");
+      }
+      
+      // Erase block from cartridge
+      m_chips[curr_chip]->erase_block(
+        descriptor()->chips[curr_chip]->blocks[curr_block]->base_address
+      );
+      
+      // Write buffer to cartridge
+      m_chips[curr_chip]->program_bytes(
+        descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
+        buffer, buffer_size
+      );
+      
+      // Update markers
+      bytes_written += buffer_size;
+      curr_block++;
+      if (curr_block >= descriptor()->chips[curr_chip]->num_blocks)
+      {
+        curr_block = 0;
+        curr_chip++;
+      }
+    }
+    
+    // Clean up before returning
+    m_linkmasta->close();
+  }
+  catch (std::exception& ex)
+  {
+    // Error occured! Clean up and pass error on to caller
+    try {
+      // Spinlock while the chip finishes erasing (if it was erasing)
+      while (m_chips[curr_chip]->is_erasing());
+    } catch (exception ex2) {
+      // Well... this is awkward
+    }
+    
+    try {
+      // Attempt to reset the chip
+      m_chips[curr_chip]->reset();
+    } catch (exception ex2) {
+      // Well... this is awkward
+    }
+    
+    try {
+      m_linkmasta->close();
+    } catch (exception ex2) {
+      // Well... this is awkward
+    }
+    
+    delete [] buffer;
+    throw ex;
+  }
+  
+  delete [] buffer;
+}
+
+void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout)
+{
+  // Ensure class was intiialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  // Determine the total number of bytes to write
+  unsigned int bytes_written = 0;
+  unsigned int bytes_total = descriptor()->num_bytes;
+  
+  // Initialize markers
+  unsigned int curr_chip = 0;
+  unsigned int curr_block = 0;
+  
+  // Allocate a buffer with max size of a block
+  const unsigned int BUFFER_MAX_SIZE = DEFAULT_BLOCK_SIZE;
+  unsigned int       buffer_size = 0;
+  unsigned char*     buffer = new unsigned char[BUFFER_MAX_SIZE];
+  
+  // Begin writing data block-by-block
+  try
+  {
+    // Open connection to NGP chip
+    m_linkmasta->open();
+    
+    while (bytes_written < bytes_total && curr_chip < descriptor()->num_chips)
+    {
+      // Calcualte number of expected bytes
+      unsigned bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
+      if (bytes_expected > bytes_total - bytes_written)
+      {
+        bytes_expected = bytes_total - bytes_written;
+      }
+      
+      // Attempt to read bytes from cartridge
+      buffer_size = m_chips[curr_chip]->read_bytes(
+        descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
+        buffer, bytes_expected
+      );
+      
+      // Check for errors
+      if (buffer_size != bytes_expected)
+      {
+        throw std::runtime_error("ERROR");
+      }
+      if (!fout.good())
+      {
+        throw std::runtime_error("ERROR");
+      }
+      
+      // Write buffer to file
+      fout.write((char*) buffer, buffer_size);
+      
+      // Update markers
+      bytes_written += buffer_size;
+      curr_block++;
+      if (curr_block >= descriptor()->chips[curr_chip]->num_blocks)
+      {
+        curr_block = 0;
+        curr_chip++;
+      }
+    }
+    
+    // Clean up before returning
+    m_linkmasta->close();
+  }
+  catch (std::exception& ex)
+  {
+    // Error occured! Clean up and pass error on to caller
+    try {
+      // Spinlock while the chip finishes erasing (if it was erasing)
+      while (m_chips[curr_chip]->is_erasing());
+    } catch (exception ex2) {
+      // Well... this is awkward
+    }
+    
+    try {
+      // Attempt to reset the chip
+      m_chips[curr_chip]->reset();
+    } catch (exception ex2) {
+      // Well... this is awkward
+    }
+    
+    try {
+      m_linkmasta->close();
+    } catch (exception ex2) {
+      // Well... this is awkward
+    }
+    
+    delete [] buffer;
+    throw ex;
+  }
+  
+  delete [] buffer;
+}
 
 void ngp_cartridge::build_cartridge_destriptor()
 {
