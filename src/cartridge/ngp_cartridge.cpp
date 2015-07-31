@@ -331,18 +331,18 @@ void ngp_cartridge::build_chip_descriptor(unsigned int chip_i)
   switch (device_id)
   {
   case 0x2F:  // 16 Mib (2^24 bits) = 2 MiB (2^21 bytes)
-    num_bytes = 0x1000000;
+    num_bytes = 0x200000;
     break;
     
   case 0x2C:  // 8 Mib (2^23 bits) = 1 MiB (2^20 bytes)
-    num_bytes = 0x800000;
+    num_bytes = 0x100000;
     break;
     
   case 0xAB:  // 4 Mib (2^22 bits) = 0.5 MiB (2^19 bytes)
-    num_bytes = 0x400000;
+    num_bytes = 0x80000;
     break;
     
-  default:    // unknown chip? too bad.
+  default:    // Unknown chip? Too bad. No bytes 4 u
     num_bytes = 0x00;
     break;
   }
@@ -389,6 +389,7 @@ void ngp_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int blo
   {
   case 1:    // Last block on chip
     block->num_bytes = DEFAULT_BLOCK_SIZE / 4;
+    break;
     
   case 2:    // Second-last block on chip
   case 3:    // Third-last block on chip

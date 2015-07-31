@@ -118,8 +118,8 @@ bool libusb_usb_device_tester::run_tests()
   m_test_count[success ? 0 : 1]++;
   
   out << "    Device class:   " << desc->device_class << endl;
-  out << "    Vendor ID:      " << hex << uppercase << desc->vendor_id << nouppercase << dec << endl;
-  out << "    Product ID:     " << hex << uppercase << desc->product_id << nouppercase << dec << endl;
+  out << "    Vendor ID:      0x" << hex << uppercase << desc->vendor_id << nouppercase << dec << endl;
+  out << "    Product ID:     0x" << hex << uppercase << desc->product_id << nouppercase << dec << endl;
   out << "    Configurations: " << desc->num_configurations << endl;
   
   for (unsigned int i = 0; i < desc->num_configurations; ++i)
