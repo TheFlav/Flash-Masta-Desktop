@@ -23,7 +23,7 @@ class ngp_cartridge_tester: public tester
 {
 public:
   ngp_cartridge_tester(std::istream& in, std::ostream& out, std::ostream& err);
-  ~ngp_cartridge_tester(){};
+  ~ngp_cartridge_tester();
   
   bool prepare();
   void pretests();
@@ -37,6 +37,7 @@ private:
   std::ostream& out;
   std::ostream& err;
 
+  std::ifstream*        m_fin;
   usb_device*           m_usb;
   linkmasta_device*     m_linkmasta;
   cartridge*            m_cartridge;

@@ -18,9 +18,14 @@
 using namespace std;
 
 ngp_cartridge_tester::ngp_cartridge_tester(std::istream& in, std::ostream& out, std::ostream& err)
-  : in(in), out(out), err(err)
+  : in(in), out(out), err(err), m_fin(new ifstream)
 {
   // Nothing else to do
+}
+
+ngp_cartridge_tester::~ngp_cartridge_tester()
+{
+  delete m_fin;
 }
 
 bool ngp_cartridge_tester::prepare()
@@ -86,6 +91,9 @@ bool ngp_cartridge_tester::prepare()
   }
   out << "done." << endl;
   
+  // Initialize input file
+  m_fin->open("/Users/Dan/Documents/ROMs/pbm.ngp", ios::binary);
+  
   return true;
 }
 
@@ -98,6 +106,8 @@ bool ngp_cartridge_tester::run_tests()
 {
   int test_num = 0;
   bool success = true;
+  ifstream& fin = *m_fin;
+  ofstream fout;
   
   //////////////////////////////////////////////////////////// 1
   
@@ -178,6 +188,85 @@ bool ngp_cartridge_tester::run_tests()
   
   success = true;
   
+  fout.open("/Users/Dan/Documents/ROMs/bkp.ngp", ios::binary);
+  
+  try
+  {
+    if (fout.good())
+    {
+      m_cartridge->write_cartridge_to_file(fout);
+    }
+    else
+    {
+      success = false;
+    }
+  }
+  catch (exception& e)
+  {
+    out << e.what() << endl;
+    success = false;
+  }
+  
+  fout.close();
+  
+  out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
+  m_test_count[success ? 0 : 1]++;
+  
+  //////////////////////////////////////////////////////////// 5
+  
+  success = true;
+  
+  fin.seekg(0, fin.beg);
+  try
+  {
+    if (fin.good())
+    {
+      m_cartridge->write_file_to_cartridge(fin);
+    }
+    else
+    {
+      success = false;
+    }
+  }
+  catch (exception& e)
+  {
+    out << e.what() << endl;
+    success = false;
+  }
+  
+  out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
+//  out << "  Test " << ++test_num << " SKIPPED" << endl;
+  m_test_count[success ? 0 : 1]++;
+  
+  //////////////////////////////////////////////////////////// 6
+  
+  success = true;
+  
+  fin.seekg(0, fin.beg);
+  try
+  {
+    if (fin.good())
+    {
+      m_cartridge->compare_file_to_cartridge(fin);
+    }
+    else
+    {
+      success = false;
+    }
+  }
+  catch (exception& e)
+  {
+    out << e.what() << endl;
+    success = false;
+  }
+  
+  out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
+  m_test_count[success ? 0 : 1]++;
+  
+  //////////////////////////////////////////////////////////// 7
+  
+  success = true;
+  
   try
   {
     delete m_cartridge;
@@ -203,6 +292,9 @@ void ngp_cartridge_tester::posttests()
 
 void ngp_cartridge_tester::cleanup()
 {
+  m_fin->close();
+  delete m_fin;
+  
   m_linkmasta->close();
   delete m_linkmasta;
   

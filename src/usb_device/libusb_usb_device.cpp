@@ -417,12 +417,6 @@ void libusb_usb_device::close()
     {
       throw std::runtime_error("ERROR");
     }
-    else
-    {
-      m_interface_set = false;
-      m_input_endpoint_set = false;
-      m_output_endpoint_set = false;
-    }
   }
   
   // Attempt to reset the configuration to what it was previously

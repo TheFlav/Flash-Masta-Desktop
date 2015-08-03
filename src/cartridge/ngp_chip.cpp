@@ -34,7 +34,7 @@ typedef ngp_chip::address_t     address_t;
 
 
 ngp_chip::ngp_chip(linkmasta_device* linkmasta_device, chip_index_t chip_num)
-  : m_mode(READ), m_supports_bypass(false),
+  : m_mode(READ), m_last_erased_addr(0), m_supports_bypass(false),
     m_linkmasta(linkmasta_device), m_chip_num(chip_num)
 {
   // Nothing else to do
@@ -242,6 +242,8 @@ void ngp_chip::erase_chip()
     reset();
   }
   
+  m_last_erased_addr = 0;
+  
   if (m_linkmasta->supports_erase_chip())
   {
     m_linkmasta->erase_chip(m_chip_num);
@@ -273,6 +275,8 @@ void ngp_chip::erase_block(address_t block_address)
   {
     reset();
   }
+  
+  m_last_erased_addr = block_address;
   
   if (m_linkmasta->supports_erase_chip())
   {
@@ -345,7 +349,7 @@ bool ngp_chip::test_erasing()
     return false;
   }
   
-  unsigned char result = read(ADDR_DONTCARE);
+  unsigned char result = read(m_last_erased_addr);
   
   m_mode = (result == 0xFF ? READ : ERASE);
   

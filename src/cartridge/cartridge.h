@@ -23,6 +23,7 @@ public:
   virtual const cartridge_descriptor* descriptor() const = 0;
   
   virtual void             init() = 0;
+  virtual bool             compare_file_to_cartridge(std::ifstream& fin) = 0;
   virtual void             write_file_to_cartridge(std::ifstream& fin) = 0;
   virtual void             write_cartridge_to_file(std::ofstream& fout) = 0;
 };

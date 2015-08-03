@@ -3,6 +3,10 @@
 #include "ngp_chip.h"
 #include <fstream>
 
+#ifdef VERBOSE
+#include <iostream>
+#endif
+
 using namespace std;
 
 #define DEFAULT_BLOCK_SIZE 0x10000
@@ -59,6 +63,139 @@ void ngp_cartridge::init()
 }
 
 
+bool ngp_cartridge::compare_file_to_cartridge(std::ifstream& fin)
+{
+  // Ensure class was initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  // determine the total number of bytes to compare
+  fin.seekg(0, fin.end);
+  unsigned int bytes_compared = 0;
+  unsigned int bytes_total = (unsigned int) fin.tellg();
+  fin.seekg(0, fin.beg);
+  
+  // Ensure file will fit
+  if (bytes_total > descriptor()->num_bytes)
+  {
+    return false;
+  }
+  
+  // Initialize markers
+  unsigned int curr_chip = 0;
+  unsigned int curr_block = 0;
+  bool         matched = true;
+  
+  // Allocate a buffer with max size of a block
+  const unsigned int BUFFER_MAX_SIZE = DEFAULT_BLOCK_SIZE;
+  unsigned int       f_buffer_size = 0;
+  unsigned char*     f_buffer = new unsigned char[BUFFER_MAX_SIZE];
+  unsigned int       c_buffer_size = 0;
+  unsigned char*     c_buffer = new unsigned char[BUFFER_MAX_SIZE];
+  
+  // Begin comparing data block-by-block
+  try
+  {
+    // Open connection to NGP chip
+    m_linkmasta->open();
+    
+    while (bytes_compared < bytes_total && matched)
+    {
+#ifdef VERBOSE
+      std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_compared << " B / " << bytes_total << " B (" << (bytes_compared * 100 / bytes_total) << "%)" << endl;
+#endif
+      
+      // Calcualte number of expected bytes
+      unsigned bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
+      if (bytes_expected > bytes_total - bytes_compared)
+      {
+        bytes_expected = bytes_total - bytes_compared;
+      }
+      
+      // Attempt to read bytes from file
+      fin.read((char*) f_buffer, bytes_expected);
+      f_buffer_size = ((unsigned int) fin.tellg()) - bytes_compared;
+      
+      // Check for errors
+      if (f_buffer_size != bytes_expected)
+      {
+        throw std::runtime_error("ERROR");
+      }
+      if (!fin.good() && (f_buffer_size + bytes_compared) < bytes_total)
+      {
+        throw std::runtime_error("ERROR");
+      }
+      
+      // Attempt to read bytes from cartridge
+      c_buffer_size = m_chips[curr_chip]->read_bytes(
+        descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
+        c_buffer, bytes_expected
+      );
+      
+      // Check for errors
+      if (c_buffer_size != bytes_expected)
+      {
+        throw std::runtime_error("ERROR");
+      }
+      
+      // Compare contents of buffers
+      for (unsigned int i = 0; i < f_buffer_size && i < c_buffer_size; ++i)
+      {
+        if (f_buffer[i] != c_buffer[i])
+        {
+          matched = false;
+          break;
+        }
+      }
+      
+      // Update markers
+      bytes_compared += f_buffer_size;
+      curr_block++;
+      if (curr_block >= descriptor()->chips[curr_chip]->num_blocks)
+      {
+        curr_block = 0;
+        curr_chip++;
+      }
+    }
+    
+    // Clean up before returning
+    m_linkmasta->close();
+  }
+  catch (std::exception& ex)
+  {
+    // Error occured! Clean up and pass error on to caller
+    try {
+      // Spinlock while the chip finishes erasing (if it was erasing)
+      while (m_chips[curr_chip]->is_erasing());
+    } catch (exception ex2) {
+      // Well... this is awkward
+    }
+    
+    try {
+      // Attempt to reset the chip
+      m_chips[curr_chip]->reset();
+    } catch (exception ex2) {
+      // Well... this is awkward
+    }
+    
+    try {
+      m_linkmasta->close();
+    } catch (exception ex2) {
+      // Well... this is awkward
+    }
+    
+    delete [] f_buffer;
+    delete [] c_buffer;
+    throw ex;
+  }
+  
+  delete [] f_buffer;
+  delete [] c_buffer;
+  return matched;
+}
+
 void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin)
 {
   // Ensure class was intiialized
@@ -70,7 +207,7 @@ void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin)
   // Determine the total number of bytes to write
   fin.seekg(0, fin.end);
   unsigned int bytes_written = 0;
-  unsigned int bytes_total = fin.peek();
+  unsigned int bytes_total = (unsigned int) fin.tellg();
   fin.seekg(0, fin.beg);
   
   // Ensure file will fit
@@ -96,6 +233,10 @@ void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin)
     
     while (bytes_written < bytes_total)
     {
+#ifdef VERBOSE
+      std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
+#endif
+      
       // Calcualte number of expected bytes
       unsigned bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
       if (bytes_expected > bytes_total - bytes_written)
@@ -104,7 +245,8 @@ void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin)
       }
       
       // Attempt to read bytes from file
-      buffer_size = (unsigned int) fin.readsome((char*) buffer, bytes_expected);
+      fin.read((char*) buffer, bytes_expected);
+      buffer_size = ((unsigned int) fin.tellg()) - bytes_written;
       
       // Check for errors
       if (buffer_size != bytes_expected)
@@ -120,6 +262,9 @@ void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin)
       m_chips[curr_chip]->erase_block(
         descriptor()->chips[curr_chip]->blocks[curr_block]->base_address
       );
+      
+      // Wait for erasure to complete
+      while (m_chips[curr_chip]->test_erasing());
       
       // Write buffer to cartridge
       m_chips[curr_chip]->program_bytes(
@@ -199,6 +344,10 @@ void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout)
     
     while (bytes_written < bytes_total && curr_chip < descriptor()->num_chips)
     {
+#ifdef VERBOSE
+      std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
+#endif
+      
       // Calcualte number of expected bytes
       unsigned bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
       if (bytes_expected > bytes_total - bytes_written)

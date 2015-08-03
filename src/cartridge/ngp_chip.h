@@ -56,6 +56,7 @@ private:
   void                    enter_autoselect();
   
   chip_mode               m_mode;
+  address_t               m_last_erased_addr;
   
   bool                    m_supports_bypass;
   

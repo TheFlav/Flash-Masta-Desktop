@@ -29,6 +29,7 @@ public:
   const cartridge_descriptor* descriptor() const;
   
   void                  init();
+  bool                  compare_file_to_cartridge(std::ifstream& fin);
   void                  write_file_to_cartridge(std::ifstream& fin);
   void                  write_cartridge_to_file(std::ofstream& fout);
   
