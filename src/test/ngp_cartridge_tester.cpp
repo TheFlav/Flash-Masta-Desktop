@@ -68,7 +68,7 @@ bool ngp_cartridge_tester::prepare()
     m_usb = new libusb_usb_device(m_device);
     m_usb->init();
   }
-  catch (exception& ex)
+  catch (std::exception& ex)
   {
     err << endl;
     err << "ERROR: An error occured when attempting to initialize usb device" << endl;
@@ -84,7 +84,7 @@ bool ngp_cartridge_tester::prepare()
     m_linkmasta = new ngp_linkmasta_device(m_usb);
     m_linkmasta->init();
   }
-  catch (exception& ex)
+  catch (std::exception& ex)
   {
     err << endl;
     err << "ERROR: An error occured when attempting to initialize linkmasta device" << endl;
@@ -118,7 +118,7 @@ bool ngp_cartridge_tester::run_tests()
   {
     m_cartridge = new ngp_cartridge(m_linkmasta);
   }
-  catch (exception& e)
+  catch (std::exception& e)
   {
     out << e.what() << endl;
     success = false;
@@ -135,7 +135,7 @@ bool ngp_cartridge_tester::run_tests()
   {
     m_cartridge->init();
   }
-  catch (exception& e)
+  catch (std::exception& e)
   {
     out << e.what() << endl;
     success = false;
@@ -153,7 +153,7 @@ bool ngp_cartridge_tester::run_tests()
   {
     desc = m_cartridge->descriptor();
   }
-  catch (exception& e)
+  catch (std::exception& e)
   {
     out << e.what() << endl;
     success = false;
@@ -202,7 +202,7 @@ bool ngp_cartridge_tester::run_tests()
       success = false;
     }
   }
-  catch (exception& e)
+  catch (std::exception& e)
   {
     out << e.what() << endl;
     success = false;
@@ -229,7 +229,7 @@ bool ngp_cartridge_tester::run_tests()
       success = false;
     }
   }
-  catch (exception& e)
+  catch (std::exception& e)
   {
     out << e.what() << endl;
     success = false;
@@ -255,7 +255,7 @@ bool ngp_cartridge_tester::run_tests()
       success = false;
     }
   }
-  catch (exception& e)
+  catch (std::exception& e)
   {
     out << e.what() << endl;
     success = false;
@@ -272,7 +272,7 @@ bool ngp_cartridge_tester::run_tests()
   {
     delete m_cartridge;
   }
-  catch (exception& e)
+  catch (std::exception& e)
   {
     out << e.what() << endl;
     success = false;

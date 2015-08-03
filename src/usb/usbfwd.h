@@ -14,7 +14,12 @@ namespace usb
 {
 
   class usb_device;
-  class usb_exception;
+  
+  class exception;
+  class timeout_exception;
+  class disconnected_exception;
+  class busy_exception;
+  class interrupted_exception;
 
 };
 
