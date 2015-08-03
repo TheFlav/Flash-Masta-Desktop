@@ -7,7 +7,7 @@
 //
 
 #include "ngp_cartridge_tester.h"
-#include "usb_device/libusb_usb_device.h"
+#include "usb/libusb_usb_device.h"
 #include "linkmasta_device/ngp_linkmasta_device.h"
 #include "cartridge/ngp_cartridge.h"
 #include "libusb-1.0/libusb.h"
@@ -16,6 +16,7 @@
 #include <fstream>
 
 using namespace std;
+using namespace usb;
 
 ngp_cartridge_tester::ngp_cartridge_tester(std::istream& in, std::ostream& out, std::ostream& err)
   : in(in), out(out), err(err), m_fin(new ifstream)

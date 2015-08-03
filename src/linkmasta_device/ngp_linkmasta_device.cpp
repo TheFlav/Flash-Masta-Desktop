@@ -7,12 +7,12 @@
 //
 
 #include "ngp_linkmasta_device.h"
-#include "usb_device/usb_device.h"
+#include "usb/usb_device.h"
 #include "cartridge/ngp_cartridge.h"
 #include "ngp_linkmasta_messages.h"
 #include <limits>
 
-
+using namespace usb;
 
 typedef ngp_linkmasta_device::data_t     data_t;
 typedef ngp_linkmasta_device::timeout_t  timeout_t;
@@ -30,6 +30,7 @@ typedef ngp_linkmasta_device::chip_index chip_index;
 #define NGP_LINKMASTA_USB_ENDPOINT_OUT  0x02
 #define NGP_LINKMASTA_USB_RXTX_SIZE     64
 #define NGP_LINKMASTA_USB_TIMEOUT       2000
+
 
 
 

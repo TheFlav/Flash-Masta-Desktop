@@ -11,10 +11,10 @@
 
 #include "tester.h"
 #include <iosfwd>
+#include "usb/usbfwd.h"
 
-class usb_device;
-class linkmasta_device;
 class cartridge;
+class linkmasta_device;
 struct libusb_context;
 struct libusb_device;
 struct libusb_device_handle;
@@ -38,7 +38,7 @@ private:
   std::ostream& err;
 
   std::ifstream*        m_fin;
-  usb_device*           m_usb;
+  usb::usb_device*      m_usb;
   linkmasta_device*     m_linkmasta;
   cartridge*            m_cartridge;
 

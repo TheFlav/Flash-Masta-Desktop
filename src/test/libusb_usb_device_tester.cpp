@@ -12,6 +12,7 @@
 #include <iomanip>
 
 using namespace std;
+using namespace usb;
 
 libusb_usb_device_tester::libusb_usb_device_tester(istream& in, ostream& out, ostream& err)
   : in(in), out(out), err(err)

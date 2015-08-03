@@ -1,6 +1,8 @@
 #include "usb_device.h"
 #include <stddef.h>
 
+using namespace usb;
+
 typedef usb_device::device_description device_description;
 typedef usb_device::device_configuration device_configuration;
 typedef usb_device::device_interface device_interface;

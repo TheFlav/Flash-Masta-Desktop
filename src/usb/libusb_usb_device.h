@@ -1,6 +1,7 @@
 #ifndef __LIBUSB_USB_DEVICE_H__
 #define __LIBUSB_USB_DEVICE_H__
 
+#include "usbfwd.h"
 #include "usb_device.h"
 
 struct libusb_device;
@@ -9,6 +10,9 @@ struct libusb_config_descriptor;
 struct libusb_interface;
 struct libusb_interface_descriptor;
 
+namespace usb
+{
+  
 class libusb_usb_device : public usb_device
 {
 public:
@@ -65,4 +69,6 @@ private:
   device_description*   m_device_description;
 };
 
-#endif // __LIBUSB_COMMUNICATOR_H__
+};
+
+#endif /* defined(__LIBUSB_USB_DEVICE_H__) */

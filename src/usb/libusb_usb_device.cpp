@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <string>
 
+using namespace usb;
+
 typedef libusb_usb_device::timeout_t            timeout_t;
 typedef libusb_usb_device::configuration_t      configuration_t;
 typedef libusb_usb_device::interface_t          interface_t;

@@ -1,11 +1,16 @@
 #ifndef __USB_DEVICE_H__
 #define __USB_DEVICE_H__
 
+#include "usbfwd.h"
+
 #define TIMEOUT_UNSET_VALUE       ((timeout_t) 0xFFFFFFFF)
 #define CONFIGURATION_UNSET_VALUE ((configuration_t) 0xFFFFFFFF)
 #define INTERFACE_UNSET_VALUE     ((interface_t) 0xFFFFFFFF)
 #define ENDPOINT_UNSET_VALUE      ((endpoint_t) 0xFFFFFFFF)
 #define DESCRIPTION_UNSET_VALUE   nullptr
+
+namespace usb
+{
 
 class usb_device
 {
@@ -169,6 +174,8 @@ struct usb_device::device_endpoint
   usb_device::endpoint_t address;
   usb_device::endpoint_transfer_type transfer_type;
   usb_device::endpoint_direction direction;
+};
+
 };
 
 #endif // __USB_COMMUNICATOR_H__
