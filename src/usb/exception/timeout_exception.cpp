@@ -10,6 +10,8 @@
 
 using namespace usb;
 
+std::ostringstream timeout_exception::m_stream;
+
 timeout_exception::timeout_exception(unsigned int timeout)
   : exception("operation exceeded timeout"), m_timeout(timeout)
 {

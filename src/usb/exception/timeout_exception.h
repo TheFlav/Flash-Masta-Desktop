@@ -27,8 +27,6 @@ private:
   static std::ostringstream m_stream;
 };
 
-std::ostringstream timeout_exception::m_stream;
-
 };
 
 #endif /* defined(__USB_TIMEOUT_EXCEPTION_H__) */

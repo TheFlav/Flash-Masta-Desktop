@@ -7,35 +7,30 @@
 //
 
 #include "exception.h"
-#include <cstring>
 
 using namespace usb;
 
 #define DEFAULT_WHAT "a USB error occured"
 
+exception::exception(const std::string& what)
+: runtime_error(DEFAULT_WHAT), m_what(std::string(DEFAULT_WHAT) + ": " + what)
+{
+  // Nothing else to do
+}
+
 exception::exception(const char* what)
-  : runtime_error(DEFAULT_WHAT),
-    m_what(new char [strlen(DEFAULT_WHAT) + strlen(": ") + strlen(what)])
+  : exception(std::string(what))
 {
-  // Pre-build "what"
-  strcpy(m_what, DEFAULT_WHAT);
-  strcat(m_what, ": ");
-  strcat(m_what, what);
+  // Nothing else to do
 }
 
-exception::exception()
-  : runtime_error(DEFAULT_WHAT),
-    m_what(new char [strlen(DEFAULT_WHAT)])
+exception::exception(const exception& other)
+  : runtime_error(DEFAULT_WHAT), m_what(other.what())
 {
-  strcmp(m_what, DEFAULT_WHAT);
-}
-
-exception::~exception()
-{
-  delete m_what;
+  // Nothing else to do
 }
 
 const char* exception::what() const throw()
 {
-  return m_what;
+  return m_what.c_str();
 }

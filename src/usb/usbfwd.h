@@ -20,6 +20,10 @@ namespace usb
   class disconnected_exception;
   class busy_exception;
   class interrupted_exception;
+  class uninitialized_exception;
+  class unopen_exception;
+  class unconfigured_exception;
+  class not_found_exception;
 
 };
 

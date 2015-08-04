@@ -46,6 +46,8 @@ private:
   device_interface*     build_device_interface(const libusb_config_descriptor* config, unsigned int index);
   device_alt_setting*   build_device_alt_setting(const libusb_interface* interface, unsigned int index);
   device_endpoint*      build_device_endpoint(const libusb_interface_descriptor* interface, unsigned int index);
+  static bool           libusb_error_occured(int libusb_error);
+  static void           throw_libusb_exception(int libusb_error, timeout_t timeout);
   
   bool                  m_was_initialized;
   bool                  m_is_open;

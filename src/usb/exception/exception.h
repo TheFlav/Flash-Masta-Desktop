@@ -12,6 +12,7 @@
 #include "../usbfwd.h"
 #include <exception>
 #include <stdexcept>
+#include <string>
 
 namespace usb
 {
@@ -19,13 +20,14 @@ namespace usb
 class exception: public std::runtime_error
 {
 public:
-  exception(const char* what);
-  exception();
-  virtual ~exception();
+  explicit exception(const std::string& what);
+  explicit exception(const char* what);
+  exception(const exception& other);
+  virtual ~exception() {};
   virtual const char* what() const throw();
   
 private:
-  char* const m_what;
+  std::string m_what;
 };
 
 };

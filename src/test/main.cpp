@@ -23,8 +23,8 @@ int main()
   
   // Allocate tester objects and add to vector
   vector<tester*> tests;
-//  tests.push_back(new libusb_usb_device_tester(in, out, err));
-  tests.push_back(new ngp_cartridge_tester(in, out, err));
+  tests.push_back(new libusb_usb_device_tester(in, out, err));
+//  tests.push_back(new ngp_cartridge_tester(in, out, err));
   
   
   // Run the tests and print summary
