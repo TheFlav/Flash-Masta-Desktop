@@ -10,6 +10,7 @@
 #include "libusb-1.0/libusb.h"
 #include "hardware/AVR/messages.h"
 #include <iomanip>
+#include "linkmasta_device/ngp_linkmasta_device.h"
 
 using namespace std;
 using namespace usb;
@@ -65,6 +66,8 @@ bool libusb_usb_device_tester::run_tests()
   int test_num = 0;
   bool success = true;
   const libusb_usb_device::device_description* desc;
+  libusb_usb_device::data_t data[65535] = "";
+  
   
   //////////////////////////////////////////////////////////// 1 
   
@@ -192,7 +195,53 @@ bool libusb_usb_device_tester::run_tests()
   
   success = true;
   
-  libusb_usb_device::data_t data[65535] = "";
+  build_write_command(data, 0, 0xF0, 0);
+  
+  try
+  {
+    if (m_test_subject->write(data, 64, 2000) != 64)
+    {
+      success = false;
+    }
+  }
+  catch (std::exception& e)
+  {
+    out << e.what() << endl;
+    success = false;
+  }
+  
+  out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
+  m_test_count[success ? 0 : 1]++;
+  
+  //////////////////////////////////////////////////////////// 6
+  
+  success = true;
+  
+  try
+  {
+    if (m_test_subject->read(data, 64, 2000) != 64)
+    {
+      success = false;
+    }
+    uint8_t result;
+    get_result_reply(data, &result);
+    if (result != MSG_RESULT_SUCCESS)
+    {
+      success = false;
+    }
+  }
+  catch (std::exception& e)
+  {
+    out << e.what() << endl;
+    success = false;
+  }
+  
+  out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
+  m_test_count[success ? 0 : 1]++;
+  
+  //////////////////////////////////////////////////////////// 6
+  
+  success = true;
   
   build_read_command(data, 0, 0);
   
@@ -220,6 +269,13 @@ bool libusb_usb_device_tester::run_tests()
   try
   {
     r  = m_test_subject->read(data, 64, 2000);
+    uint8_t result;
+
+    get_result_reply(data, &result);
+    if (result == MSG_RESULT_FAIL)
+    {
+      throw std::runtime_error("FUUUU");
+    }
   }
   catch (std::exception& e)
   {

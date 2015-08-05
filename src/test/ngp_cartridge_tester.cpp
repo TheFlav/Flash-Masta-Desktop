@@ -14,6 +14,8 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 using namespace usb;
@@ -71,6 +73,7 @@ bool ngp_cartridge_tester::prepare()
   catch (std::exception& ex)
   {
     err << endl;
+    err << ex.what();
     err << "ERROR: An error occured when attempting to initialize usb device" << endl;
     return false;
   }
@@ -87,6 +90,7 @@ bool ngp_cartridge_tester::prepare()
   catch (std::exception& ex)
   {
     err << endl;
+    err << ex.what();
     err << "ERROR: An error occured when attempting to initialize linkmasta device" << endl;
     return false;
   }
@@ -178,15 +182,15 @@ bool ngp_cartridge_tester::run_tests()
     for (unsigned int j = 0; j < chip->num_blocks; ++j)
     {
       const cartridge_descriptor::chip_descriptor::block_descriptor* block = chip->blocks[j];
-      out << "      Block " << block->block_num << endl;
-      out << "        Address:   0x" << hex << uppercase << setfill('0') << setw(6) << block->base_address << setfill(' ') << nouppercase << dec << endl;
-      out << "        Size:      " << block->num_bytes << " B (" << (block->num_bytes / 0x400) << " KiB)" << endl;
-      out << "        Protected: " << (block->is_protected ? "YES" : "NO") << endl;
+      out << "        Block " << block->block_num << ",  ";
+      out << "Address: 0x" << hex << uppercase << setfill('0') << setw(6) << block->base_address << setfill(' ') << nouppercase << dec << ",  ";
+      out << "Size: " << block->num_bytes << " B (" << (block->num_bytes / 0x400) << " KiB)" << ",  ";
+      out << "Protected: " << (block->is_protected ? "YES" : "NO") << endl;
     }
   }
   
   //////////////////////////////////////////////////////////// 4
-  
+  /*
   success = true;
   
   fout.open("/Users/Dan/Documents/ROMs/bkp.ngp", ios::binary);
@@ -212,9 +216,9 @@ bool ngp_cartridge_tester::run_tests()
   
   out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
   m_test_count[success ? 0 : 1]++;
-  
+  */
   //////////////////////////////////////////////////////////// 5
-  
+  /*
   success = true;
   
   fin.seekg(0, fin.beg);
@@ -238,9 +242,9 @@ bool ngp_cartridge_tester::run_tests()
   out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
 //  out << "  Test " << ++test_num << " SKIPPED" << endl;
   m_test_count[success ? 0 : 1]++;
-  
+  */
   //////////////////////////////////////////////////////////// 6
-  
+  /*
   success = true;
   
   fin.seekg(0, fin.beg);
@@ -263,7 +267,7 @@ bool ngp_cartridge_tester::run_tests()
   
   out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
   m_test_count[success ? 0 : 1]++;
-  
+  */
   //////////////////////////////////////////////////////////// 7
   
   success = true;

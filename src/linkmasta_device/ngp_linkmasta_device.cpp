@@ -469,7 +469,7 @@ void ngp_linkmasta_device::fetch_firmware_version()
   get_getversion_reply(buffer, &majVer, &minVer);
   
   m_firmware_major_version = (unsigned int) majVer;
-  m_firmware_major_version = (unsigned int) minVer;
+  m_firmware_minor_version = (unsigned int) minVer;
   m_firmware_version_set = true;
 }
 

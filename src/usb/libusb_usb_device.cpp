@@ -30,7 +30,7 @@ libusb_usb_device::libusb_usb_device(libusb_device* device)
   : m_was_initialized    (false),
     m_is_open            (false),
     m_kernel_was_attached(false),
-    m_timeout_set        (false),
+    m_timeout_set        (true),
     m_configuration_set  (false),
     m_interface_set      (false),
     m_input_endpoint_set (false),
@@ -324,7 +324,8 @@ void libusb_usb_device::set_input_endpoint(endpoint_t input_endpoint)
   // Find desired endpoint
   device_endpoint* ep = nullptr;
   device_alt_setting* as = get_device_description()->configurations[m_configuration]->interfaces[m_interface]->alt_settings[m_alt_setting];
-  for (unsigned int i = 0; i < as->num_endpoints; ++i)
+  unsigned int i;
+  for (i = 0; i < as->num_endpoints; ++i)
   {
     if (as->endpoints[i]->address == input_endpoint)
     {
@@ -338,7 +339,7 @@ void libusb_usb_device::set_input_endpoint(endpoint_t input_endpoint)
     throw not_found_exception("endpoint{address: " + std::to_string(input_endpoint) + "}");
   }
   
-  m_input_endpoint = (unsigned char) ep->address;
+  m_input_endpoint = i;
   m_input_endpoint_set = true;
 }
 
@@ -365,12 +366,11 @@ void libusb_usb_device::set_output_endpoint(endpoint_t output_endpoint)
                                 + " for argument 1: endpoint address does not indicate output.");
   }
   
-  
-  
   // Find desired endpoint
   device_endpoint* ep = nullptr;
   device_alt_setting* as = get_device_description()->configurations[m_configuration]->interfaces[m_interface]->alt_settings[m_alt_setting];
-  for (unsigned int i = 0; i < as->num_endpoints; ++i)
+  unsigned int i;
+  for (i = 0; i < as->num_endpoints; ++i)
   {
     if (as->endpoints[i]->address == output_endpoint)
     {
@@ -384,7 +384,7 @@ void libusb_usb_device::set_output_endpoint(endpoint_t output_endpoint)
     throw not_found_exception("endpoint{address: " + std::to_string(output_endpoint) + "}");
   }
   
-  m_output_endpoint = (unsigned char) ep->address;
+  m_output_endpoint = i;
   m_output_endpoint_set = true;
 }
 
@@ -528,7 +528,7 @@ void libusb_usb_device::close()
 
 unsigned int libusb_usb_device::read(data_t *buffer, unsigned int num_bytes)
 {
-  return read(buffer, num_bytes, m_timeout);
+  return read(buffer, num_bytes, timeout());
 }
 
 unsigned int libusb_usb_device::read(data_t *buffer, unsigned int num_bytes, timeout_t timeout)
@@ -544,7 +544,7 @@ unsigned int libusb_usb_device::read(data_t *buffer, unsigned int num_bytes, tim
     ->configurations[m_configuration]
     ->interfaces[m_interface]
     ->alt_settings[m_alt_setting]
-    ->endpoints[m_output_endpoint]
+    ->endpoints[m_input_endpoint]
     ->address;
   
   // Transfer data, catching errors and throwing exceptions if necessary
@@ -566,7 +566,7 @@ unsigned int libusb_usb_device::read(data_t *buffer, unsigned int num_bytes, tim
 
 unsigned int libusb_usb_device::write(const data_t* data, unsigned int num_bytes)
 {
-  return write(data, num_bytes, m_timeout);
+  return write(data, num_bytes, timeout());
 }
 
 unsigned int libusb_usb_device::write(const data_t* data, unsigned int num_bytes, timeout_t timeout)

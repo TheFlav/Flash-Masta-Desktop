@@ -580,4 +580,17 @@ void ngp_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int blo
   block->is_protected = (chip->get_block_protection(block->base_address) == 0 ? false : true);
 }
 
+bool ngp_cartridge::test_for_cartridge(linkmasta_device* linkmasta)
+{
+  bool exists;
+  
+  // Check the device id and manufacturer id and see if they are invalid
+  linkmasta->open();
+  ngp_chip chip(linkmasta, 0);
+  chip.reset();
+  exists = !(chip.get_device_id() == 0x90 || chip.get_manufacturer_id() == 0x90);
+  linkmasta->close();
+  
+  return exists;
+}
 

@@ -33,6 +33,8 @@ public:
   void                  write_file_to_cartridge(std::ifstream& fin);
   void                  write_cartridge_to_file(std::ofstream& fout);
   
+  static bool           test_for_cartridge(linkmasta_device* linkmasta);
+  
 protected:
   void                  build_cartridge_destriptor();
   void                  build_chip_descriptor(unsigned int chip_i);
