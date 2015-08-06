@@ -13,9 +13,10 @@
 
 class forwarding_task_controller: public task_controller
 {
+public:
   forwarding_task_controller(task_controller* receiver);
   forwarding_task_controller(const forwarding_task_controller& other);
-  ~forwarding_task_controller();
+  virtual ~forwarding_task_controller();
   
   virtual void on_task_update(task_status status, int work_progress);
   virtual bool is_task_cancelled() const;

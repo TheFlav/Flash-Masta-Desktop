@@ -30,8 +30,6 @@ public:
   virtual void on_task_complete(task_status status, int work_total);
   virtual bool is_task_cancelled() const;
   virtual float get_task_progress_percentage() const;
-
-protected:
   virtual task_status get_task_status() const;
   virtual int get_task_expected_work() const;
   virtual int get_task_work_progress() const;

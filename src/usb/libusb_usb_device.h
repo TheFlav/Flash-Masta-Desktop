@@ -37,12 +37,8 @@ public:
   void                  close();
   unsigned int          read(data_t* data, unsigned int num_bytes);
   unsigned int          read(data_t* data, unsigned int num_bytes, timeout_t timeout);
-  unsigned int          read(data_t* data, unsigned int num_bytes, task_controller* controller);
-  unsigned int          read(data_t* data, unsigned int num_bytes, timeout_t timeout, task_controller* controller);
   unsigned int          write(const data_t* buffer, unsigned int num_bytes);
   unsigned int          write(const data_t* buffer, unsigned int num_bytes, timeout_t timeout);
-  unsigned int          write(const data_t* buffer, unsigned int num_bytes, task_controller* controller);
-  unsigned int          write(const data_t* buffer, unsigned int num_bytes, timeout_t timeout, task_controller* controller);
   
 private:
   device_description*   build_device_description();

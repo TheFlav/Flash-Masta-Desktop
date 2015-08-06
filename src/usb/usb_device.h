@@ -107,12 +107,8 @@ public:
   virtual void close() = 0;
   virtual unsigned int read(data_t* data, unsigned int num_bytes) = 0;
   virtual unsigned int read(data_t* data, unsigned int num_bytes, timeout_t timeout) = 0;
-  virtual unsigned int read(data_t* data, unsigned int num_bytes, task_controller* controller) = 0;
-  virtual unsigned int read(data_t* data, unsigned int num_bytes, timeout_t timeout, task_controller* controller) = 0;
   virtual unsigned int write(const data_t* buffer, unsigned int num_bytes) = 0;
   virtual unsigned int write(const data_t* buffer, unsigned int num_bytes, timeout_t timeout) = 0;
-  virtual unsigned int write(const data_t* buffer, unsigned int num_bytes, task_controller* controller) = 0;
-  virtual unsigned int write(const data_t* buffer, unsigned int num_bytes, timeout_t timeout, task_controller* controller) = 0;
 };
 
 
