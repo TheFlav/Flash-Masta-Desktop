@@ -443,7 +443,7 @@ void ngp_cartridge::build_cartridge_destriptor()
     m_num_chips = i + 1;
     
     // Initialize chip
-    chip->test_bypass_support();
+    m_chips[i]->test_bypass_support();
   }
   
   // Initialize cartridge descriptor

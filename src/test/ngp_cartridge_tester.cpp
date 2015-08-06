@@ -97,7 +97,7 @@ bool ngp_cartridge_tester::prepare()
   out << "done." << endl;
   
   // Initialize input file
-  m_fin->open("/Users/Dan/Documents/ROMs/pbm.ngp", ios::binary);
+  m_fin->open("/Users/Dan/Documents/ROMs/pacman_cut.ngp", ios::binary);
   
   return true;
 }
@@ -190,7 +190,7 @@ bool ngp_cartridge_tester::run_tests()
   }
   
   //////////////////////////////////////////////////////////// 4
-  /*
+  
   success = true;
   
   fout.open("/Users/Dan/Documents/ROMs/bkp.ngp", ios::binary);
@@ -216,7 +216,7 @@ bool ngp_cartridge_tester::run_tests()
   
   out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
   m_test_count[success ? 0 : 1]++;
-  */
+  
   //////////////////////////////////////////////////////////// 5
   /*
   success = true;
@@ -244,7 +244,8 @@ bool ngp_cartridge_tester::run_tests()
   m_test_count[success ? 0 : 1]++;
   */
   //////////////////////////////////////////////////////////// 6
-  /*
+  
+  //// Verify cartridge ////
   success = true;
   
   fin.seekg(0, fin.beg);
@@ -252,7 +253,10 @@ bool ngp_cartridge_tester::run_tests()
   {
     if (fin.good())
     {
-      m_cartridge->compare_file_to_cartridge(fin);
+      if (!m_cartridge->compare_file_to_cartridge(fin))
+      {
+        success = false;
+      }
     }
     else
     {
@@ -267,7 +271,7 @@ bool ngp_cartridge_tester::run_tests()
   
   out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
   m_test_count[success ? 0 : 1]++;
-  */
+  
   //////////////////////////////////////////////////////////// 7
   
   success = true;

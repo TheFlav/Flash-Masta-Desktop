@@ -73,11 +73,11 @@ void ngp_chip::reset()
     write(ADDR_DONTCARE, 0x90);
     write(ADDR_DONTCARE, 0x00);
   }
-  else
-  {
-    // Send the reset command
-    write(ADDR_DONTCARE, 0xF0);
-  }
+  
+  // Send the full command
+  write(ADDR_COMMAND1, 0xAA);
+  write(ADDR_COMMAND2, 0x55);
+  write(ADDR_COMMAND3, 0xF0);
   
   // Update the cached mode
   m_mode = READ;
