@@ -1,5 +1,6 @@
 #include "libusb_usb_device.h"
 #include "usb.h"
+#include "tasks/task_controller.h"
 #include "libusb-1.0/libusb.h"
 #include <stdexcept>
 #include <string>
@@ -533,6 +534,16 @@ unsigned int libusb_usb_device::read(data_t *buffer, unsigned int num_bytes)
 
 unsigned int libusb_usb_device::read(data_t *buffer, unsigned int num_bytes, timeout_t timeout)
 {
+  return read(buffer, num_bytes, timeout, nullptr);
+}
+
+unsigned int libusb_usb_device::read(data_t* buffer, unsigned int num_bytes, task_controller* controller)
+{
+  return read(buffer, num_bytes, timeout(), controller);
+}
+
+unsigned int libusb_usb_device::read(data_t* buffer, unsigned int num_bytes, timeout_t timeout, task_controller* controller)
+{
   if (!m_was_initialized) throw uninitialized_exception(CLASS_NAME);
   if (!m_is_open) throw unopen_exception(CLASS_NAME);
   if (!m_configuration_set) throw unconfigured_exception(CONFIG_NAME);
@@ -541,11 +552,11 @@ unsigned int libusb_usb_device::read(data_t *buffer, unsigned int num_bytes, tim
   
   int bytes_written = 0;
   unsigned char endpoint = get_device_description()
-    ->configurations[m_configuration]
-    ->interfaces[m_interface]
-    ->alt_settings[m_alt_setting]
-    ->endpoints[m_input_endpoint]
-    ->address;
+  ->configurations[m_configuration]
+  ->interfaces[m_interface]
+  ->alt_settings[m_alt_setting]
+  ->endpoints[m_input_endpoint]
+  ->address;
   
   // Transfer data, catching errors and throwing exceptions if necessary
   int error = libusb_bulk_transfer(m_device_handle, endpoint, buffer, num_bytes, &bytes_written, (unsigned int) timeout);
@@ -611,6 +622,13 @@ unsigned int libusb_usb_device::write(const data_t* data, unsigned int num_bytes
   
   return (unsigned int) bytes_read;
 }
+
+unsigned int libusb_usb_device::write(const data_t* data, unsigned int num_bytes, task_controller* controller)
+{
+  return write(data, num_bytes, timeout(), controller);
+}
+
+unsigned int libusb_usb_device::write(const data_t* data, unsigned int num_bytes, timeout_t timeout, task_controller* controller);
 
 
 

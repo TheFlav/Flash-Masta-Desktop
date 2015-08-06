@@ -218,7 +218,7 @@ bool ngp_cartridge_tester::run_tests()
   m_test_count[success ? 0 : 1]++;
   
   //////////////////////////////////////////////////////////// 5
-  /*
+  
   success = true;
   
   fin.seekg(0, fin.beg);
@@ -242,7 +242,7 @@ bool ngp_cartridge_tester::run_tests()
   out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
 //  out << "  Test " << ++test_num << " SKIPPED" << endl;
   m_test_count[success ? 0 : 1]++;
-  */
+  
   //////////////////////////////////////////////////////////// 6
   
   //// Verify cartridge ////

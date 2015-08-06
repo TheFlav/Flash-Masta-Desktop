@@ -23,6 +23,7 @@ class task_controller
 {
 public:
   task_controller();
+  task_controller(const task_controller& other);
   virtual ~task_controller();
   virtual void on_task_start(int work_expected);
   virtual void on_task_update(task_status status, int work_progress);

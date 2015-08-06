@@ -9,7 +9,17 @@
 #include "task_controller.h"
 
 task_controller::task_controller()
-  : m_task_status(NOT_STARTED), m_task_work_expected(0), m_task_work_total(0)
+  : m_task_status(NOT_STARTED), m_task_work_expected(0), m_task_work_total(0),
+    m_task_is_cancelled(false)
+{
+  // Nothing else to do
+}
+
+task_controller::task_controller(const task_controller& other)
+  : m_task_status(other.task_status),
+    m_task_work_expected(other.m_task_work_expected),
+    m_task_work_total(other.m_task_work_total),
+    m_task_is_cancelled(other.m_task_is_cancelled)
 {
   // Nothing else to do
 }
@@ -75,3 +85,5 @@ void task_controller::cancel_task()
 {
   m_task_is_cancelled = true;
 }
+
+
