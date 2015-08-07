@@ -191,6 +191,7 @@ bool ngp_cartridge_tester::run_tests()
   
   //////////////////////////////////////////////////////////// 4
   
+  //// Backup cartridge ////
   success = true;
   
   fout.open("/Users/Dan/Documents/ROMs/bkp.ngp", ios::binary);
@@ -219,6 +220,7 @@ bool ngp_cartridge_tester::run_tests()
   
   //////////////////////////////////////////////////////////// 5
   
+  //// Write cartridge ////
   success = true;
   
   fin.seekg(0, fin.beg);
@@ -240,7 +242,6 @@ bool ngp_cartridge_tester::run_tests()
   }
   
   out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
-//  out << "  Test " << ++test_num << " SKIPPED" << endl;
   m_test_count[success ? 0 : 1]++;
   
   //////////////////////////////////////////////////////////// 6

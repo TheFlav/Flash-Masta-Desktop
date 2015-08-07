@@ -342,7 +342,7 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
   }
   
   // Inform controller that task is complete
-  if (controller == nullptr)
+  if (controller != nullptr)
   {
     controller->on_task_end(offset < num_bytes && controller->is_task_cancelled() ?  task_status::CANCELLED : task_status::COMPLETED, offset);
   }
