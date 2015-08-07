@@ -389,18 +389,21 @@ unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int 
       unsigned int result;
       
       // Request read from linkmasta, forwarding task progress updates
-      try
+      if (!controller->is_task_cancelled())
       {
-        result = m_linkmasta->read_bytes(m_chip_num, address, data, num_bytes, &fwd_controller);
-      }
-      catch (std::exception& ex)
-      {
-        controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-        throw;
+        try
+        {
+          result = m_linkmasta->read_bytes(m_chip_num, address, data, num_bytes, &fwd_controller);
+        }
+        catch (std::exception& ex)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+          throw;
+        }
       }
       
       // Inform controller that task has ended
-      controller->on_task_end(task_status::COMPLETED, num_bytes);
+      controller->on_task_end(controller->is_task_cancelled() && result < num_bytes ? task_status::CANCELLED : task_status::COMPLETED, result);
       return result;
     }
   }
@@ -413,7 +416,8 @@ unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int 
     }
     
     // Linkmasta does not support batch reading; to it manually
-    for (unsigned int i = 0; i < num_bytes; ++i, ++address)
+    unsigned int i;
+    for (i = 0; i < num_bytes && (controller == nullptr || !controller->is_task_cancelled()); ++i, ++address)
     {
       try
       {
@@ -439,9 +443,9 @@ unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int 
     // Inform controller that task is complete
     if (controller != nullptr)
     {
-      controller->on_task_end(task_status::COMPLETED, num_bytes);
+      controller->on_task_end(controller->is_task_cancelled() && i < num_bytes ? task_status::CANCELLED : task_status::COMPLETED, num_bytes);
     }
-    return num_bytes;
+    return i;
   }
 }
 
@@ -476,18 +480,21 @@ unsigned int ngp_chip::program_bytes(address_t address, const data_t* data, unsi
       unsigned int result;
       
       // Request program from linkmasta, forwarding task progress updates
-      try
+      if (!controller->is_task_cancelled())
       {
-        result = m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, supports_bypass(),  &fwd_controller);
-      }
-      catch (std::exception& ex)
-      {
-        controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-        throw;
+        try
+        {
+          result = m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, supports_bypass(),  &fwd_controller);
+        }
+        catch (std::exception& ex)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+          throw;
+        }
       }
       
       // Inform controller of task end
-      controller->on_task_end(task_status::COMPLETED, num_bytes);
+      controller->on_task_end(controller->is_task_cancelled() && result < num_bytes ? task_status::CANCELLED :  task_status::COMPLETED, result);
       return result;
     }
   }
@@ -512,7 +519,8 @@ unsigned int ngp_chip::program_bytes(address_t address, const data_t* data, unsi
     }
     
     // Send byte of data one at a time
-    for (unsigned int i = 0; i < num_bytes; ++i, ++address)
+    unsigned int i;
+    for (i = 0; i < num_bytes && (controller == nullptr || !controller->is_task_cancelled()); ++i, ++address)
     {
       try
       {
@@ -537,7 +545,7 @@ unsigned int ngp_chip::program_bytes(address_t address, const data_t* data, unsi
     // Inform controller of task end
     if (controller != nullptr)
     {
-      controller->on_task_end(task_status::COMPLETED, num_bytes);
+      controller->on_task_end(controller->is_task_cancelled() && i < num_bytes ? task_status::CANCELLED : task_status::COMPLETED, num_bytes);
     }
     return num_bytes;
   }
