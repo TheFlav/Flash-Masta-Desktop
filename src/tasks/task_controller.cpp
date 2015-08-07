@@ -16,7 +16,7 @@ task_controller::task_controller()
 }
 
 task_controller::task_controller(const task_controller& other)
-  : m_task_status(other.task_status),
+  : m_task_status(other.m_task_status),
     m_task_work_expected(other.m_task_work_expected),
     m_task_work_total(other.m_task_work_total),
     m_task_is_cancelled(other.m_task_is_cancelled)
@@ -41,7 +41,7 @@ void task_controller::on_task_update(task_status status, int work_progress)
   m_task_work_total += work_progress;
 }
 
-void task_controller::on_task_complete(task_status status, int work_total)
+void task_controller::on_task_end(task_status status, int work_total)
 {
   m_task_status = status;
   m_task_work_total = work_total;
