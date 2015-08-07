@@ -8,6 +8,8 @@
 
 #include "ngp_chip.h"
 #include "linkmasta_device/linkmasta_device.h"
+#include "tasks/task_controller.h"
+#include "tasks/forwarding_task_controller.h"
 
 
 
@@ -356,50 +358,7 @@ bool ngp_chip::test_erasing()
   return is_erasing();
 }
 
-unsigned int ngp_chip::program_bytes(address_t address, const data_t* data, unsigned int num_bytes)
-{
-  if (is_erasing())
-  {
-    // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  
-  if (m_linkmasta->supports_program_bytes())
-  {
-    // Ensure we're in default mode before passing command along to Linkmasta
-    if (current_mode() != READ)
-    {
-      reset();
-    }
-    
-    // Use Linkmasta's built-in support for batch programming
-    return m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, supports_bypass());
-  }
-  else
-  {
-    // Linkmasta does not support batch programming; do it manually
-    
-    // First, ensure we're in the correct mode
-    if (supports_bypass() && current_mode() != BYPASS)
-    {
-      unlock_bypass();
-    }
-    else if (!supports_bypass() && current_mode() != READ)
-    {
-      reset();
-    }
-    
-    // Send byte of data one at a time
-    for (unsigned int i = 0; i < num_bytes; ++i, ++address)
-    {
-      program_byte(address, data[i]);
-    }
-    
-    return num_bytes;
-  }
-}
-
-unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int num_bytes)
+unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int num_bytes, task_controller* controller)
 {
   if (is_erasing())
   {
@@ -416,19 +375,182 @@ unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int 
   if (m_linkmasta->supports_read_bytes())
   {
     // Use Linkmasta's built-in support for batch reads
-    return m_linkmasta->read_bytes(m_chip_num, address, data, num_bytes);
+    if (controller == nullptr)
+    {
+      return m_linkmasta->read_bytes(m_chip_num, address, data, num_bytes);
+    }
+    else
+    {
+      // Create temporary forwarding controller to pass to linkmasta
+      forwarding_task_controller fwd_controller(controller);
+      fwd_controller.scale_work_to(num_bytes);
+      controller->on_task_start(num_bytes);
+      
+      unsigned int result;
+      
+      // Request read from linkmasta, forwarding task progress updates
+      if (!controller->is_task_cancelled())
+      {
+        try
+        {
+          result = m_linkmasta->read_bytes(m_chip_num, address, data, num_bytes, &fwd_controller);
+        }
+        catch (std::exception& ex)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+          throw;
+        }
+      }
+      
+      // Inform controller that task has ended
+      controller->on_task_end(controller->is_task_cancelled() && result < num_bytes ? task_status::CANCELLED : task_status::COMPLETED, result);
+      return result;
+    }
   }
   else
   {
-    // Linkmasta does not support batch reading; to it manually
-    for (unsigned int i = 0; i < num_bytes; ++i, ++address)
+    // Inform controller that task has started
+    if (controller != nullptr)
     {
-      data[i] = read(address);
+      controller->on_task_start(num_bytes);
     }
     
+    // Linkmasta does not support batch reading; to it manually
+    unsigned int i;
+    for (i = 0; i < num_bytes && (controller == nullptr || !controller->is_task_cancelled()); ++i, ++address)
+    {
+      try
+      {
+        data[i] = read(address);
+      }
+      catch (std::exception& ex)
+      {
+        // Inform controller that an error has occured and pass exception up
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, i);
+        }
+        throw;
+      }
+      
+      // Update controller on task progress
+      if (controller != nullptr)
+      {
+        controller->on_task_update(task_status::RUNNING, 1);
+      }
+    }
+    
+    // Inform controller that task is complete
+    if (controller != nullptr)
+    {
+      controller->on_task_end(controller->is_task_cancelled() && i < num_bytes ? task_status::CANCELLED : task_status::COMPLETED, num_bytes);
+    }
+    return i;
+  }
+}
+
+unsigned int ngp_chip::program_bytes(address_t address, const data_t* data, unsigned int num_bytes, task_controller* controller)
+{
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  if (m_linkmasta->supports_program_bytes())
+  {
+    // Ensure we're in default mode before passing command along to Linkmasta
+    if (current_mode() != READ)
+    {
+      reset();
+    }
+    
+    // Use Linkmasta's built-in support for batch programming
+    if (controller == nullptr)
+    {
+      return m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, supports_bypass());
+    }
+    else
+    {
+      // Create temporary forwarding controller to pass to linkmasta
+      forwarding_task_controller fwd_controller(controller);
+      fwd_controller.scale_work_to(num_bytes);
+      controller->on_task_start(num_bytes);
+      
+      unsigned int result;
+      
+      // Request program from linkmasta, forwarding task progress updates
+      if (!controller->is_task_cancelled())
+      {
+        try
+        {
+          result = m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, supports_bypass(),  &fwd_controller);
+        }
+        catch (std::exception& ex)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+          throw;
+        }
+      }
+      
+      // Inform controller of task end
+      controller->on_task_end(controller->is_task_cancelled() && result < num_bytes ? task_status::CANCELLED :  task_status::COMPLETED, result);
+      return result;
+    }
+  }
+  else
+  {
+    // Linkmasta does not support batch programming; do it manually
+    
+    // First, ensure we're in the correct mode
+    if (supports_bypass() && current_mode() != BYPASS)
+    {
+      unlock_bypass();
+    }
+    else if (!supports_bypass() && current_mode() != READ)
+    {
+      reset();
+    }
+    
+    // Inform controller of task start
+    if (controller != nullptr)
+    {
+      controller->on_task_start(num_bytes);
+    }
+    
+    // Send byte of data one at a time
+    unsigned int i;
+    for (i = 0; i < num_bytes && (controller == nullptr || !controller->is_task_cancelled()); ++i, ++address)
+    {
+      try
+      {
+        program_byte(address, data[i]);
+      }
+      catch (std::exception& ex)
+      {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, i);
+        }
+        throw;
+      }
+      
+      // Inform controller of task progress
+      if (controller != nullptr)
+      {
+        controller->on_task_update(task_status::RUNNING, 1);
+      }
+    }
+    
+    // Inform controller of task end
+    if (controller != nullptr)
+    {
+      controller->on_task_end(controller->is_task_cancelled() && i < num_bytes ? task_status::CANCELLED : task_status::COMPLETED, num_bytes);
+    }
     return num_bytes;
   }
 }
+
 
 
 

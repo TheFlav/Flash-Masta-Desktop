@@ -5,6 +5,8 @@
 #include "cartridge_descriptor.h"
 #include <iosfwd>
 
+class task_controller;
+
 
 
 /**
@@ -23,9 +25,9 @@ public:
   virtual const cartridge_descriptor* descriptor() const = 0;
   
   virtual void             init() = 0;
-  virtual bool             compare_file_to_cartridge(std::ifstream& fin) = 0;
-  virtual void             write_file_to_cartridge(std::ifstream& fin) = 0;
-  virtual void             write_cartridge_to_file(std::ofstream& fout) = 0;
+  virtual bool             compare_file_to_cartridge(std::ifstream& fin, task_controller* controller = nullptr) = 0;
+  virtual void             write_file_to_cartridge(std::ifstream& fin, task_controller* controller = nullptr) = 0;
+  virtual void             write_cartridge_to_file(std::ofstream& fout, task_controller* controller = nullptr) = 0;
 };
 
 #endif // __CARTRIDGE_H__

@@ -1,6 +1,8 @@
 #include "ngp_cartridge.h"
 #include "linkmasta_device/linkmasta_device.h"
 #include "ngp_chip.h"
+#include "tasks/task_controller.h"
+#include "tasks/forwarding_task_controller.h"
 #include <fstream>
 
 #ifdef VERBOSE
@@ -63,7 +65,7 @@ void ngp_cartridge::init()
 }
 
 
-bool ngp_cartridge::compare_file_to_cartridge(std::ifstream& fin)
+bool ngp_cartridge::compare_file_to_cartridge(std::ifstream& fin, task_controller* controller)
 {
   // Ensure class was initialized
   if (!m_was_init)
@@ -95,13 +97,19 @@ bool ngp_cartridge::compare_file_to_cartridge(std::ifstream& fin)
   unsigned int       c_buffer_size = 0;
   unsigned char*     c_buffer = new unsigned char[BUFFER_MAX_SIZE];
   
+  // Inform controller that task is starting
+  if (controller != nullptr)
+  {
+    controller->on_task_start(bytes_total);
+  }
+  
   // Begin comparing data block-by-block
   try
   {
     // Open connection to NGP chip
     m_linkmasta->open();
     
-    while (bytes_compared < bytes_total && matched)
+    while (bytes_compared < bytes_total && matched && (controller == nullptr || !controller->is_task_cancelled()))
     {
 #ifdef VERBOSE
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_compared << " B / " << bytes_total << " B (" << (bytes_compared * 100 / bytes_total) << "%)" << endl;
@@ -121,22 +129,56 @@ bool ngp_cartridge::compare_file_to_cartridge(std::ifstream& fin)
       // Check for errors
       if (f_buffer_size != bytes_expected)
       {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
         throw std::runtime_error("ERROR");
       }
       if (!fin.good() && (f_buffer_size + bytes_compared) < bytes_total)
       {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
         throw std::runtime_error("ERROR");
       }
       
       // Attempt to read bytes from cartridge
-      c_buffer_size = m_chips[curr_chip]->read_bytes(
-        descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-        c_buffer, bytes_expected
-      );
+      if (controller == nullptr)
+      {
+        c_buffer_size = m_chips[curr_chip]->read_bytes(
+          descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
+          c_buffer, bytes_expected
+        );
+      }
+      else
+      {
+        // Use a forwarding controller to pass progress updates to our controller
+        forwarding_task_controller fwd_controller(controller);
+        fwd_controller.scale_work_to(bytes_expected);
+        try
+        {
+          c_buffer_size = m_chips[curr_chip]->read_bytes(
+            descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
+            c_buffer, bytes_expected, &fwd_controller
+          );
+        }
+        catch (std::exception& ex)
+        {
+          // Inform controller of error
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+          throw;
+        }
+      }
       
       // Check for errors
       if (c_buffer_size != bytes_expected)
       {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
         throw std::runtime_error("ERROR");
       }
       
@@ -166,6 +208,7 @@ bool ngp_cartridge::compare_file_to_cartridge(std::ifstream& fin)
   catch (std::exception& ex)
   {
     // Error occured! Clean up and pass error on to caller
+    // Note: I appologize for the change in style: it's to save lines
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
       while (m_chips[curr_chip]->is_erasing());
@@ -186,17 +229,27 @@ bool ngp_cartridge::compare_file_to_cartridge(std::ifstream& fin)
       // Well... this is awkward
     }
     
+    // Inform controller that error
+    if (controller != nullptr)
+    {
+      controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+    }
     delete [] f_buffer;
     delete [] c_buffer;
-    throw ex;
+    throw;
   }
   
+  // Inform controller that task has ended
+  if (controller != nullptr)
+  {
+    controller->on_task_end(controller->is_task_cancelled() && bytes_compared < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_compared);
+  }
   delete [] f_buffer;
   delete [] c_buffer;
   return matched;
 }
 
-void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin)
+void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin, task_controller* controller)
 {
   // Ensure class was intiialized
   if (!m_was_init)
@@ -225,13 +278,19 @@ void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin)
   unsigned int       buffer_size = 0;
   unsigned char*     buffer = new unsigned char[BUFFER_MAX_SIZE];
   
+  // Inform controller that task is starting
+  if (controller != nullptr)
+  {
+    controller->on_task_start(bytes_total);
+  }
+  
   // Begin writing data block-by-block
   try
   {
     // Open connection to NGP chip
     m_linkmasta->open();
     
-    while (bytes_written < bytes_total)
+    while (bytes_written < bytes_total && (controller == nullptr || !controller->is_task_cancelled()))
     {
 #ifdef VERBOSE
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
@@ -251,10 +310,18 @@ void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin)
       // Check for errors
       if (buffer_size != bytes_expected)
       {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
         throw std::runtime_error("ERROR");
       }
       if (!fin.good() && (buffer_size + bytes_written) < bytes_total)
       {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
         throw std::runtime_error("ERROR");
       }
       
@@ -267,10 +334,30 @@ void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin)
       while (m_chips[curr_chip]->test_erasing());
       
       // Write buffer to cartridge
-      m_chips[curr_chip]->program_bytes(
-        descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-        buffer, buffer_size
-      );
+      if (controller == nullptr)
+      {
+        m_chips[curr_chip]->program_bytes(
+          descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
+          buffer, buffer_size
+        );
+      }
+      else
+      {
+        forwarding_task_controller fwd_controller(controller);
+        fwd_controller.scale_work_to(buffer_size);
+        try
+        {
+          m_chips[curr_chip]->program_bytes(
+            descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
+            buffer, buffer_size, &fwd_controller
+          );
+        }
+        catch (std::exception& ex)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+          throw;
+        }
+      }
       
       // Update markers
       bytes_written += buffer_size;
@@ -308,14 +395,23 @@ void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin)
       // Well... this is awkward
     }
     
+    if (controller != nullptr)
+    {
+      controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+    }
     delete [] buffer;
-    throw ex;
+    throw;
   }
   
+  // Inform controller that task has ended
+  if (controller != nullptr)
+  {
+    controller->on_task_end(controller->is_task_cancelled() && bytes_written < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_written);
+  }
   delete [] buffer;
 }
 
-void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout)
+void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout, task_controller* controller)
 {
   // Ensure class was intiialized
   if (!m_was_init)
@@ -336,13 +432,19 @@ void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout)
   unsigned int       buffer_size = 0;
   unsigned char*     buffer = new unsigned char[BUFFER_MAX_SIZE];
   
+  // Inform controller that task is starting
+  if (controller != nullptr)
+  {
+    controller->on_task_start(bytes_total);
+  }
+  
   // Begin writing data block-by-block
   try
   {
     // Open connection to NGP chip
     m_linkmasta->open();
     
-    while (bytes_written < bytes_total && curr_chip < descriptor()->num_chips)
+    while (bytes_written < bytes_total && curr_chip < descriptor()->num_chips && (controller == nullptr || !controller->is_task_cancelled()))
     {
 #ifdef VERBOSE
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
@@ -356,18 +458,47 @@ void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout)
       }
       
       // Attempt to read bytes from cartridge
-      buffer_size = m_chips[curr_chip]->read_bytes(
-        descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-        buffer, bytes_expected
-      );
+      if (controller == nullptr)
+      {
+        buffer_size = m_chips[curr_chip]->read_bytes(
+          descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
+          buffer, bytes_expected
+        );
+      }
+      else
+      {
+        // Create a forwarding controller to pass progress updates to
+        forwarding_task_controller fwd_controller(controller);
+        fwd_controller.scale_work_to(bytes_expected);
+        try
+        {
+          buffer_size = m_chips[curr_chip]->read_bytes(
+            descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
+            buffer, bytes_expected, &fwd_controller
+          );
+        }
+        catch (std::exception& ex)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+          throw;
+        }
+      }
       
       // Check for errors
       if (buffer_size != bytes_expected)
       {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
         throw std::runtime_error("ERROR");
       }
       if (!fout.good())
       {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
         throw std::runtime_error("ERROR");
       }
       
@@ -410,10 +541,20 @@ void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout)
       // Well... this is awkward
     }
     
+    // Inform controller of task end
+    if (controller != nullptr)
+    {
+      controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+    }
     delete [] buffer;
-    throw ex;
+    throw;
   }
   
+  // Inform controller of task end
+  if (controller != nullptr)
+  {
+    controller->on_task_end(controller->is_task_cancelled() && bytes_written < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_written);
+  }
   delete [] buffer;
 }
 
