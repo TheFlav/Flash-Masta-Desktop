@@ -10,6 +10,7 @@
 #define __NGP_CHIP_H__
 
 class linkmasta_device;
+class task_controller;
 
 class ngp_chip
 {
@@ -49,8 +50,8 @@ public:
   bool                    test_bypass_support();
   bool                    is_erasing() const;
   bool                    test_erasing();
-  unsigned int            program_bytes(address_t address, const data_t* data, unsigned int num_bytes);
-  unsigned int            read_bytes(address_t address, data_t* data, unsigned int num_bytes);
+  unsigned int            read_bytes(address_t address, data_t* data, unsigned int num_bytes, task_controller* controller = nullptr);
+  unsigned int            program_bytes(address_t address, const data_t* data, unsigned int num_bytes, task_controller* controller = nullptr);
   
 private:
   void                    enter_autoselect();
