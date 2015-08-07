@@ -29,9 +29,9 @@ public:
   const cartridge_descriptor* descriptor() const;
   
   void                  init();
-  bool                  compare_file_to_cartridge(std::ifstream& fin);
-  void                  write_file_to_cartridge(std::ifstream& fin);
-  void                  write_cartridge_to_file(std::ofstream& fout);
+  bool                  compare_file_to_cartridge(std::ifstream& fin, task_controller* controller = nullptr);
+  void                  write_file_to_cartridge(std::ifstream& fin, task_controller* controller = nullptr);
+  void                  write_cartridge_to_file(std::ofstream& fout, task_controller* controller = nullptr);
   
   static bool           test_for_cartridge(linkmasta_device* linkmasta);
   
