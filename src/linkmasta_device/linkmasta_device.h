@@ -13,6 +13,7 @@
 #include <string>
 
 class cartridge;
+class task_controller;
 
 class linkmasta_device
 {
@@ -44,8 +45,8 @@ public:
   virtual bool             supports_read_device_id() const = 0;
   virtual bool             supports_read_block_protection() const = 0;
   
-  virtual unsigned int     read_bytes(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes) = 0;
-  virtual unsigned int     program_bytes(chip_index chip, address_t start_address, const data_t* buffer, unsigned int num_bytes, bool bypass_mode) = 0;
+  virtual unsigned int     read_bytes(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes, task_controller* controller = nullptr) = 0;
+  virtual unsigned int     program_bytes(chip_index chip, address_t start_address, const data_t* buffer, unsigned int num_bytes, bool bypass_mode, task_controller* controller = nullptr) = 0;
   virtual void             erase_chip(chip_index chip) = 0;
   virtual void             erase_chip_block(chip_index chip, address_t block_address) = 0;
   virtual unsigned int     read_manufacturer_id(chip_index chip) = 0;

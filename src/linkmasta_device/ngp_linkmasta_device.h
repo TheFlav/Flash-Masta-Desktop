@@ -44,8 +44,8 @@ public:
   bool             supports_read_device_id() const;
   bool             supports_read_block_protection() const;
   
-  unsigned int     read_bytes(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes);
-  unsigned int     program_bytes(chip_index chip, address_t start_address, const data_t* buffer, unsigned int num_bytes, bool bypass_mode);
+  unsigned int     read_bytes(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes, task_controller* controller = nullptr);
+  unsigned int     program_bytes(chip_index chip, address_t start_address, const data_t* buffer, unsigned int num_bytes, bool bypass_mode, task_controller* controller = nullptr);
   void             erase_chip(chip_index chip);
   void             erase_chip_block(chip_index chip, address_t block_address);
   unsigned int     read_manufacturer_id(chip_index chip);

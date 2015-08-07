@@ -10,6 +10,7 @@
 #include "usb/usb_device.h"
 #include "cartridge/ngp_cartridge.h"
 #include "ngp_linkmasta_messages.h"
+#include "tasks/task_controller.h"
 #include <limits>
 
 using namespace usb;
@@ -264,7 +265,7 @@ bool ngp_linkmasta_device::supports_read_block_protection() const
 
 
 
-unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes)
+unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes, task_controller* controller)
 {
   // Make sure we are in a ready state
   if (!m_was_init || !m_is_open)
@@ -276,10 +277,16 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
   data_t   _buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
   unsigned int offset = 0;
   
+  // Inform the controller that the task has begun
+  if (controller != nullptr)
+  {
+    controller->on_task_start(num_bytes);
+  }
   
   // Get as many bytes of data as possible in packets of 64
-  while ((offset - num_bytes) / NGP_LINKMASTA_USB_RXTX_SIZE >= 1)
-  {
+  while ((offset - num_bytes) / NGP_LINKMASTA_USB_RXTX_SIZE >= 1
+         && (controller == nullptr || !controller->is_task_cancelled()))
+  {    
     unsigned int num_packets = (num_bytes - offset) / NGP_LINKMASTA_USB_RXTX_SIZE;
     if (num_packets > std::numeric_limits<uint8_t>::max())
     {
@@ -289,20 +296,26 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
     build_read64xN_command(_buffer, start_address + offset, chip, num_packets);
     m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
     
-    for (unsigned int packets_i = 0;
-         packets_i < num_packets;
-         ++packets_i, offset += NGP_LINKMASTA_USB_RXTX_SIZE)
+    for (unsigned int packets_i = 0; packets_i < num_packets; ++packets_i)
     {
       // Get response from device and write directly to buffer
       if (m_usb_device->read(&buffer[offset], NGP_LINKMASTA_USB_RXTX_SIZE) != NGP_LINKMASTA_USB_RXTX_SIZE)
       {
         throw std::runtime_error("ERROR"); // TODO
       }
+      
+      // Update offset and inform controller of progress
+      offset += NGP_LINKMASTA_USB_RXTX_SIZE;
+      if (controller != nullptr)
+      {
+        controller->on_task_update(task_status::RUNNING, NGP_LINKMASTA_USB_RXTX_SIZE);
+      }
     }
   }
   
   // Get any remaining bytes of data individually
-  while (num_bytes - offset > 0)
+  while (num_bytes - offset > 0
+         && (controller == nullptr || !controller->is_task_cancelled()))
   {
     build_read_command(_buffer, start_address + offset, chip);
     m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
@@ -319,15 +332,24 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
     {
       throw std::runtime_error("ERROR");
     }
+    
+    // Update offset and inform controller of progress
     ++offset;
+    if (controller != nullptr)
+    {
+      controller->on_task_update(task_status::RUNNING, 1);
+    }
   }
   
-  // Yeah, yeah, yeah, I know, but exceptions get thrown if something goes wrong
-  // so don't judge me.
-  return num_bytes;
+  // Inform controller that task is complete
+  if (controller == nullptr)
+  {
+    controller->on_task_end(offset < num_bytes && controller->is_task_cancelled() ?  task_status::CANCELLED : task_status::COMPLETED, offset);
+  }
+  return offset;
 }
 
-unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes, bool bypass_mode)
+unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes, bool bypass_mode, task_controller* controller)
 {
   if (!m_was_init || !m_is_open)
   {
@@ -336,13 +358,18 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
   
   // Some working variables
   data_t   _buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
-  unsigned int offset;
+  unsigned int offset = 0;
   uint8_t  result;
   
-  offset = 0;
+  // Inform controller that task has started
+  if (controller != nullptr)
+  {
+    controller->on_task_start(num_bytes);
+  }
   
   // Inform device of incoming data
-  while ((num_bytes - offset) / NGP_LINKMASTA_USB_RXTX_SIZE >= 1)
+  while ((num_bytes - offset) / NGP_LINKMASTA_USB_RXTX_SIZE >= 1
+         && (controller == nullptr || !controller->is_task_cancelled()))
   {
     // Makes sure we don't go over the packet limit
     unsigned int num_packets = (num_bytes - offset) / NGP_LINKMASTA_USB_RXTX_SIZE;
@@ -355,12 +382,17 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
     m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
     
     // Send chunks of 64 bytes to device
-    for (unsigned int packet_i = 0;
-         packet_i < num_packets;
-         ++packet_i, offset += NGP_LINKMASTA_USB_RXTX_SIZE)
+    for (unsigned int packet_i = 0; packet_i < num_packets; ++packet_i)
     {
       build_flash_write64xN_data_packet(_buffer, &buffer[offset]);
       m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+      
+      // Update offset and inform controller of progress
+      offset += NGP_LINKMASTA_USB_RXTX_SIZE;
+      if (controller != nullptr)
+      {
+        controller->on_task_update(task_status::RUNNING, NGP_LINKMASTA_USB_RXTX_SIZE);
+      }
     }
     
     // Verify that operaton worked
@@ -379,7 +411,8 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
   }
   
   // If at least 32 bytes remain, write them
-  while (num_bytes - offset >= NGP_LINKMASTA_USB_RXTX_SIZE / 2)
+  while (num_bytes - offset >= NGP_LINKMASTA_USB_RXTX_SIZE / 2
+         && (controller == nullptr || !controller->is_task_cancelled()))
   {
     build_flash_write_32_command(_buffer, start_address + offset, &buffer[offset], chip, bypass_mode);
     m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
@@ -392,11 +425,17 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
       throw std::runtime_error("ERROR"); // TODO
     }
     
+    // Update offset and inform controller of progress
     offset += NGP_LINKMASTA_USB_RXTX_SIZE / 2;
+    if (controller != nullptr)
+    {
+      controller->on_task_update(task_status::RUNNING, NGP_LINKMASTA_USB_RXTX_SIZE / 2);
+    }
   }
   
   // If any bytes remain, write them
-  while (num_bytes - offset > 0)
+  while (num_bytes - offset > 0
+         && (controller == nullptr || !controller->is_task_cancelled()))
   {
     unsigned int num_bytes_ = num_bytes;
     if (num_bytes_ >= NGP_LINKMASTA_USB_RXTX_SIZE / 2)
@@ -412,13 +451,27 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
     get_result_reply(_buffer, &result);
     if (result != MSG_RESULT_SUCCESS)
     {
+      if (controller != nullptr)
+      {
+        controller->on_task_end(task_status::ERROR, offset);
+      }
       throw std::runtime_error("ERROR"); // TODO
     }
     
+    // Update offset and inform controller of progress
     offset += num_bytes_ - offset;
+    if (controller != nullptr)
+    {
+      controller->on_task_end(task_status::RUNNING, num_bytes - offset);
+    }
   }
   
-  return num_bytes;
+  // Inform controller that task is complete
+  if (controller != nullptr)
+  {
+    controller->on_task_end(offset < num_bytes && controller->is_task_cancelled() ? task_status::CANCELLED : task_status::COMPLETED, offset);
+  }
+  return offset;
 }
 
 void ngp_linkmasta_device::erase_chip(chip_index chip)
