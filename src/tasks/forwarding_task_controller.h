@@ -10,6 +10,7 @@
 #define __FORWARDING_TASK_CONTROLLER_H__
 
 #include "task_controller.h"
+#include <mutex>
 
 class forwarding_task_controller: public task_controller
 {
@@ -26,6 +27,7 @@ public:
 private:
   task_controller* const m_receiver;
   int m_task_work_target;
+  std::mutex* m_mutex;
 };
 
 #endif /* defined(__FORWARDING_TASK_CONTROLLER_H__) */

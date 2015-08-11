@@ -195,7 +195,7 @@ void libusb_usb_device::set_configuration(configuration_t configuration)
   }
   
   // Only change configuration if new value differs from old value
-  if (!m_configuration_set || m_configuration != (unsigned int) configuration)
+  if (!m_configuration_set || m_configuration != (int) configuration)
   {
     m_configuration = (unsigned int) configuration;
     m_configuration_set = true;
@@ -437,7 +437,7 @@ void libusb_usb_device::open()
   // Update m_old_configuration to be index of configuration
   for (unsigned int i = 0; i < m_device_description->num_configurations; ++i)
   {
-    if (m_device_description->configurations[i]->config_id == m_old_configuration)
+    if ((int) m_device_description->configurations[i]->config_id == m_old_configuration)
     {
       m_old_configuration = i;
       break;
