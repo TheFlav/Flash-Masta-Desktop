@@ -1,9 +1,9 @@
-#include "mainwindow.h"
+#include "main_window.h"
 #include "ui_mainwindow.h"
 #include <qfontdatabase.h>
 #include <qfiledialog.h>
 #include "../../hardware/PC-App-CLI/NeoLinkmasta.h"
-#include "cartridgebackuptask.h"
+#include "cartridge_backup_task.h"
 
 
 

@@ -1,4 +1,4 @@
-#include "cartridgebackuptask.h"
+#include "cartridge_backup_task.h"
 #include <fstream>
 #include <thread>
 #include <QMessageBox>
@@ -210,11 +210,6 @@ void CartridgeBackupTask::on_task_start(int work_expected)
 void CartridgeBackupTask::on_task_update(task_status status, int work_progress)
 {
   m_mutex->lock();
-  if (work_progress < 0)
-  {
-    work_progress = work_progress;
-  }
-  
   task_controller::on_task_update(status, work_progress);
   m_progress->setValue(get_task_work_progress());
   QApplication::processEvents();
