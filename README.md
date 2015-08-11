@@ -49,13 +49,55 @@ control.
 Contains all source code for the project. No IDE project files. All files in
 this directory should be relevant to source control.
 
-**/src/cartridges** - tracked  
-Contains files related to cartridges, cartridge information, and cartridge
-reading and writing.
+**/src/cartridge** - tracked  
+Contains files related to cartridges and cartridge information.
+
+**/src/cartridge_io** - tracked
+Contains file related to cartridge reading and writing. Code in here should
+primarily contain gaming system and cartridge-specific functionality.
+
+**/src/common** - tracked
+Contains common files that are found throughout the program. These files
+contain global type defines and preprocessor macros that are class-agnostic.
+
+**/src/hardware** - tracked
+Contains the original LinkMasta code written by Ed Mandy. The files contained
+in this directory build messages to communicate with the firmware on the
+LinkMasta and performing *libusb* library function calls to send and receive
+data via USB.
+
+**/src/test** - tracked
+Contains files and classes for unit testing.
+
+**/src/hardware/AVR** - tracked
+Contains some header files used by the original LinkMasta. These files actually
+contain a lot of source code despite their header status, these functions
+existing in the global scope. They should not be included or used except by the
+original LinkMasta code.
+
+**/src/hardware/PC-App-CLI** - tracked
+Contains the original LinkMasta code and corresponding header. The code in these
+files serves multiple functions; everything from command line argument handling
+to interacting with the LinkMasta firmware to making *libusb* library calls to
+communicating with the hardware via USB.
 
 **/src/ui** – tracked   
-Contains code and tempalte files necessary for user interfaces. This includes
+Contains code and template files necessary for user interfaces. This includes
 graphical user interfaces and command line interfaces.
+
+**/src/ui/cl** - tracked
+Contains code related to a command line-based interface.
 
 **/src/ui/qt** - tracked  
 Contains files related to the Qt graphical user interface.
+
+**/src/usb_communicator** - tracked
+Contains files for classes that are intermediaries between the USB libraries
+used and the rest of the program. These classes contain functionality for
+monitering USB ports, getting handles for connected USB devices, and listing
+devices connected to the computer.
+
+**/src/usb_device** - tracked
+Contains files for classes that are used as "handles" for USB devices. These
+classes contain functionality for opening a connection and transmitting data
+to and from USB devices.

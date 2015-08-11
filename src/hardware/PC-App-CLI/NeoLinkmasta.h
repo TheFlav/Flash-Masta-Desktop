@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 7400 Circuits. All rights reserved.
 //
 
-#ifndef __FLASHMASTA_HARDWARE_PC_APP_CLI_NEOLINKMASTA_H__
-#define __FLASHMASTA_HARDWARE_PC_APP_CLI_NEOLINKMASTA_H__
+#ifndef __NEOLINKMASTA_H__
+#define __NEOLINKMASTA_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -107,4 +107,4 @@ int _main(int argc, char *argv[]);
 }
 #endif
 
-#endif
+#endif // __NEOLINKMASTA_H__

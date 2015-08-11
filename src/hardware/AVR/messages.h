@@ -1,6 +1,10 @@
 #ifndef _MESSAGES_H_
 #define _MESSAGES_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #if defined(OS_WINDOWS)
@@ -83,9 +87,9 @@ void get_getversion_reply(uint8_t *buf, uint8_t *majVer, uint8_t *minVer)
 //message structure
 //byte  value
 //0     msgType
-//1     address high byte   ((addr>>16)&0xFF)
-//2     address middle byte ((addr>> 8)&0xFF)
-//3     address low byte    (addr&0xFF)
+//1     address_thigh byte   ((addr>>16)&0xFF)
+//2     address_tmiddle byte ((addr>> 8)&0xFF)
+//3     address_tlow byte    (addr&0xFF)
 //4     data (8bits)
 
 void build_write_command(uint8_t *buf, uint32_t addr_host, uint8_t data, uint8_t chip)
@@ -338,5 +342,9 @@ void get_blink_led_message(uint8_t *buf, uint8_t *blinkCount)
 {
     *blinkCount = buf[MSG_DATA_OFFSET];
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //_MESSAGES_H_
