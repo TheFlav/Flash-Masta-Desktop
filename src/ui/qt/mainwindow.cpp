@@ -3,6 +3,7 @@
 #include <qfontdatabase.h>
 #include <qfiledialog.h>
 #include "../../hardware/PC-App-CLI/NeoLinkmasta.h"
+#include "cartridgebackuptask.h"
 
 
 
@@ -46,6 +47,8 @@ void MainWindow::print_to_console(const char* message, ...)
 
 void MainWindow::on_button_backup_rom_clicked()
 {
+  CartridgeBackupTask(this).go();
+  /*
   char* argv[3] = {0};
   char argv1[] = "";
   char argv2[] = "/b";
@@ -67,6 +70,7 @@ void MainWindow::on_button_backup_rom_clicked()
     strcpy(argv3, filename.toStdString().c_str());
     print_to_console("%d", _main(3, argv));
   }
+  */
 }
 
 void MainWindow::on_button_flash_rom_clicked()

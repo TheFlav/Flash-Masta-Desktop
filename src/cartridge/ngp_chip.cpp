@@ -386,7 +386,7 @@ unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int 
       fwd_controller.scale_work_to(num_bytes);
       controller->on_task_start(num_bytes);
       
-      unsigned int result;
+      unsigned int result = 0;
       
       // Request read from linkmasta, forwarding task progress updates
       if (!controller->is_task_cancelled())
@@ -477,7 +477,7 @@ unsigned int ngp_chip::program_bytes(address_t address, const data_t* data, unsi
       fwd_controller.scale_work_to(num_bytes);
       controller->on_task_start(num_bytes);
       
-      unsigned int result;
+      unsigned int result = 0;
       
       // Request program from linkmasta, forwarding task progress updates
       if (!controller->is_task_cancelled())

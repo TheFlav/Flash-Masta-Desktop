@@ -451,7 +451,7 @@ void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout, task_controller
 #endif
       
       // Calcualte number of expected bytes
-      unsigned bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
+      unsigned int bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
       if (bytes_expected > bytes_total - bytes_written)
       {
         bytes_expected = bytes_total - bytes_written;
@@ -524,20 +524,20 @@ void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout, task_controller
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
       while (m_chips[curr_chip]->is_erasing());
-    } catch (exception ex2) {
+    } catch (std::exception& ex2) {
       // Well... this is awkward
     }
     
     try {
       // Attempt to reset the chip
       m_chips[curr_chip]->reset();
-    } catch (exception ex2) {
+    } catch (std::exception& ex2) {
       // Well... this is awkward
     }
     
     try {
       m_linkmasta->close();
-    } catch (exception ex2) {
+    } catch (std::exception& ex2) {
       // Well... this is awkward
     }
     
