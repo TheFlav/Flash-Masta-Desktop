@@ -4,6 +4,8 @@
 #include <qfiledialog.h>
 #include "../../hardware/PC-App-CLI/NeoLinkmasta.h"
 #include "cartridge_backup_task.h"
+#include "cartridge_verify_task.h"
+#include "cartridge_flash_task.h"
 
 
 
@@ -48,52 +50,14 @@ void MainWindow::print_to_console(const char* message, ...)
 void MainWindow::on_button_backup_rom_clicked()
 {
   CartridgeBackupTask(this).go();
-  /*
-  char* argv[3] = {0};
-  char argv1[] = "";
-  char argv2[] = "/b";
-  char argv3[256] = "";
-  argv[0] = argv1;
-  argv[1] = argv2;
-  argv[2] = argv3;
-  
-  QString filename = QFileDialog::getSaveFileName(
-        this, tr("Save File"), "backup.ngp",
-        tr("Neo Geo Pocket (*.ngp)"));
-  
-  if (filename == QString::null)
-  {
-    // Do nothing. fail.
-  }
-  else
-  {
-    strcpy(argv3, filename.toStdString().c_str());
-    print_to_console("%d", _main(3, argv));
-  }
-  */
+}
+
+void MainWindow::on_button_verify_rom_clicked()
+{
+  CartridgeVerifyTask(this).go();
 }
 
 void MainWindow::on_button_flash_rom_clicked()
 {
-  char* argv[3] = {0};
-  char argv1[] = "";
-  char argv2[] = "/w";
-  char argv3[256] = "";
-  argv[0] = argv1;
-  argv[1] = argv2;
-  argv[2] = argv3;
-  
-  QString filename = QFileDialog::getOpenFileName(
-        this, tr("Open File"), "backup.ngp",
-        tr("Neo Geo Pocket (*.ngp)"));
-  
-  if (filename == QString::null)
-  {
-    // Do nothing. fail.
-  }
-  else
-  {
-    strcpy(argv3, filename.toStdString().c_str());
-    print_to_console("%d", _main(3, argv));
-  }
+  CartridgeFlashTask(this).go();
 }
