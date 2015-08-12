@@ -127,7 +127,6 @@ void CartridgeTask::go()
   }
   
   // Begin task
-  bool success = true;
   try
   {
     this->run_task();
@@ -143,7 +142,6 @@ void CartridgeTask::go()
       msgBox.setText(QString("An error occured during operation.\n\n") + ex.what());
       msgBox.exec();
     }
-    success = false;
   }
   
   // Cleanup
