@@ -4,6 +4,7 @@
 #include <qfiledialog.h>
 #include "../../hardware/PC-App-CLI/NeoLinkmasta.h"
 #include "cartridge_backup_task.h"
+#include "cartridge_verify_task.h"
 
 
 
@@ -71,6 +72,11 @@ void MainWindow::on_button_backup_rom_clicked()
     print_to_console("%d", _main(3, argv));
   }
   */
+}
+
+void MainWindow::on_button_verify_rom_clicked()
+{
+  CartridgeVerifyTask(this).go();
 }
 
 void MainWindow::on_button_flash_rom_clicked()
