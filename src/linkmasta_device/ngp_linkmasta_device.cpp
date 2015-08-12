@@ -476,26 +476,33 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
 
 void ngp_linkmasta_device::erase_chip(chip_index chip)
 {
+  (void) chip;
   throw std::runtime_error("ERROR: NOT SUPPORTED"); // TODO
 }
 
 void ngp_linkmasta_device::erase_chip_block(chip_index chip, address_t block_address)
 {
+  (void) chip;
+  (void) block_address;
   throw std::runtime_error("ERROR: NOT SUPPORTED"); // TODO
 }
 
 unsigned int ngp_linkmasta_device::read_manufacturer_id(chip_index chip)
 {
+  (void) chip;
   throw std::runtime_error("ERROR: NOT SUPPORTED"); // TODO
 }
 
 unsigned int ngp_linkmasta_device::read_device_id(chip_index chip)
 {
+  (void) chip;
   throw std::runtime_error("ERROR: NOT SUPPORTED"); // TODO
 }
 
 bool ngp_linkmasta_device::read_block_protection(chip_index chip, address_t block_address)
 {
+  (void) chip;
+  (void) block_address;
   throw std::runtime_error("ERROR: NOT SUPPORTED"); // TODO
 }
 

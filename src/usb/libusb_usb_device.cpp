@@ -195,7 +195,7 @@ void libusb_usb_device::set_configuration(configuration_t configuration)
   }
   
   // Only change configuration if new value differs from old value
-  if (!m_configuration_set || m_configuration != (unsigned int) configuration)
+  if (!m_configuration_set || m_configuration != (int) configuration)
   {
     m_configuration = (unsigned int) configuration;
     m_configuration_set = true;
@@ -411,15 +411,24 @@ void libusb_usb_device::open()
   }
   
   // Attempt to detach the OS kernel driver if it is attached
-  if (libusb_kernel_driver_active(m_device_handle, m_interface))
+  if (libusb_has_capability(LIBUSB_CAP_SUPPORTS_DETACH_KERNEL_DRIVER))
   {
-    error = libusb_detach_kernel_driver(m_device_handle, m_interface);
-    if (libusb_error_occured(error))
+    error = libusb_kernel_driver_active(m_device_handle, m_interface);
+    if (error == 1)
     {
-      throw_libusb_exception(error, timeout());
-      return;
+        error = libusb_detach_kernel_driver(m_device_handle, m_interface);
+        if (libusb_error_occured(error))
+        {
+          throw_libusb_exception(error, timeout());
+          return;
+        }
+        m_kernel_was_attached = true;
     }
-    m_kernel_was_attached = true;
+    else if (libusb_error_occured(error))
+    {
+        throw_libusb_exception(error, timeout());
+        return;
+    }
   }
   else
   {
@@ -437,7 +446,7 @@ void libusb_usb_device::open()
   // Update m_old_configuration to be index of configuration
   for (unsigned int i = 0; i < m_device_description->num_configurations; ++i)
   {
-    if (m_device_description->configurations[i]->config_id == m_old_configuration)
+    if ((int) m_device_description->configurations[i]->config_id == m_old_configuration)
     {
       m_old_configuration = i;
       break;
@@ -466,7 +475,7 @@ void libusb_usb_device::open()
   // Attempt to claim the desired interface
   if (m_interface_set)
   {
-    error = libusb_claim_interface(m_device_handle, m_interface);
+    error = libusb_claim_interface(m_device_handle, interface());
     if (libusb_error_occured(error))
     {
       throw_libusb_exception(error, timeout());

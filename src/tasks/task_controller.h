@@ -9,6 +9,8 @@
 #ifndef __TASK_CONTROLLER_H__
 #define __TASK_CONTROLLER_H__
 
+#include <mutex>
+
 enum task_status
 {
   ERROR,
@@ -41,6 +43,7 @@ private:
   int m_task_work_expected;
   int m_task_work_total;
   bool m_task_is_cancelled;
+  std::mutex* m_mutex;
 };
 
 #endif /* defined(__TASK_CONTROLLER_H__) */
