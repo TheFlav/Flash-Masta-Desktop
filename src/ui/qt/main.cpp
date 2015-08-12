@@ -1,9 +1,9 @@
 #include "main_window.h"
-#include <QApplication>
+#include "flash_masta.h"
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    FlashMasta a(argc, argv);
     MainWindow w;
     w.show();
 
