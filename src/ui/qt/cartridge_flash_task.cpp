@@ -51,7 +51,21 @@ void CartridgeFlashTask::run_task()
     (void) ex;
     m_fin->close();
     delete m_fin;
+    
+    if (is_task_cancelled())
+    {
+      QMessageBox msgBox;
+      msgBox.setText("Operation aborted: cartridge may be in an unplayable state.");
+      msgBox.exec();
+    }
     throw;
+  }
+  
+  if (is_task_cancelled())
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Operation aborted: cartridge may be in an unplayable state.");
+    msgBox.exec();
   }
   
   // Cleanup

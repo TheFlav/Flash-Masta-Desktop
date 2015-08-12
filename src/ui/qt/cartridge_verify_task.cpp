@@ -42,13 +42,13 @@ void CartridgeVerifyTask::run_task()
   // Begin task
   try
   {
-    if (m_cartridge->compare_file_to_cartridge(*m_fin, this))
+    if (m_cartridge->compare_file_to_cartridge(*m_fin, this) && !is_task_cancelled())
     {
       QMessageBox msgBox;
-      msgBox.setText("Cartridge matches the chosen file 100%.");
+      msgBox.setText("Cartridge and file match.");
       msgBox.exec();
     }
-    else
+    else if(!is_task_cancelled())
     {
       QMessageBox msgBox;
       msgBox.setText("Cartridge data does not match the chosen file.");

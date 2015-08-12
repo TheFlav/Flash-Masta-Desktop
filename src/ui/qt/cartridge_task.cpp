@@ -135,6 +135,14 @@ void CartridgeTask::go()
   catch (std::exception& ex)
   {
     (void) ex;
+    
+    // Only display error message if task wasn't cancelled
+    if (!is_task_cancelled())
+    {
+      QMessageBox msgBox((QWidget*) this->parent());
+      msgBox.setText(QString("An error occured during operation.\n\n") + ex.what());
+      msgBox.exec();
+    }
     success = false;
   }
   
@@ -143,12 +151,6 @@ void CartridgeTask::go()
   delete m_linkmasta;
   libusb_unref_device(m_device);
   libusb_exit(m_libusb);
-  if (success == false || get_task_status() == task_status::ERROR)
-  {
-    QMessageBox msgBox((QWidget*) this->parent());
-    msgBox.setText("An error occured while backing up cartridge.");
-    msgBox.exec();
-  }
   if (m_progress != nullptr)
   {
     m_progress->close();
