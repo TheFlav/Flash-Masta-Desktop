@@ -1,5 +1,4 @@
 #include "cartridge_backup_task.h"
-#include <QProgressDialog>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <fstream>

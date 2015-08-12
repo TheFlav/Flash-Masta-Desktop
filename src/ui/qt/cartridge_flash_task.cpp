@@ -1,20 +1,22 @@
-#include "cartridge_verify_task.h"
+#include "cartridge_flash_task.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-CartridgeVerifyTask::CartridgeVerifyTask(QWidget *parent) : CartridgeTask(parent)
+CartridgeFlashTask::CartridgeFlashTask(QWidget* parent): CartridgeTask(parent)
 {
   // Nothing else to do
 }
 
-CartridgeVerifyTask::~CartridgeVerifyTask()
+CartridgeFlashTask::~CartridgeFlashTask()
 {
   // Nothing else to do
 }
 
-void CartridgeVerifyTask::run_task()
+
+
+void CartridgeFlashTask::run_task()
 {
   // Get source file from user
   QString filename = QFileDialog::getOpenFileName(
@@ -37,23 +39,12 @@ void CartridgeVerifyTask::run_task()
     return;
   }
   
-  set_progress_label("Verifying cartridge");
+  set_progress_label("Writing data to cartridge");
   
   // Begin task
   try
   {
-    if (m_cartridge->compare_file_to_cartridge(*m_fin, this))
-    {
-      QMessageBox msgBox;
-      msgBox.setText("Cartridge matches the chosen file 100%.");
-      msgBox.exec();
-    }
-    else
-    {
-      QMessageBox msgBox;
-      msgBox.setText("Cartridge data does not match the chosen file.");
-      msgBox.exec();
-    }
+    m_cartridge->write_file_to_cartridge(*m_fin, this);
   }
   catch (std::exception& ex)
   {

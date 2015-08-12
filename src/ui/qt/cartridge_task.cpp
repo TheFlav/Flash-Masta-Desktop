@@ -12,7 +12,7 @@ using namespace usb;
 
 CartridgeTask::CartridgeTask(QWidget *parent) 
   : QObject(parent), task_controller(), m_mutex(new std::mutex()),
-    m_progress_label()
+    m_progress(nullptr), m_progress_label()
 {
   // Nothing else to do
 }
@@ -145,12 +145,15 @@ void CartridgeTask::go()
   libusb_exit(m_libusb);
   if (success == false || get_task_status() == task_status::ERROR)
   {
-    QMessageBox msgBox(m_progress);
+    QMessageBox msgBox((QWidget*) this->parent());
     msgBox.setText("An error occured while backing up cartridge.");
     msgBox.exec();
   }
-  m_progress->close();
-  delete m_progress;
+  if (m_progress != nullptr)
+  {
+    m_progress->close();
+    delete m_progress;
+  }
 }
 
 
