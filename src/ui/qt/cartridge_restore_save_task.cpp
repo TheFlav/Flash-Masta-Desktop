@@ -1,22 +1,22 @@
-#include "cartridge_flash_task.h"
+#include "cartridge_restore_save_task.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-CartridgeFlashTask::CartridgeFlashTask(QWidget* parent): CartridgeTask(parent)
+CartridgeRestoreSaveTask::CartridgeRestoreSaveTask(QWidget* parent): CartridgeTask(parent)
 {
   // Nothing else to do
 }
 
-CartridgeFlashTask::~CartridgeFlashTask()
+CartridgeRestoreSaveTask::~CartridgeRestoreSaveTask()
 {
   // Nothing else to do
 }
 
 
 
-void CartridgeFlashTask::run_task()
+void CartridgeRestoreSaveTask::run_task()
 {
   // Get source file from user
   QString filename = QFileDialog::getOpenFileName(
@@ -39,12 +39,12 @@ void CartridgeFlashTask::run_task()
     return;
   }
   
-  set_progress_label("Writing data to cartridge");
+  set_progress_label("Restoring save data to cartridge");
   
   // Begin task
   try
   {
-    m_cartridge->restore_cartridge_game_data(*m_fin, this);
+    m_cartridge->restore_cartridge_save_data(*m_fin, this);
   }
   catch (std::exception& ex)
   {

@@ -1,24 +1,24 @@
-#include "cartridge_backup_task.h"
+#include "cartridge_backup_save_task.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-CartridgeBackupTask::CartridgeBackupTask(QWidget *parent) : CartridgeTask(parent)
+CartridgeBackupSaveTask::CartridgeBackupSaveTask(QWidget *parent) : CartridgeTask(parent)
 {
   // Nothing else to do
 }
 
-CartridgeBackupTask::~CartridgeBackupTask()
+CartridgeBackupSaveTask::~CartridgeBackupSaveTask()
 {
   // Nothing else to do
 }
 
-void CartridgeBackupTask::run_task()
+void CartridgeBackupSaveTask::run_task()
 {
   // Get destination file from user
   QString filename = QFileDialog::getSaveFileName(
-    (QWidget*) this->parent(), tr("Save File"), "backup.ngp",
+    (QWidget*) this->parent(), tr("Save File"), "save_backup.ngp",
     tr("Neo Geo Pocket (*.ngp)"));
   if (filename == QString::null)
   {
@@ -37,12 +37,12 @@ void CartridgeBackupTask::run_task()
     return;
   }
   
-  set_progress_label("Creating cartridge backup");
+  set_progress_label("Creating game save backup");
   
   // Begin task
   try
   {
-    m_cartridge->backup_cartridge_game_data(*m_fout, this);
+    m_cartridge->backup_cartridge_save_data(*m_fout, this);
   }
   catch (std::exception& ex)
   {
