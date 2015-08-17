@@ -8,7 +8,8 @@
 
 #include "unopen_exception.h"
 
-using namespace usb;
+namespace usb
+{
 
 unopen_exception::unopen_exception(const std::string& class_name)
   : exception("an object of type " + class_name + " was used without being opened"),
@@ -33,3 +34,5 @@ const char* unopen_exception::class_name() const
 {
   return m_class_name.c_str();
 }
+
+};

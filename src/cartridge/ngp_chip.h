@@ -16,6 +16,7 @@ class ngp_chip
 {
 public:
   typedef unsigned char    data_t;
+  typedef unsigned int     word_t;
   typedef unsigned int     chip_index_t;
   typedef unsigned int     manufact_id_t;
   typedef unsigned int     device_id_t;
@@ -33,8 +34,8 @@ public:
   /* constructor */       ngp_chip(linkmasta_device* linkmasta_device, chip_index_t chip_num);
   /* destructor  */       ~ngp_chip();
   
-  data_t                  read(address_t address);
-  void                    write(address_t address, data_t data);
+  word_t                  read(address_t address);
+  void                    write(address_t address, word_t data);
   
   void                    reset();
   manufact_id_t           get_manufacturer_id();

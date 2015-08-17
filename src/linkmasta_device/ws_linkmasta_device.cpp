@@ -1,46 +1,40 @@
 //
-//  ngp_linkmasta_flash_device.cpp
+//  ws_linkmasta_device.cpp
 //  FlashMasta
 //
-//  Created by Dan on 7/24/15.
+//  Created by Dan on 8/14/15.
 //  Copyright (c) 2015 7400 Circuits. All rights reserved.
 //
 
-#include "ngp_linkmasta_device.h"
+#include "ws_linkmasta_device.h"
 #include "usb/usb_device.h"
-#include "cartridge/ngp_cartridge.h"
-#include "ngp_linkmasta_messages.h"
+#include "ws_linkmasta_messages.h"
 #include "tasks/task_controller.h"
 #include <limits>
 
 using namespace usb;
 
-typedef ngp_linkmasta_device::data_t     data_t;
-typedef ngp_linkmasta_device::word_t     word_t;
-typedef ngp_linkmasta_device::timeout_t  timeout_t;
-typedef ngp_linkmasta_device::version_t  version_t;
-typedef ngp_linkmasta_device::chip_index chip_index;
+typedef ws_linkmasta_device::data_t     data_t;
+typedef ws_linkmasta_device::word_t     word_t;
+typedef ws_linkmasta_device::timeout_t  timeout_t;
+typedef ws_linkmasta_device::version_t  version_t;
+typedef ws_linkmasta_device::chip_index chip_index;
+
+#define WS_LINKMASTA_VENDOR_ID          0x20A0
+#define WS_LINKMASTA_PRODUCT_ID         0x4252
+#define WS_LINKMASTA_USB_CONFIGURATION  0x01
+#define WS_LINKMASTA_USB_INTERFACE      0X00
+#define WS_LINKMASTA_USB_ALT_SETTING    0X00
+#define WS_LINKMASTA_USB_ENDPOINT_IN    0x81
+#define WS_LINKMASTA_USB_ENDPOINT_OUT   0x02
+#define WS_LINKMASTA_USB_RXTX_SIZE      64
+#define WS_LINKMASTA_USB_TIMEOUT        2000
+
+using namespace wsmsg;
 
 
 
-#define NGP_LINKMASTA_VENDOR_ID         0x20A0
-#define NGP_LINKMASTA_PRODUCT_ID        0x4178
-#define NGP_LINKMASTA_USB_CONFIGURATION 0x01
-#define NGP_LINKMASTA_USB_INTERFACE     0X00
-#define NGP_LINKMASTA_USB_ALT_SETTING   0X00
-#define NGP_LINKMASTA_USB_ENDPOINT_IN   0x81
-#define NGP_LINKMASTA_USB_ENDPOINT_OUT  0x02
-#define NGP_LINKMASTA_USB_RXTX_SIZE     64
-#define NGP_LINKMASTA_USB_TIMEOUT       2000
-
-using namespace ngpmsg;
-
-
-
-
-// CONSTRUCTORS, INITIALIZERS, AND DESTRUCTORS
-
-ngp_linkmasta_device::ngp_linkmasta_device(usb_device* usb_device)
+ws_linkmasta_device::ws_linkmasta_device(usb::usb_device* usb_device)
   : m_usb_device(usb_device),
     m_was_init(false), m_is_open(false), m_firmware_version_set(false),
     m_firmware_major_version(0), m_firmware_minor_version(0)
@@ -48,7 +42,7 @@ ngp_linkmasta_device::ngp_linkmasta_device(usb_device* usb_device)
   // Nothing else to do
 }
 
-ngp_linkmasta_device::~ngp_linkmasta_device()
+ws_linkmasta_device::~ws_linkmasta_device()
 {
   if (m_is_open)
   {
@@ -61,7 +55,7 @@ ngp_linkmasta_device::~ngp_linkmasta_device()
   }
 }
 
-void ngp_linkmasta_device::init()
+void ws_linkmasta_device::init()
 {
   if (m_was_init)
   {
@@ -75,30 +69,30 @@ void ngp_linkmasta_device::init()
   const usb_device::device_description* desc;
   desc = m_usb_device->get_device_description();
   
-  if (desc->vendor_id != NGP_LINKMASTA_VENDOR_ID
-      || desc->product_id != NGP_LINKMASTA_PRODUCT_ID)
+  if (desc->vendor_id != WS_LINKMASTA_VENDOR_ID
+      || desc->product_id != WS_LINKMASTA_PRODUCT_ID)
   {
-    throw std::runtime_error("USB Device not identified as Neo Linkmasta");
+    throw std::runtime_error("USB Device not identified as Linkmasta");
   }
   
   // Set device configuration
-  m_usb_device->set_timeout(NGP_LINKMASTA_USB_TIMEOUT);
-  m_usb_device->set_configuration(NGP_LINKMASTA_USB_CONFIGURATION);
-  m_usb_device->set_interface(NGP_LINKMASTA_USB_INTERFACE);
-  m_usb_device->set_input_endpoint(NGP_LINKMASTA_USB_ENDPOINT_IN);
-  m_usb_device->set_output_endpoint(NGP_LINKMASTA_USB_ENDPOINT_OUT);
+  m_usb_device->set_timeout(WS_LINKMASTA_USB_TIMEOUT);
+  m_usb_device->set_configuration(WS_LINKMASTA_USB_CONFIGURATION);
+  m_usb_device->set_interface(WS_LINKMASTA_USB_INTERFACE);
+  m_usb_device->set_input_endpoint(WS_LINKMASTA_USB_ENDPOINT_IN);
+  m_usb_device->set_output_endpoint(WS_LINKMASTA_USB_ENDPOINT_OUT);
   
   m_was_init = true;
 }
 
 
 
-bool ngp_linkmasta_device::is_open() const
+bool ws_linkmasta_device::is_open() const
 {
   return m_is_open;
 }
 
-timeout_t ngp_linkmasta_device::timeout() const
+timeout_t ws_linkmasta_device::timeout() const
 {
   // Make sure object was initialized
   if (!m_was_init)
@@ -109,7 +103,7 @@ timeout_t ngp_linkmasta_device::timeout() const
   return m_usb_device->timeout();
 }
 
-version_t ngp_linkmasta_device::firmware_version()
+version_t ws_linkmasta_device::firmware_version()
 {
   if (!m_was_init || !m_is_open)
   {
@@ -122,12 +116,12 @@ version_t ngp_linkmasta_device::firmware_version()
   }
   
   return std::to_string(m_firmware_major_version) + "."
-         + std::to_string(m_firmware_minor_version);
+  + std::to_string(m_firmware_minor_version);
 }
 
 
 
-void ngp_linkmasta_device::set_timeout(timeout_t timeout)
+void ws_linkmasta_device::set_timeout(timeout_t timeout)
 {
   // Make sure object was initialized
   if (!m_was_init)
@@ -140,7 +134,7 @@ void ngp_linkmasta_device::set_timeout(timeout_t timeout)
 
 
 
-void ngp_linkmasta_device::open()
+void ws_linkmasta_device::open()
 {
   // Make sure object was initialized
   if (!m_was_init)
@@ -159,7 +153,7 @@ void ngp_linkmasta_device::open()
   m_is_open = true;
 }
 
-void ngp_linkmasta_device::close()
+void ws_linkmasta_device::close()
 {
   // Make sure object was initialized
   if (!m_was_init)
@@ -178,7 +172,7 @@ void ngp_linkmasta_device::close()
   m_is_open = false;
 }
 
-word_t ngp_linkmasta_device::read_word(chip_index chip, address_t address)
+word_t ws_linkmasta_device::read_word(chip_index chip, address_t address)
 {
   // Make sure we are in a ready state
   if (!m_was_init || !m_is_open)
@@ -186,14 +180,14 @@ word_t ngp_linkmasta_device::read_word(chip_index chip, address_t address)
     throw std::runtime_error("ERROR"); // TODO
   }
   
-  uint8_t data;
-  data_t buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
+  uint16_t data;
+  data_t buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
   
-  build_read_command(buffer, address, chip);
-  m_usb_device->write(buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+  build_read16_command(buffer, address);
+  m_usb_device->write(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
   
-  m_usb_device->read(buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
-  if (get_read_reply(buffer, &address, &data))
+  m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+  if (get_read16_reply(buffer, &address, &data))
   {
     return data;
   }
@@ -203,7 +197,7 @@ word_t ngp_linkmasta_device::read_word(chip_index chip, address_t address)
   }
 }
 
-void ngp_linkmasta_device::write_word(chip_index chip, address_t address, word_t data)
+void ws_linkmasta_device::write_word(chip_index chip, address_t address, word_t data)
 {
   // Make sure we are in a ready state
   if (!m_was_init || !m_is_open)
@@ -212,12 +206,12 @@ void ngp_linkmasta_device::write_word(chip_index chip, address_t address, word_t
   }
   
   uint8_t result;
-  data_t buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
+  data_t buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
   
-  build_write_command(buffer, address, (uint8_t) data, chip);
-  m_usb_device->write(buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+  build_write16_command(buffer, address, data);
+  m_usb_device->write(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
   
-  m_usb_device->read(buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+  m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
   get_result_reply(buffer, &result);
   if (result == MSG_RESULT_SUCCESS)
   {
@@ -231,19 +225,19 @@ void ngp_linkmasta_device::write_word(chip_index chip, address_t address, word_t
 
 
 
-bool ngp_linkmasta_device::supports_read_bytes() const
+bool ws_linkmasta_device::supports_read_bytes() const
 {
   return true;
 }
 
-bool ngp_linkmasta_device::supports_program_bytes() const
+bool ws_linkmasta_device::supports_program_bytes() const
 {
   return true;
 }
 
 
 
-unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes, task_controller* controller)
+unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes, task_controller* controller)
 {
   // Make sure we are in a ready state
   if (!m_was_init || !m_is_open)
@@ -252,8 +246,12 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
   }
   
   // Some working variables
-  data_t   _buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
+  data_t   _buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
   unsigned int offset = 0;
+  
+  // Because of WS's curious 2-byte words, always remove lower order bit
+  start_address = start_address & (address_t) ~1;
+  num_bytes = num_bytes & (unsigned int) ~1;
   
   // Inform the controller that the task has begun
   if (controller != nullptr)
@@ -262,32 +260,32 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
   }
   
   // Get as many bytes of data as possible in packets of 64
-  while ((offset - num_bytes) / NGP_LINKMASTA_USB_RXTX_SIZE >= 1
+  while ((offset - num_bytes) / WS_LINKMASTA_USB_RXTX_SIZE >= 1
          && (controller == nullptr || !controller->is_task_cancelled()))
   {
     // Calculate number of packets. Don't go over packet limit
-    unsigned int num_packets = (num_bytes - offset) / NGP_LINKMASTA_USB_RXTX_SIZE;
+    unsigned int num_packets = (num_bytes - offset) / WS_LINKMASTA_USB_RXTX_SIZE;
     if (num_packets > std::numeric_limits<uint8_t>::max())
     {
       num_packets = std::numeric_limits<uint8_t>::max();
     }
     
-    build_read64xN_command(_buffer, start_address + offset, chip, num_packets);
-    m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+    build_read64xN_command(_buffer, start_address + offset, num_packets);
+    m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
     
     for (unsigned int packets_i = 0; packets_i < num_packets; ++packets_i)
     {
       // Get response from device and write directly to buffer
-      if (m_usb_device->read(&buffer[offset], NGP_LINKMASTA_USB_RXTX_SIZE) != NGP_LINKMASTA_USB_RXTX_SIZE)
+      if (m_usb_device->read(&buffer[offset], WS_LINKMASTA_USB_RXTX_SIZE) != WS_LINKMASTA_USB_RXTX_SIZE)
       {
         throw std::runtime_error("ERROR"); // TODO
       }
       
       // Update offset and inform controller of progress
-      offset += NGP_LINKMASTA_USB_RXTX_SIZE;
+      offset += WS_LINKMASTA_USB_RXTX_SIZE;
       if (controller != nullptr)
       {
-        controller->on_task_update(task_status::RUNNING, NGP_LINKMASTA_USB_RXTX_SIZE);
+        controller->on_task_update(task_status::RUNNING, WS_LINKMASTA_USB_RXTX_SIZE);
       }
     }
   }
@@ -296,16 +294,17 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
   while (num_bytes - offset > 0
          && (controller == nullptr || !controller->is_task_cancelled()))
   {
-    build_read_command(_buffer, start_address + offset, chip);
-    m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+    build_read16_command(_buffer, start_address + offset);
+    m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
     
-    m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+    m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
     
     uint32_t address;
-    uint8_t  data;
-    if (get_read_reply(_buffer, &address, &data) == MSG_RESULT_SUCCESS)
+    uint16_t data;
+    if (get_read16_reply(_buffer, &address, &data) == MSG_RESULT_SUCCESS)
     {
-      buffer[offset] = data;
+      buffer[offset] = (data_t) (data >> 8);
+      buffer[offset+1] = (data_t) (data);
     }
     else
     {
@@ -313,7 +312,7 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
     }
     
     // Update offset and inform controller of progress
-    ++offset;
+    offset += 2;
     if (controller != nullptr)
     {
       controller->on_task_update(task_status::RUNNING, 1);
@@ -328,7 +327,7 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
   return offset;
 }
 
-unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes, bool bypass_mode, task_controller* controller)
+unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes, bool bypass_mode, task_controller* controller)
 {
   if (!m_was_init || !m_is_open)
   {
@@ -336,9 +335,13 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
   }
   
   // Some working variables
-  data_t   _buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
+  data_t   _buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
   unsigned int offset = 0;
   uint8_t  result;
+  
+  // Because of WS's curious 2-byte words, always remove lower order bit
+  start_address = start_address & (address_t) ~1;
+  num_bytes = num_bytes & (unsigned int) ~1;
   
   // Inform controller that task has started
   if (controller != nullptr)
@@ -346,37 +349,37 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
     controller->on_task_start(num_bytes);
   }
   
-  // Inform device of incoming data
-  while ((num_bytes - offset) / NGP_LINKMASTA_USB_RXTX_SIZE >= 1
+  // Program in packets of 64 bytes
+  while ((num_bytes - offset) / WS_LINKMASTA_USB_RXTX_SIZE >= 1
          && (controller == nullptr || !controller->is_task_cancelled()))
   {
     // Makes sure we don't go over the packet limit
-    unsigned int num_packets = (num_bytes - offset) / NGP_LINKMASTA_USB_RXTX_SIZE;
+    unsigned int num_packets = (num_bytes - offset) / WS_LINKMASTA_USB_RXTX_SIZE;
     if (num_packets > std::numeric_limits<uint8_t>::max())
     {
       num_packets = std::numeric_limits<uint8_t>::max();
     }
     
-    build_flash_write64xN_command(_buffer, start_address + offset, chip, num_packets, bypass_mode);
-    m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+    build_flash_write64xN_command(_buffer, start_address + offset, num_packets);
+    m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
     
     // Send chunks of 64 bytes to device
     for (unsigned int packet_i = 0; packet_i < num_packets; ++packet_i)
     {
       build_flash_write64xN_data_packet(_buffer, &buffer[offset]);
-      m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+      m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
       
       // Update offset and inform controller of progress
-      offset += NGP_LINKMASTA_USB_RXTX_SIZE;
+      offset += WS_LINKMASTA_USB_RXTX_SIZE;
       if (controller != nullptr)
       {
-        controller->on_task_update(task_status::RUNNING, NGP_LINKMASTA_USB_RXTX_SIZE);
+        controller->on_task_update(task_status::RUNNING, WS_LINKMASTA_USB_RXTX_SIZE);
       }
     }
     
     // Verify that operaton worked
     uint8_t packets_processed;
-    m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+    m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
     get_flash_write64xN_reply(_buffer, &result, &packets_processed);
     
     if(result != MSG_WRITE64xN_REPLY)
@@ -390,14 +393,14 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
   }
   
   // If at least 32 bytes remain, write them
-  while (num_bytes - offset >= NGP_LINKMASTA_USB_RXTX_SIZE / 2
+  while (num_bytes - offset >= WS_LINKMASTA_USB_RXTX_SIZE / 2
          && (controller == nullptr || !controller->is_task_cancelled()))
   {
-    build_flash_write_32_command(_buffer, start_address + offset, &buffer[offset], chip, bypass_mode);
-    m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+    build_flash_write_32_command(_buffer, start_address + offset, &buffer[offset]);
+    m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
     
     // Verify that operation worked
-    m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+    m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
     get_result_reply(_buffer, &result);
     if (result != MSG_RESULT_SUCCESS)
     {
@@ -405,10 +408,10 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
     }
     
     // Update offset and inform controller of progress
-    offset += NGP_LINKMASTA_USB_RXTX_SIZE / 2;
+    offset += WS_LINKMASTA_USB_RXTX_SIZE / 2;
     if (controller != nullptr)
     {
-      controller->on_task_update(task_status::RUNNING, NGP_LINKMASTA_USB_RXTX_SIZE / 2);
+      controller->on_task_update(task_status::RUNNING, WS_LINKMASTA_USB_RXTX_SIZE / 2);
     }
   }
   
@@ -417,16 +420,16 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
          && (controller == nullptr || !controller->is_task_cancelled()))
   {
     unsigned int num_bytes_ = num_bytes;
-    if (num_bytes_ >= NGP_LINKMASTA_USB_RXTX_SIZE / 2)
+    if (num_bytes_ >= WS_LINKMASTA_USB_RXTX_SIZE / 2)
     {
-      num_bytes_ = (NGP_LINKMASTA_USB_RXTX_SIZE / 2) - 1;
+      num_bytes_ = (WS_LINKMASTA_USB_RXTX_SIZE / 2) - 1;
     }
     
-    build_flash_write_N_command(_buffer, start_address + offset, &buffer[offset], chip, num_bytes_ - offset, bypass_mode);
-    m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+    build_flash_write_N_command(_buffer, start_address + offset, &buffer[offset], num_bytes_ - offset);
+    m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
     
     // Verify that operation worked
-    m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+    m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
     get_result_reply(_buffer, &result);
     if (result != MSG_RESULT_SUCCESS)
     {
@@ -455,19 +458,19 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
 
 
 
-void ngp_linkmasta_device::fetch_firmware_version()
+void ws_linkmasta_device::fetch_firmware_version()
 {
-  data_t buffer[NGP_LINKMASTA_USB_RXTX_SIZE] = {0};
+  data_t buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
   build_getversion_command(buffer);
   
   unsigned int num_bytes;
   
   // Send command
-  num_bytes = m_usb_device->write(buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
+  num_bytes = m_usb_device->write(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
   
   // Fetch reply
-  num_bytes = m_usb_device->read(buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
-  if (num_bytes != NGP_LINKMASTA_USB_RXTX_SIZE)
+  num_bytes = m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+  if (num_bytes != WS_LINKMASTA_USB_RXTX_SIZE)
   {
     throw std::runtime_error("ERROR"); // TODO
   }

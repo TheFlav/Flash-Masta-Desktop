@@ -27,6 +27,7 @@ const int BYPASS_SUPPORTERS[3] = {
 };
 
 typedef ngp_chip::data_t        data_t;
+typedef ngp_chip::word_t        word_t;
 typedef ngp_chip::chip_index_t  chip_index_t;
 typedef ngp_chip::manufact_id_t manufact_id_t;
 typedef ngp_chip::device_id_t   device_id_t;
@@ -49,14 +50,14 @@ ngp_chip::~ngp_chip()
 
 
 
-data_t ngp_chip::read(address_t address)
+word_t ngp_chip::read(address_t address)
 {
-  return m_linkmasta->read_byte(m_chip_num, address);
+  return m_linkmasta->read_word(m_chip_num, address);
 }
 
-void ngp_chip::write(address_t address, data_t data)
+void ngp_chip::write(address_t address, word_t data)
 {
-  return m_linkmasta->write_byte(m_chip_num, address, data);
+  return m_linkmasta->write_word(m_chip_num, address, data);
 }
 
 

@@ -13,7 +13,8 @@
 #define OUTPUT_ENDPOINT_NAME "USB output endpoint"
 #define TIMEOUT_NAME "USB timeout"
 
-using namespace usb;
+namespace usb
+{
 
 typedef libusb_usb_device::timeout_t            timeout_t;
 typedef libusb_usb_device::configuration_t      configuration_t;
@@ -822,3 +823,5 @@ void libusb_usb_device::throw_libusb_exception(int libusb_error, timeout_t timeo
       throw usb::exception("libusb error code " + std::to_string(libusb_error) + " (" + libusb_error_name(libusb_error) + ")");
   }
 }
+
+};

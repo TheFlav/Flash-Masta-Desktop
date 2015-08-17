@@ -8,7 +8,8 @@
 
 #include "exception.h"
 
-using namespace usb;
+namespace usb
+{
 
 #define DEFAULT_WHAT "a USB error occured"
 
@@ -34,3 +35,5 @@ const char* exception::what() const throw()
 {
   return m_what.c_str();
 }
+
+};
