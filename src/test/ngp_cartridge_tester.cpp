@@ -200,7 +200,7 @@ bool ngp_cartridge_tester::run_tests()
   {
     if (fout.good())
     {
-      m_cartridge->write_cartridge_to_file(fout);
+      m_cartridge->backup_cartridge_game_data(fout);
     }
     else
     {
@@ -228,7 +228,7 @@ bool ngp_cartridge_tester::run_tests()
   {
     if (fin.good())
     {
-      m_cartridge->write_file_to_cartridge(fin);
+      m_cartridge->restore_cartridge_game_data(fin);
     }
     else
     {
@@ -254,7 +254,7 @@ bool ngp_cartridge_tester::run_tests()
   {
     if (fin.good())
     {
-      if (!m_cartridge->compare_file_to_cartridge(fin))
+      if (!m_cartridge->compare_cartridge_game_data(fin))
       {
         success = false;
       }

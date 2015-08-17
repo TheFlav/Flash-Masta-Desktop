@@ -25,9 +25,12 @@ public:
   virtual const cartridge_descriptor* descriptor() const = 0;
   
   virtual void             init() = 0;
-  virtual bool             compare_file_to_cartridge(std::ifstream& fin, task_controller* controller = nullptr) = 0;
-  virtual void             write_file_to_cartridge(std::ifstream& fin, task_controller* controller = nullptr) = 0;
-  virtual void             write_cartridge_to_file(std::ofstream& fout, task_controller* controller = nullptr) = 0;
+  virtual void             backup_cartridge_game_data(std::ostream& fout, task_controller* controller = nullptr) = 0;
+  virtual void             restore_cartridge_game_data(std::istream& fin, task_controller* controller = nullptr) = 0;
+  virtual bool             compare_cartridge_game_data(std::istream& fin, task_controller* controller = nullptr) = 0;
+  virtual void             backup_cartridge_save_data(std::ostream& fout, task_controller* controller = nullptr) = 0;
+  virtual void             restore_cartridge_save_data(std::istream& fin, task_controller* controller = nullptr) = 0;
+  virtual bool             compare_cartridge_save_data(std::istream& fin, task_controller* controller = nullptr) = 0;
 };
 
 #endif // __CARTRIDGE_H__

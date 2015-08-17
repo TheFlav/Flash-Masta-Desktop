@@ -21,6 +21,8 @@ private slots:
   void on_button_backup_rom_clicked();
   void on_button_verify_rom_clicked();
   void on_button_flash_rom_clicked();
+  void on_button_backup_save_clicked();
+  void on_button_restore_save_clicked();
   
 private:
   Ui::MainWindow *ui;

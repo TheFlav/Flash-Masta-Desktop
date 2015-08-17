@@ -6,6 +6,8 @@
 #include "cartridge_backup_task.h"
 #include "cartridge_verify_task.h"
 #include "cartridge_flash_task.h"
+#include "cartridge_backup_save_task.h"
+#include "cartridge_restore_save_task.h"
 
 
 
@@ -60,4 +62,14 @@ void MainWindow::on_button_verify_rom_clicked()
 void MainWindow::on_button_flash_rom_clicked()
 {
   CartridgeFlashTask(this).go();
+}
+
+void MainWindow::on_button_backup_save_clicked()
+{
+  CartridgeBackupSaveTask(this).go();
+}
+
+void MainWindow::on_button_restore_save_clicked()
+{
+  CartridgeRestoreSaveTask(this).go();
 }

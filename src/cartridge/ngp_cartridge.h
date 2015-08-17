@@ -29,9 +29,12 @@ public:
   const cartridge_descriptor* descriptor() const;
   
   void                  init();
-  bool                  compare_file_to_cartridge(std::ifstream& fin, task_controller* controller = nullptr);
-  void                  write_file_to_cartridge(std::ifstream& fin, task_controller* controller = nullptr);
-  void                  write_cartridge_to_file(std::ofstream& fout, task_controller* controller = nullptr);
+  void                  backup_cartridge_game_data(std::ostream& fout, task_controller* controller = nullptr);
+  void                  restore_cartridge_game_data(std::istream& fin, task_controller* controller = nullptr);
+  bool                  compare_cartridge_game_data(std::istream& fin, task_controller* controller = nullptr);
+  void                  backup_cartridge_save_data(std::ostream& fout, task_controller* controller = nullptr);
+  void                  restore_cartridge_save_data(std::istream& fin, task_controller* controller = nullptr);
+  bool                  compare_cartridge_save_data(std::istream& fin, task_controller* controller = nullptr);
   
   static bool           test_for_cartridge(linkmasta_device* linkmasta);
   
