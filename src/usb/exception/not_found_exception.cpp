@@ -8,7 +8,8 @@
 
 #include "not_found_exception.h"
 
-using namespace usb;
+namespace usb
+{
 
 not_found_exception::not_found_exception(const std::string& item_not_found)
   : exception(item_not_found + " not found"), m_item_not_found(item_not_found)
@@ -32,3 +33,5 @@ const char* not_found_exception::item_not_found() const
 {
   return m_item_not_found.c_str();
 }
+
+};

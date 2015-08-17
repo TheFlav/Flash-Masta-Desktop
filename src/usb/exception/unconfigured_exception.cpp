@@ -8,7 +8,8 @@
 
 #include "unconfigured_exception.h"
 
-using namespace usb;
+namespace usb
+{
 
 unconfigured_exception::unconfigured_exception(const std::string& missing_config)
   : exception(missing_config + " not configured"), m_missing_config(missing_config)
@@ -32,3 +33,5 @@ const char* unconfigured_exception::missing_config() const
 {
   return m_missing_config.c_str();
 }
+
+};

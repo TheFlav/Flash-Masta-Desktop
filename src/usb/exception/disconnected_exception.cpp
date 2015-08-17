@@ -8,10 +8,13 @@
 
 #include "disconnected_exception.h"
 
-using namespace usb;
+namespace usb
+{
 
 disconnected_exception::disconnected_exception()
   : exception("device disconneced mid-operation")
 {
   // Nothing else to do
 }
+
+};
