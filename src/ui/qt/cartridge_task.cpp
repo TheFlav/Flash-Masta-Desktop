@@ -4,8 +4,9 @@
 #include <QApplication>
 #include <fstream>
 #include <limits>
+#include "cartridge/ws_cartridge.h"
 #include "usb/libusb_usb_device.h"
-#include "linkmasta_device/ngp_linkmasta_device.h"
+#include "linkmasta_device/ws_linkmasta_device.h"
 #include "libusb-1.0/libusb.h"
 
 using namespace usb;
@@ -34,7 +35,7 @@ void CartridgeTask::go()
   }
   
   // Get handle to USB device
-  m_handle = libusb_open_device_with_vid_pid(m_libusb, 0x20A0, 0x4178);
+  m_handle = libusb_open_device_with_vid_pid(m_libusb, 0x20A0, 0x4252);
   if (m_handle == nullptr)
   {
     libusb_exit(m_libusb);
@@ -69,7 +70,7 @@ void CartridgeTask::go()
   // Initialize linkmasta device
   try
   {
-    m_linkmasta = new ngp_linkmasta_device(m_usb);
+    m_linkmasta = new ws_linkmasta_device(m_usb);
     m_linkmasta->init();
   }
   catch (std::exception& ex)
@@ -84,9 +85,10 @@ void CartridgeTask::go()
   }
   
   // Test for cartridge
+  /*
   try
   {
-    if (!ngp_cartridge::test_for_cartridge(m_linkmasta))
+    if (!ws_cartridge::test_for_cartridge(m_linkmasta))
     {
       delete m_linkmasta;
       libusb_unref_device(m_device);
@@ -107,11 +109,12 @@ void CartridgeTask::go()
     msgBox.exec();
     return;
   }
+  */
   
   // Initialize cartridge
   try
   {
-    m_cartridge = new ngp_cartridge(m_linkmasta);
+    m_cartridge = new ws_cartridge(m_linkmasta);
     m_cartridge->init();
   }
   catch (std::exception& ex)
