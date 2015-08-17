@@ -8,9 +8,7 @@
 
 #include "ws_linkmasta_messages.h"
 
-#if defined(DEBUG)
 #include <stdio.h>
-#endif
 
 #if defined(OS_WINDOWS)
 #include <winsock2.h>

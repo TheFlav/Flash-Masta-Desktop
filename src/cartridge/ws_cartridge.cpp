@@ -64,7 +64,7 @@ void ws_cartridge::init()
   m_was_init = true;
 }
 
-bool ws_cartridge::compare_file_to_cartridge(std::ifstream& fin, task_controller* controller)
+bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, task_controller* controller)
 {
   // Ensure class was initialized
   if (!m_was_init)
@@ -248,7 +248,7 @@ bool ws_cartridge::compare_file_to_cartridge(std::ifstream& fin, task_controller
   return matched;
 }
 
-void ws_cartridge::write_file_to_cartridge(std::ifstream& fin, task_controller* controller)
+void ws_cartridge::restore_cartridge_game_data(std::istream& fin, task_controller* controller)
 {
   // Ensure class was intiialized
   if (!m_was_init)
@@ -410,7 +410,7 @@ void ws_cartridge::write_file_to_cartridge(std::ifstream& fin, task_controller* 
   delete [] buffer;
 }
 
-void ws_cartridge::write_cartridge_to_file(std::ofstream& fout, task_controller* controller)
+void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controller* controller)
 {
   // Ensure class was intiialized
   if (!m_was_init)
@@ -555,6 +555,28 @@ void ws_cartridge::write_cartridge_to_file(std::ofstream& fout, task_controller*
     controller->on_task_end(controller->is_task_cancelled() && bytes_written < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_written);
   }
   delete [] buffer;
+}
+
+void ws_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controller* controller)
+{
+  // TODO
+  (void) fout;
+  (void) controller;
+}
+
+void ws_cartridge::restore_cartridge_save_data(std::istream& fin, task_controller* controller)
+{
+  // TODO
+  (void) fin;
+  (void) controller;
+}
+
+bool ws_cartridge::compare_cartridge_save_data(std::istream& fin, task_controller* controller)
+{
+  // TODO
+  (void) fin;
+  (void) controller;
+  return false;
 }
 
 
