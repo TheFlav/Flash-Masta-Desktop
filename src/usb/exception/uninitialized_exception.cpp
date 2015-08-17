@@ -8,7 +8,8 @@
 
 #include "uninitialized_exception.h"
 
-using namespace usb;
+namespace usb
+{
 
 uninitialized_exception::uninitialized_exception(const std::string& class_name)
   : exception("object of type " + class_name + " used without being initialized"), m_class_name(class_name)
@@ -32,3 +33,5 @@ const char* uninitialized_exception::class_name() const
 {
   return m_class_name.c_str();
 }
+
+};

@@ -1,7 +1,8 @@
 #include "usb_device.h"
 #include <stddef.h>
 
-using namespace usb;
+namespace usb
+{
 
 typedef usb_device::device_description device_description;
 typedef usb_device::device_configuration device_configuration;
@@ -181,3 +182,5 @@ device_endpoint::device_endpoint(const device_endpoint& other)
 {
   // Nothing else to do here
 }
+
+};

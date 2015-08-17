@@ -18,7 +18,8 @@
 enum system_type
 {
   UNKNOWN,          //<! Unknown cartridge type
-  NEO_GEO_POCKET    //<! Cartridge made for the Neo Geo Pocket
+  NEO_GEO_POCKET,   //<! Cartridge made for the Neo Geo Pocket
+  WONDERSWAN
 };
 
 

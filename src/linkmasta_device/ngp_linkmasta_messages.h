@@ -15,6 +15,9 @@
 #define MSG_RESULT_FAIL             0x10
 #define MSG_RESULT_SUCCESS          0x11
 
+namespace ngpmsg
+{
+
 void build_blink_led_command(uint8_t *buf, uint8_t blinkCount);
 void build_getversion_command(uint8_t *buf);
 void build_getversion_reply(uint8_t *buf, uint8_t majVer, uint8_t minVer);
@@ -46,5 +49,7 @@ int get_read_reply(uint8_t *buf, uint32_t *addr21, uint8_t *data);
 void get_flash_write64xN_reply(uint8_t *buf, uint8_t *msgType, uint8_t *packetsProcessed);
 void get_result_reply(uint8_t *buf, uint8_t *result);
 void get_blink_led_message(uint8_t *buf, uint8_t *blinkCount);
+
+};
 
 #endif /* defined(__NGP_LINKMASTA_MESSAGES_H__) */
