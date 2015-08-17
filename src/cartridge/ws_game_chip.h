@@ -1,22 +1,22 @@
 //
-//  ngp_chip.h
+//  ws_game_chip.h
 //  FlashMasta
 //
-//  Created by Dan on 7/29/15.
+//  Created by Dan on 8/17/15.
 //  Copyright (c) 2015 7400 Circuits. All rights reserved.
 //
 
-#ifndef __NGP_CHIP_H__
-#define __NGP_CHIP_H__
+#ifndef __WS_GAME_CHIP_H__
+#define __WS_GAME_CHIP_H__
 
 class linkmasta_device;
 class task_controller;
 
-class ngp_chip
+class ws_game_chip
 {
 public:
   typedef unsigned char    data_t;
-  typedef unsigned char    word_t;
+  typedef unsigned short   word_t;
   typedef unsigned int     chip_index_t;
   typedef unsigned int     manufact_id_t;
   typedef unsigned int     device_id_t;
@@ -31,8 +31,8 @@ public:
     ERASE
   };
   
-  /* constructor */       ngp_chip(linkmasta_device* linkmasta_device, chip_index_t chip_num);
-  /* destructor  */       ~ngp_chip();
+  /* constructor */       ws_game_chip(linkmasta_device* linkmasta_device);
+  /* destructor  */       ~ws_game_chip();
   
   word_t                  read(address_t address);
   void                    write(address_t address, word_t data);
@@ -40,6 +40,7 @@ public:
   void                    reset();
   manufact_id_t           get_manufacturer_id();
   device_id_t             get_device_id();
+  device_id_t             get_size_id();
   protect_t               get_block_protection(address_t sector_address);
   void                    program_byte(address_t address, data_t data);
   void                    unlock_bypass();
@@ -66,4 +67,4 @@ private:
   chip_index_t const      m_chip_num;
 };
 
-#endif /* defined(__NGP_CHIP_H__) */
+#endif /* defined(__WS_GAME_CHIP_H__) */

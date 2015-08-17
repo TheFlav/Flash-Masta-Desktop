@@ -1,12 +1,12 @@
 //
-//  ngp_chip.cpp
+//  ws_game_chip.cpp
 //  FlashMasta
 //
-//  Created by Dan on 7/29/15.
+//  Created by Dan on 8/17/15.
 //  Copyright (c) 2015 7400 Circuits. All rights reserved.
 //
 
-#include "ngp_chip.h"
+#include "ws_game_chip.h"
 #include "linkmasta_device/linkmasta_device.h"
 #include "tasks/task_controller.h"
 #include "tasks/forwarding_task_controller.h"
@@ -14,55 +14,49 @@
 
 
 #define ADDR_DONTCARE 0x00000000
-#define ADDR_COMMAND1 0x00005555
-#define ADDR_COMMAND2 0x00002AAA
-#define ADDR_COMMAND3 0x00005555
+#define ADDR_COMMAND1 0x00002AAA
+#define ADDR_COMMAND2 0x00005555
+#define ADDR_COMMAND3 0x00002AAA
 
 #define MASK_SECTOR   0x001FE000
 
-const int BYPASS_SUPPORTERS[3] = {
-  0x83, /* NGP Flashmasta */
-  0x85, /* WS Flashmasta */
-  -1    /* sentinal value (end of array) */
-};
-
-typedef ngp_chip::data_t        data_t;
-typedef ngp_chip::word_t        word_t;
-typedef ngp_chip::chip_index_t  chip_index_t;
-typedef ngp_chip::manufact_id_t manufact_id_t;
-typedef ngp_chip::device_id_t   device_id_t;
-typedef ngp_chip::protect_t     protect_t;
-typedef ngp_chip::address_t     address_t;
+typedef ws_game_chip::data_t        data_t;
+typedef ws_game_chip::word_t        word_t;
+typedef ws_game_chip::chip_index_t  chip_index_t;
+typedef ws_game_chip::manufact_id_t manufact_id_t;
+typedef ws_game_chip::device_id_t   device_id_t;
+typedef ws_game_chip::protect_t     protect_t;
+typedef ws_game_chip::address_t     address_t;
 
 
 
-ngp_chip::ngp_chip(linkmasta_device* linkmasta_device, chip_index_t chip_num)
+ws_game_chip::ws_game_chip(linkmasta_device* linkmasta_device)
   : m_mode(READ), m_last_erased_addr(0), m_supports_bypass(false),
-    m_linkmasta(linkmasta_device), m_chip_num(chip_num)
+    m_linkmasta(linkmasta_device), m_chip_num(0)
 {
   // Nothing else to do
 }
 
-ngp_chip::~ngp_chip()
+ws_game_chip::~ws_game_chip()
 {
   // Nothing to do
 }
 
 
 
-word_t ngp_chip::read(address_t address)
+word_t ws_game_chip::read(address_t address)
 {
   return m_linkmasta->read_word(m_chip_num, address);
 }
 
-void ngp_chip::write(address_t address, word_t data)
+void ws_game_chip::write(address_t address, word_t data)
 {
   return m_linkmasta->write_word(m_chip_num, address, data);
 }
 
 
 
-void ngp_chip::reset()
+void ws_game_chip::reset()
 {
   if (is_erasing())
   {
@@ -86,7 +80,7 @@ void ngp_chip::reset()
   m_mode = READ;
 }
 
-manufact_id_t ngp_chip::get_manufacturer_id()
+manufact_id_t ws_game_chip::get_manufacturer_id()
 {
   if (is_erasing())
   {
@@ -114,7 +108,7 @@ manufact_id_t ngp_chip::get_manufacturer_id()
   }
 }
 
-device_id_t ngp_chip::get_device_id()
+device_id_t ws_game_chip::get_device_id()
 {
   if (is_erasing())
   {
@@ -138,11 +132,39 @@ device_id_t ngp_chip::get_device_id()
       enter_autoselect();
     }
     
-    return read(0x0001);
+    return read(0x0002);
   }
 }
 
-protect_t ngp_chip::get_block_protection(address_t sector_address)
+device_id_t ws_game_chip::get_size_id()
+{
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  if (m_linkmasta->supports_read_device_id())
+  {
+    if (current_mode() != READ)
+    {
+      reset();
+    }
+    
+    return m_linkmasta->read_device_id(m_chip_num);
+  }
+  else
+  {
+    if (current_mode() != AUTOSELECT)
+    {
+      enter_autoselect();
+    }
+    
+    return read(0x001C);
+  }
+}
+
+protect_t ws_game_chip::get_block_protection(address_t sector_address)
 {
   if (is_erasing())
   {
@@ -171,7 +193,7 @@ protect_t ngp_chip::get_block_protection(address_t sector_address)
   }
 }
 
-void ngp_chip::program_byte(address_t address, data_t data)
+void ws_game_chip::program_byte(address_t address, data_t data)
 {
   if (is_erasing())
   {
@@ -200,7 +222,7 @@ void ngp_chip::program_byte(address_t address, data_t data)
   write(address, data);
 }
 
-void ngp_chip::unlock_bypass()
+void ws_game_chip::unlock_bypass()
 {
   if (is_erasing())
   {
@@ -231,7 +253,7 @@ void ngp_chip::unlock_bypass()
   }
 }
 
-void ngp_chip::erase_chip()
+void ws_game_chip::erase_chip()
 {
   if (is_erasing())
   {
@@ -265,7 +287,7 @@ void ngp_chip::erase_chip()
   m_mode = ERASE;
 }
 
-void ngp_chip::erase_block(address_t block_address)
+void ws_game_chip::erase_block(address_t block_address)
 {
   if (is_erasing())
   {
@@ -301,17 +323,17 @@ void ngp_chip::erase_block(address_t block_address)
 
 
 
-ngp_chip::chip_mode ngp_chip::current_mode() const
+ws_game_chip::chip_mode ws_game_chip::current_mode() const
 {
   return m_mode;
 }
 
-bool ngp_chip::supports_bypass() const
+bool ws_game_chip::supports_bypass() const
 {
   return m_supports_bypass;
 }
 
-bool ngp_chip::test_bypass_support()
+bool ws_game_chip::test_bypass_support()
 {
   if (is_erasing())
   {
@@ -325,27 +347,19 @@ bool ngp_chip::test_bypass_support()
     enter_autoselect();
   }
   
-  unsigned char result = read(0x03);
+  unsigned char result = read(0x00A2);
   
-  m_supports_bypass = false;
-  for (unsigned int i = 0; BYPASS_SUPPORTERS[i] != -1; ++i)
-  {
-    if ((int) result == BYPASS_SUPPORTERS[i])
-    {
-      m_supports_bypass = true;
-      break;
-    }
-  }
+  m_supports_bypass = (result != 0);
   
   return supports_bypass();
 }
 
-bool ngp_chip::is_erasing() const
+bool ws_game_chip::is_erasing() const
 {
   return (current_mode() == ERASE);
 }
 
-bool ngp_chip::test_erasing()
+bool ws_game_chip::test_erasing()
 {
   if (current_mode() != ERASE)
   {
@@ -359,7 +373,7 @@ bool ngp_chip::test_erasing()
   return is_erasing();
 }
 
-unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int num_bytes, task_controller* controller)
+unsigned int ws_game_chip::read_bytes(address_t address, data_t* data, unsigned int num_bytes, task_controller* controller)
 {
   if (is_erasing())
   {
@@ -450,7 +464,7 @@ unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int 
   }
 }
 
-unsigned int ngp_chip::program_bytes(address_t address, const data_t* data, unsigned int num_bytes, task_controller* controller)
+unsigned int ws_game_chip::program_bytes(address_t address, const data_t* data, unsigned int num_bytes, task_controller* controller)
 {
   if (is_erasing())
   {
@@ -554,7 +568,7 @@ unsigned int ngp_chip::program_bytes(address_t address, const data_t* data, unsi
 
 
 
-void ngp_chip::enter_autoselect()
+void ws_game_chip::enter_autoselect()
 {
   write(ADDR_COMMAND1, 0xAA);
   write(ADDR_COMMAND2, 0x55);

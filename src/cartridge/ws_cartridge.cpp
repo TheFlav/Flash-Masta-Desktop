@@ -1,6 +1,14 @@
-#include "ngp_cartridge.h"
+//
+//  ws_cartridge.cpp
+//  FlashMasta
+//
+//  Created by Dan on 8/17/15.
+//  Copyright (c) 2015 7400 Circuits. All rights reserved.
+//
+
+#include "ws_cartridge.h"
 #include "linkmasta_device/linkmasta_device.h"
-#include "ngp_chip.h"
+#include "ws_game_chip.h"
 #include "tasks/task_controller.h"
 #include "tasks/forwarding_task_controller.h"
 #include <fstream>
@@ -15,41 +23,33 @@ using namespace std;
 
 
 
-ngp_cartridge::ngp_cartridge(linkmasta_device* linkmasta)
-  : m_was_init(false),
-    m_linkmasta(linkmasta), m_descriptor(nullptr), m_num_chips(0)
+ws_cartridge::ws_cartridge(linkmasta_device* linkmasta)
+  : m_was_init(false), m_linkmasta(linkmasta), m_descriptor(nullptr),
+    m_game_chip(nullptr)
 {
-  for (unsigned int i = 0; i < MAX_NUM_CHIPS; ++i)
-  {
-    m_chips[i] = nullptr;
-  }
+  // Nothing else to do
 }
 
-ngp_cartridge::~ngp_cartridge()
+ws_cartridge::~ws_cartridge()
 {
-  if (m_descriptor != nullptr)
-  {
-    delete m_descriptor;
-  }
-  
-  for (unsigned int i = 0; i < m_num_chips; ++i)
-  {
-    delete m_chips[i];
-  }
+  // Nothing else to do
 }
 
-// Note: documentation contained in super class cartridge
-system_type ngp_cartridge::system() const
+
+
+system_type ws_cartridge::system() const
 {
-  return system_type::NEO_GEO_POCKET;
+  return system_type::WONDERSWAN;
 }
 
-const cartridge_descriptor* ngp_cartridge::descriptor() const
+const cartridge_descriptor* ws_cartridge::descriptor() const
 {
   return m_descriptor;
 }
 
-void ngp_cartridge::init()
+
+
+void ws_cartridge::init()
 {
   if (m_was_init)
   {
@@ -60,12 +60,11 @@ void ngp_cartridge::init()
   m_linkmasta->open();
   build_cartridge_destriptor();
   m_linkmasta->close();
-
+  
   m_was_init = true;
 }
 
-
-bool ngp_cartridge::compare_file_to_cartridge(std::ifstream& fin, task_controller* controller)
+bool ws_cartridge::compare_file_to_cartridge(std::ifstream& fin, task_controller* controller)
 {
   // Ensure class was initialized
   if (!m_was_init)
@@ -147,7 +146,7 @@ bool ngp_cartridge::compare_file_to_cartridge(std::ifstream& fin, task_controlle
       // Attempt to read bytes from cartridge
       if (controller == nullptr)
       {
-        c_buffer_size = m_chips[curr_chip]->read_bytes(
+        c_buffer_size = m_game_chip->read_bytes(
           descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
           c_buffer, bytes_expected
         );
@@ -159,7 +158,7 @@ bool ngp_cartridge::compare_file_to_cartridge(std::ifstream& fin, task_controlle
         fwd_controller.scale_work_to(bytes_expected);
         try
         {
-          c_buffer_size = m_chips[curr_chip]->read_bytes(
+          c_buffer_size = m_game_chip->read_bytes(
             descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
             c_buffer, bytes_expected, &fwd_controller
           );
@@ -211,14 +210,14 @@ bool ngp_cartridge::compare_file_to_cartridge(std::ifstream& fin, task_controlle
     // Note: I appologize for the change in style: it's to save lines
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
-      while (m_chips[curr_chip]->is_erasing());
+      while (m_game_chip->is_erasing());
     } catch (exception ex2) {
       // Well... this is awkward
     }
     
     try {
       // Attempt to reset the chip
-      m_chips[curr_chip]->reset();
+      m_game_chip->reset();
     } catch (exception ex2) {
       // Well... this is awkward
     }
@@ -249,7 +248,7 @@ bool ngp_cartridge::compare_file_to_cartridge(std::ifstream& fin, task_controlle
   return matched;
 }
 
-void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin, task_controller* controller)
+void ws_cartridge::write_file_to_cartridge(std::ifstream& fin, task_controller* controller)
 {
   // Ensure class was intiialized
   if (!m_was_init)
@@ -326,17 +325,17 @@ void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin, task_controller*
       }
       
       // Erase block from cartridge
-      m_chips[curr_chip]->erase_block(
+      m_game_chip->erase_block(
         descriptor()->chips[curr_chip]->blocks[curr_block]->base_address
       );
       
       // Wait for erasure to complete
-      while (m_chips[curr_chip]->test_erasing());
+      while (m_game_chip->test_erasing());
       
       // Write buffer to cartridge
       if (controller == nullptr)
       {
-        m_chips[curr_chip]->program_bytes(
+        m_game_chip->program_bytes(
           descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
           buffer, buffer_size
         );
@@ -347,7 +346,7 @@ void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin, task_controller*
         fwd_controller.scale_work_to(buffer_size);
         try
         {
-          m_chips[curr_chip]->program_bytes(
+          m_game_chip->program_bytes(
             descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
             buffer, buffer_size, &fwd_controller
           );
@@ -377,14 +376,14 @@ void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin, task_controller*
     // Error occured! Clean up and pass error on to caller
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
-      while (m_chips[curr_chip]->is_erasing());
+      while (m_game_chip->is_erasing());
     } catch (exception ex2) {
       // Well... this is awkward
     }
     
     try {
       // Attempt to reset the chip
-      m_chips[curr_chip]->reset();
+      m_game_chip->reset();
     } catch (exception ex2) {
       // Well... this is awkward
     }
@@ -411,7 +410,7 @@ void ngp_cartridge::write_file_to_cartridge(std::ifstream& fin, task_controller*
   delete [] buffer;
 }
 
-void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout, task_controller* controller)
+void ws_cartridge::write_cartridge_to_file(std::ofstream& fout, task_controller* controller)
 {
   // Ensure class was intiialized
   if (!m_was_init)
@@ -460,7 +459,7 @@ void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout, task_controller
       // Attempt to read bytes from cartridge
       if (controller == nullptr)
       {
-        buffer_size = m_chips[curr_chip]->read_bytes(
+        buffer_size = m_game_chip->read_bytes(
           descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
           buffer, bytes_expected
         );
@@ -472,7 +471,7 @@ void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout, task_controller
         fwd_controller.scale_work_to(bytes_expected);
         try
         {
-          buffer_size = m_chips[curr_chip]->read_bytes(
+          buffer_size = m_game_chip->read_bytes(
             descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
             buffer, bytes_expected, &fwd_controller
           );
@@ -523,14 +522,14 @@ void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout, task_controller
     // Error occured! Clean up and pass error on to caller
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
-      while (m_chips[curr_chip]->is_erasing());
+      while (m_game_chip->is_erasing());
     } catch (std::exception& ex2) {
       // Well... this is awkward
     }
     
     try {
       // Attempt to reset the chip
-      m_chips[curr_chip]->reset();
+      m_game_chip->reset();
     } catch (std::exception& ex2) {
       // Well... this is awkward
     }
@@ -560,7 +559,7 @@ void ngp_cartridge::write_cartridge_to_file(std::ofstream& fout, task_controller
 
 
 
-void ngp_cartridge::build_cartridge_destriptor()
+void ws_cartridge::build_cartridge_destriptor()
 {
   if (m_descriptor != nullptr)
   {
@@ -568,49 +567,42 @@ void ngp_cartridge::build_cartridge_destriptor()
     m_descriptor = nullptr;
   }
   
-  ngp_chip* chip;
+  ws_game_chip* chip;
   
-  for (unsigned int i = 0; i < MAX_NUM_CHIPS; ++i)
+  chip = new ws_game_chip(m_linkmasta);
+  
+  // Check if chip exists or not
+  if (chip->get_manufacturer_id() == 0x90 && chip->get_device_id() == 0x90)
   {
-    chip = new ngp_chip(m_linkmasta, i);
-    
-    // Check if chip exists or not
-    if (chip->get_manufacturer_id() == 0x90 && chip->get_device_id() == 0x90)
-    {
-      delete chip;
-      m_num_chips = i;
-      break;
-    }
-    
-    m_chips[i] = chip;
-    m_num_chips = i + 1;
-    
-    // Initialize chip
-    m_chips[i]->test_bypass_support();
+    delete chip;
+    return;
   }
+  
+  m_game_chip = chip;
+  
+  // Initialize chip
+  m_game_chip->test_bypass_support();
   
   // Initialize cartridge descriptor
-  m_descriptor = new cartridge_descriptor(m_num_chips);
-  m_descriptor->type = NEO_GEO_POCKET;
+  m_descriptor = new cartridge_descriptor(1);
+  m_descriptor->type = system_type::WONDERSWAN;
   m_descriptor->num_bytes = 0;
   
-  // Build chips
-  for (unsigned int i = 0; i < m_num_chips; ++i)
-  {
-    build_chip_descriptor(i);
-    m_descriptor->num_bytes += m_descriptor->chips[i]->num_bytes;
-  }
+  // Build chip
+  build_chip_descriptor(0);
+  m_descriptor->num_bytes += m_descriptor->chips[0]->num_bytes;
 }
 
-void ngp_cartridge::build_chip_descriptor(unsigned int chip_i)
+void ws_cartridge::build_chip_descriptor(unsigned int chip_i)
 {
-  ngp_chip* chip = m_chips[chip_i];
+  ws_game_chip* chip = m_game_chip;
   cartridge_descriptor::chip_descriptor* chip_desc;
   unsigned int num_bytes;
   unsigned int num_blocks;
   
-  ngp_chip::manufact_id_t manufacturer = chip->get_manufacturer_id();
-  ngp_chip::device_id_t   device_id    = chip->get_device_id();
+  ws_game_chip::manufact_id_t manufacturer = chip->get_manufacturer_id();
+  ws_game_chip::device_id_t   device_id    = chip->get_device_id();
+  ws_game_chip::device_id_t   size_id      = chip->get_size_id();
   
   // Confirm that chip exists
   if (manufacturer == 0x90 && device_id == 0x90)
@@ -619,24 +611,28 @@ void ngp_cartridge::build_chip_descriptor(unsigned int chip_i)
     return;
   }
   
-  // Determine size of chip based on device id
-  switch (device_id)
+  // Determine size of chip based on some size number
+  switch (size_id)
   {
-  case 0x2F:  // 16 Mib (2^24 bits) = 2 MiB (2^21 bytes)
-    num_bytes = 0x200000;
-    break;
-    
-  case 0x2C:  // 8 Mib (2^23 bits) = 1 MiB (2^20 bytes)
-    num_bytes = 0x100000;
-    break;
-    
-  case 0xAB:  // 4 Mib (2^22 bits) = 0.5 MiB (2^19 bytes)
-    num_bytes = 0x80000;
-    break;
-    
-  default:    // Unknown chip? Too bad. No bytes 4 u
-    num_bytes = 0x00;
-    break;
+    case 0x2228:  // 1 Gib (2^30 bits) = 128 MiB (2^27 bytes)
+      num_bytes = 0x8000000;
+      break;
+      
+    case 0x2223:  // 512 Mib (2^29 bits) = 64 MiB (2^26 bytes)
+      num_bytes = 0x4000000;
+      break;
+      
+    case 0x2222:  // 256 Mib (2^28 bits) = 32 MiB (2^25 bytes)
+      num_bytes = 0x2000000;
+      break;
+      
+    case 0x2221:  // 128 MiB (2^27 bits) = 16 MiB (2^24 bytes)
+      num_bytes = 0x1000000;
+      break;
+      
+    default:    // Unknown chip? Too bad. No bytes 4 u
+      num_bytes = 0x00;
+      break;
   }
   
   // Calculate number of blocks. (1 block per 64 Kib (8 KiB))
@@ -663,9 +659,9 @@ void ngp_cartridge::build_chip_descriptor(unsigned int chip_i)
   }
 }
 
-void ngp_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int block_i)
+void ws_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int block_i)
 {
-  ngp_chip* chip = m_chips[chip_i];
+  ws_game_chip* chip = m_game_chip;
   
   // Initialize block descriptor
   cartridge_descriptor::chip_descriptor::block_descriptor* block;
@@ -679,22 +675,22 @@ void ngp_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int blo
   // of blocks on chip
   switch (m_descriptor->chips[chip_i]->num_blocks - block_i)
   {
-  case 1:    // Last block on chip
-    block->num_bytes = DEFAULT_BLOCK_SIZE / 4;
-    break;
-    
-  case 2:    // Second-last block on chip
-  case 3:    // Third-last block on chip
-    block->num_bytes = DEFAULT_BLOCK_SIZE / 8;
-    break;
-    
-  case 4:    // Fourth-last block on chip
-    block->num_bytes = DEFAULT_BLOCK_SIZE / 2;
-    break;
-    
-  default:   // Some other block
-    block->num_bytes = DEFAULT_BLOCK_SIZE;
-    break;
+    case 1:    // Last block on chip
+      block->num_bytes = DEFAULT_BLOCK_SIZE / 4;
+      break;
+      
+    case 2:    // Second-last block on chip
+    case 3:    // Third-last block on chip
+      block->num_bytes = DEFAULT_BLOCK_SIZE / 8;
+      break;
+      
+    case 4:    // Fourth-last block on chip
+      block->num_bytes = DEFAULT_BLOCK_SIZE / 2;
+      break;
+      
+    default:   // Some other block
+      block->num_bytes = DEFAULT_BLOCK_SIZE;
+      break;
   }
   
   // Determine base address of block based on index of block relative to total
@@ -703,37 +699,24 @@ void ngp_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int blo
   unsigned int num_basic_blocks = m_descriptor->chips[chip_i]->num_blocks - 4;
   switch (m_descriptor->chips[chip_i]->num_blocks - block_i)
   {
-  // Note: Fall-throughs are intended
-  case 1:    // Last block on chip
-    block->base_address += DEFAULT_BLOCK_SIZE / 8;
-    
-  case 2:    // Second-last block on chip
-    block->base_address += DEFAULT_BLOCK_SIZE / 8;
-    
-  case 3:    // Third-last block on chip
-    block->base_address += DEFAULT_BLOCK_SIZE / 2;
-    
-  case 4:    // Fourth-last block on chip
-  default:   // Some other block
-    block->base_address += (block_i > num_basic_blocks ? num_basic_blocks : block_i) * DEFAULT_BLOCK_SIZE;
-    break;
+      // Note: Fall-throughs are intended
+    case 1:    // Last block on chip
+      block->base_address += DEFAULT_BLOCK_SIZE / 8;
+      
+    case 2:    // Second-last block on chip
+      block->base_address += DEFAULT_BLOCK_SIZE / 8;
+      
+    case 3:    // Third-last block on chip
+      block->base_address += DEFAULT_BLOCK_SIZE / 2;
+      
+    case 4:    // Fourth-last block on chip
+    default:   // Some other block
+      block->base_address += (block_i > num_basic_blocks ? num_basic_blocks : block_i) * DEFAULT_BLOCK_SIZE;
+      break;
   }
   
   // Query chip for protection status of block
   block->is_protected = (chip->get_block_protection(block->base_address) == 0 ? false : true);
 }
 
-bool ngp_cartridge::test_for_cartridge(linkmasta_device* linkmasta)
-{
-  bool exists;
-  
-  // Check the device id and manufacturer id and see if they are invalid
-  linkmasta->open();
-  ngp_chip chip(linkmasta, 0);
-  chip.reset();
-  exists = !(chip.get_device_id() == 0x90 || chip.get_manufacturer_id() == 0x90);
-  linkmasta->close();
-  
-  return exists;
-}
 
