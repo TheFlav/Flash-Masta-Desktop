@@ -8,7 +8,8 @@
 
 #include "timeout_exception.h"
 
-using namespace usb;
+namespace usb
+{
 
 std::ostringstream timeout_exception::m_stream;
 
@@ -29,3 +30,5 @@ unsigned int timeout_exception::timeout() const
 {
   return m_timeout;
 }
+
+};

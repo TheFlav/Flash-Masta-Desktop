@@ -8,10 +8,13 @@
 
 #include "busy_exception.h"
 
-using namespace usb;
+namespace usb
+{
 
 busy_exception::busy_exception()
   : exception("device is busy")
 {
   // Nothing else to do
 }
+
+};

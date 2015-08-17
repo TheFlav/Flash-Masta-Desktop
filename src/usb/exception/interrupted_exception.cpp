@@ -8,10 +8,13 @@
 
 #include "interrupted_exception.h"
 
-using namespace usb;
+namespace usb
+{
 
 interrupted_exception::interrupted_exception()
   : exception("interrupted by system")
 {
   // Nothing else to do
 }
+
+};

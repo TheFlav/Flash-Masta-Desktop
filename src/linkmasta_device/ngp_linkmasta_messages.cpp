@@ -47,6 +47,9 @@
 #define COUNT_64xN (0x80)  //should be a power of 2 and fit into a uint8_t
 
 
+namespace ngpmsg
+{
+
 void build_blink_led_command(uint8_t *buf, uint8_t blinkCount)
 {
   buf[MSG_TYPE_OFFSET] = MSG_BLINK_LED;
@@ -340,3 +343,4 @@ void get_blink_led_message(uint8_t *buf, uint8_t *blinkCount)
   *blinkCount = buf[MSG_DATA_OFFSET];
 }
 
+};
