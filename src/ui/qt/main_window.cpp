@@ -3,11 +3,11 @@
 #include <qfontdatabase.h>
 #include <qfiledialog.h>
 #include "../../hardware/PC-App-CLI/NeoLinkmasta.h"
-#include "cartridge_backup_task.h"
-#include "cartridge_verify_task.h"
-#include "cartridge_flash_task.h"
-#include "cartridge_backup_save_task.h"
-#include "cartridge_restore_save_task.h"
+#include "ngp_cartridge_backup_task.h"
+#include "ngp_cartridge_verify_task.h"
+#include "ngp_cartridge_flash_task.h"
+#include "ngp_cartridge_backup_save_task.h"
+#include "ngp_cartridge_restore_save_task.h"
 
 
 
@@ -51,25 +51,25 @@ void MainWindow::print_to_console(const char* message, ...)
 
 void MainWindow::on_button_backup_rom_clicked()
 {
-  CartridgeBackupTask(this).go();
+  NgpCartridgeBackupTask(this).go();
 }
 
 void MainWindow::on_button_verify_rom_clicked()
 {
-  CartridgeVerifyTask(this).go();
+  NgpCartridgeVerifyTask(this).go();
 }
 
 void MainWindow::on_button_flash_rom_clicked()
 {
-  CartridgeFlashTask(this).go();
+  NgpCartridgeFlashTask(this).go();
 }
 
 void MainWindow::on_button_backup_save_clicked()
 {
-  CartridgeBackupSaveTask(this).go();
+  NgpCartridgeBackupSaveTask(this).go();
 }
 
 void MainWindow::on_button_restore_save_clicked()
 {
-  CartridgeRestoreSaveTask(this).go();
+  NgpCartridgeRestoreSaveTask(this).go();
 }

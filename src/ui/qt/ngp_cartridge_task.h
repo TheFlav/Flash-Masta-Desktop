@@ -1,5 +1,5 @@
-#ifndef CARTRIDGETASK_H
-#define CARTRIDGETASK_H
+#ifndef __NGP_CARTRIDGE_TASK_H__
+#define __NGP_CARTRIDGE_TASK_H__
 
 #include <QObject>
 #include <mutex>
@@ -13,12 +13,12 @@ struct libusb_context;
 struct libusb_device;
 struct libusb_device_handle;
 
-class CartridgeTask : public QObject, public task_controller
+class NgpCartridgeTask : public QObject, public task_controller
 {
   Q_OBJECT
 public:
-  explicit              CartridgeTask(QWidget *parent = 0);
-  virtual               ~CartridgeTask();
+  explicit              NgpCartridgeTask(QWidget *parent = 0);
+  virtual               ~NgpCartridgeTask();
   
   virtual void          go();
   
@@ -46,4 +46,4 @@ private:
   libusb_device_handle* m_handle;
 };
 
-#endif // CARTRIDGETASK_H
+#endif // __NGP_CARTRIDGE_TASK_H__

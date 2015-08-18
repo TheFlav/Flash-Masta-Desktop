@@ -1,4 +1,4 @@
-#include "cartridge_task.h"
+#include "ngp_cartridge_task.h"
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QApplication>
@@ -11,19 +11,19 @@
 
 using namespace usb;
 
-CartridgeTask::CartridgeTask(QWidget *parent) 
+NgpCartridgeTask::NgpCartridgeTask(QWidget *parent) 
   : QObject(parent), task_controller(), m_mutex(new std::mutex()),
     m_progress(nullptr), m_progress_label()
 {
   // Nothing else to do
 }
 
-CartridgeTask::~CartridgeTask()
+NgpCartridgeTask::~NgpCartridgeTask()
 {
   delete m_mutex;
 }
 
-void CartridgeTask::go()
+void NgpCartridgeTask::go()
 {
   // Initialize libusb
   if (libusb_init(&m_libusb) != 0)
@@ -161,7 +161,7 @@ void CartridgeTask::go()
 
 
 
-void CartridgeTask::on_task_start(int work_expected)
+void NgpCartridgeTask::on_task_start(int work_expected)
 {
   m_mutex->lock();
   task_controller::on_task_start(work_expected);
@@ -175,7 +175,7 @@ void CartridgeTask::on_task_start(int work_expected)
   m_mutex->unlock();
 }
 
-void CartridgeTask::on_task_update(task_status status, int work_progress)
+void NgpCartridgeTask::on_task_update(task_status status, int work_progress)
 {
   m_mutex->lock();
   task_controller::on_task_update(status, work_progress);
@@ -184,14 +184,14 @@ void CartridgeTask::on_task_update(task_status status, int work_progress)
   m_mutex->unlock();
 }
 
-void CartridgeTask::on_task_end(task_status status, int work_total)
+void NgpCartridgeTask::on_task_end(task_status status, int work_total)
 {
   m_mutex->lock();
   task_controller::on_task_end(status, work_total);
   m_mutex->unlock();
 }
 
-bool CartridgeTask::is_task_cancelled() const
+bool NgpCartridgeTask::is_task_cancelled() const
 {
   m_mutex->lock();
   auto r = m_progress->wasCanceled();
@@ -201,12 +201,12 @@ bool CartridgeTask::is_task_cancelled() const
 
 
 
-QString CartridgeTask::get_progress_label() const
+QString NgpCartridgeTask::get_progress_label() const
 {
   return m_progress_label;
 }
 
-void CartridgeTask::set_progress_label(QString label)
+void NgpCartridgeTask::set_progress_label(QString label)
 {
   m_progress_label = label;
 }
