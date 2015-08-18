@@ -18,7 +18,7 @@
 #define ADDR_COMMAND2 0x00005555
 #define ADDR_COMMAND3 0x00002AAA
 
-#define MASK_SECTOR   0x001FE000
+#define MASK_SECTOR   0xFFFE0000
 
 typedef ws_game_chip::data_t        data_t;
 typedef ws_game_chip::word_t        word_t;
@@ -31,7 +31,7 @@ typedef ws_game_chip::address_t     address_t;
 
 
 ws_game_chip::ws_game_chip(linkmasta_device* linkmasta_device)
-  : m_mode(READ), m_last_erased_addr(0), m_supports_bypass(false),
+  : m_mode(READ), m_last_erased_addr(0),
     m_linkmasta(linkmasta_device), m_chip_num(0)
 {
   // Nothing else to do
@@ -62,13 +62,6 @@ void ws_game_chip::reset()
   {
     // We can only reset when we're not erasing
     throw std::runtime_error("ERROR"); // TODO
-  }
-  
-  if (current_mode() == BYPASS)
-  {
-    // If we're in bypass mode, do something special to exit it
-    write(ADDR_DONTCARE, 0x90);
-    write(ADDR_DONTCARE, 0x00);
   }
   
   // Send the full command
@@ -166,34 +159,11 @@ device_id_t ws_game_chip::get_size_id()
 
 protect_t ws_game_chip::get_block_protection(address_t sector_address)
 {
-  if (is_erasing())
-  {
-    // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  
-  if (m_linkmasta->supports_read_block_protection())
-  {
-    // Ensure the chip's been reset before passing control to Linkmasta
-    if (current_mode() != READ)
-    {
-      reset();
-    }
-    
-    return m_linkmasta->read_block_protection(m_chip_num, sector_address);
-  }
-  else
-  {
-    if (current_mode() != AUTOSELECT)
-    {
-      enter_autoselect();
-    }
-    
-    return read((sector_address & MASK_SECTOR) | 0x00000002);
-  }
+  (void) sector_address;
+  return 0;
 }
 
-void ws_game_chip::program_byte(address_t address, data_t data)
+void ws_game_chip::program_word(address_t address, word_t data)
 {
   if (is_erasing())
   {
@@ -202,55 +172,15 @@ void ws_game_chip::program_byte(address_t address, data_t data)
   }
   
   // Reset if in autoselect mode
-  if (current_mode() != BYPASS && current_mode() != READ)
-  {
-    reset();
-  }
-  
-  // Write prefix based on whether or not in bypass mode
-  if (current_mode() == BYPASS)
-  {
-    write(ADDR_DONTCARE, 0xA0);
-  }
-  else
-  {
-    write(ADDR_COMMAND1, 0xAA);
-    write(ADDR_COMMAND2, 0x55);
-    write(ADDR_COMMAND3, 0xA0);
-  }
-  
-  write(address, data);
-}
-
-void ws_game_chip::unlock_bypass()
-{
-  if (is_erasing())
-  {
-    // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  
-  // Ensure that we actually support bypass mode before doing anything
-  if (!supports_bypass())
-  {
-    return;
-  }
-  
-  // Reset the chip if necessary
   if (current_mode() != READ)
   {
     reset();
   }
   
-  // Unlock bypass mode and update flags
-  if (current_mode() != BYPASS)
-  {
-    write(ADDR_COMMAND1, 0xAA);
-    write(ADDR_COMMAND2, 0x55);
-    write(ADDR_COMMAND3, 0x20);
-    
-    m_mode = BYPASS;
-  }
+  write(ADDR_COMMAND1, 0xAA);
+  write(ADDR_COMMAND2, 0x55);
+  write(ADDR_COMMAND3, 0xA0);
+  write(address, data);
 }
 
 void ws_game_chip::erase_chip()
@@ -326,32 +256,6 @@ void ws_game_chip::erase_block(address_t block_address)
 ws_game_chip::chip_mode ws_game_chip::current_mode() const
 {
   return m_mode;
-}
-
-bool ws_game_chip::supports_bypass() const
-{
-  return m_supports_bypass;
-}
-
-bool ws_game_chip::test_bypass_support()
-{
-  if (is_erasing())
-  {
-    // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  
-  // Test against manufacturer id, device id, and some potentially custom data
-  if (current_mode() != AUTOSELECT)
-  {
-    enter_autoselect();
-  }
-  
-  unsigned char result = read(0x00A2);
-  
-  m_supports_bypass = (result != 0);
-  
-  return supports_bypass();
 }
 
 bool ws_game_chip::is_erasing() const
@@ -483,7 +387,7 @@ unsigned int ws_game_chip::program_bytes(address_t address, const data_t* data, 
     // Use Linkmasta's built-in support for batch programming
     if (controller == nullptr)
     {
-      return m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, supports_bypass());
+      return m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, false);
     }
     else
     {
@@ -499,7 +403,7 @@ unsigned int ws_game_chip::program_bytes(address_t address, const data_t* data, 
       {
         try
         {
-          result = m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, supports_bypass(),  &fwd_controller);
+          result = m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, false,  &fwd_controller);
         }
         catch (std::exception& ex)
         {
@@ -517,12 +421,10 @@ unsigned int ws_game_chip::program_bytes(address_t address, const data_t* data, 
   {
     // Linkmasta does not support batch programming; do it manually
     
+    // TODO: Make use of chip's buffer commands
+    
     // First, ensure we're in the correct mode
-    if (supports_bypass() && current_mode() != BYPASS)
-    {
-      unlock_bypass();
-    }
-    else if (!supports_bypass() && current_mode() != READ)
+    if (current_mode() != READ)
     {
       reset();
     }
@@ -533,13 +435,19 @@ unsigned int ws_game_chip::program_bytes(address_t address, const data_t* data, 
       controller->on_task_start(num_bytes);
     }
     
-    // Send byte of data one at a time
+    // Program word of data one at a time
     unsigned int i;
-    for (i = 0; i < num_bytes && (controller == nullptr || !controller->is_task_cancelled()); ++i, ++address)
+    for (i = 0; i < num_bytes && (controller == nullptr || !controller->is_task_cancelled()); i+=2, address+=2)
     {
+      // Combine 2 bytes into 1 word
+      word_t d = 0;
+      d |= data[i];
+      d <<= (sizeof(data[i]) * 8);
+      d |= data[i+1];
+      
       try
       {
-        program_byte(address, data[i]);
+        program_word(address, d);
       }
       catch (std::exception& ex)
       {

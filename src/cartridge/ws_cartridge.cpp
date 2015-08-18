@@ -19,7 +19,7 @@
 
 using namespace std;
 
-#define DEFAULT_BLOCK_SIZE 0x10000
+#define DEFAULT_BLOCK_SIZE 0x20000
 
 
 
@@ -330,7 +330,14 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, task_controlle
       );
       
       // Wait for erasure to complete
-      while (m_game_chip->test_erasing());
+      while (m_game_chip->test_erasing())
+      {
+        // Give UI an opportunity to update
+        if (controller != nullptr)
+        {
+          controller->on_task_update(task_status::RUNNING, 0);
+        }
+      }
       
       // Write buffer to cartridge
       if (controller == nullptr)
@@ -602,9 +609,6 @@ void ws_cartridge::build_cartridge_destriptor()
   
   m_game_chip = chip;
   
-  // Initialize chip
-  m_game_chip->test_bypass_support();
-  
   // Initialize cartridge descriptor
   m_descriptor = new cartridge_descriptor(1);
   m_descriptor->type = system_type::WONDERSWAN;
@@ -659,11 +663,6 @@ void ws_cartridge::build_chip_descriptor(unsigned int chip_i)
   
   // Calculate number of blocks. (1 block per 64 Kib (8 KiB))
   num_blocks = num_bytes / DEFAULT_BLOCK_SIZE;
-  if (num_blocks > 0)
-  {
-    // Account for last block being split into 4
-    num_blocks += 3;
-  }
   
   // Initialize chip descriptor
   chip_desc = new cartridge_descriptor::chip_descriptor(num_blocks);
@@ -693,49 +692,11 @@ void ws_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int bloc
   // Add (unfinished) block descriptor to chip descriptor
   m_descriptor->chips[chip_i]->blocks[block_i] = block;
   
-  // Determine size of block based on index of block relative to total number
-  // of blocks on chip
-  switch (m_descriptor->chips[chip_i]->num_blocks - block_i)
-  {
-    case 1:    // Last block on chip
-      block->num_bytes = DEFAULT_BLOCK_SIZE / 4;
-      break;
-      
-    case 2:    // Second-last block on chip
-    case 3:    // Third-last block on chip
-      block->num_bytes = DEFAULT_BLOCK_SIZE / 8;
-      break;
-      
-    case 4:    // Fourth-last block on chip
-      block->num_bytes = DEFAULT_BLOCK_SIZE / 2;
-      break;
-      
-    default:   // Some other block
-      block->num_bytes = DEFAULT_BLOCK_SIZE;
-      break;
-  }
-  
-  // Determine base address of block based on index of block relative to total
-  // number of blocks on chip
-  block->base_address = 0;
-  unsigned int num_basic_blocks = m_descriptor->chips[chip_i]->num_blocks - 4;
-  switch (m_descriptor->chips[chip_i]->num_blocks - block_i)
-  {
-      // Note: Fall-throughs are intended
-    case 1:    // Last block on chip
-      block->base_address += DEFAULT_BLOCK_SIZE / 8;
-      
-    case 2:    // Second-last block on chip
-      block->base_address += DEFAULT_BLOCK_SIZE / 8;
-      
-    case 3:    // Third-last block on chip
-      block->base_address += DEFAULT_BLOCK_SIZE / 2;
-      
-    case 4:    // Fourth-last block on chip
-    default:   // Some other block
-      block->base_address += (block_i > num_basic_blocks ? num_basic_blocks : block_i) * DEFAULT_BLOCK_SIZE;
-      break;
-  }
+  // Determine size of block. All blocks are of uniform size
+  block->num_bytes = DEFAULT_BLOCK_SIZE;
+    
+  // Determine base address of block based on index of block
+  block->base_address = block_i * DEFAULT_BLOCK_SIZE;
   
   // Query chip for protection status of block
   block->is_protected = (chip->get_block_protection(block->base_address) == 0 ? false : true);
