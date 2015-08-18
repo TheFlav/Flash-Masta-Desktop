@@ -3,11 +3,11 @@
 #include <qfontdatabase.h>
 #include <qfiledialog.h>
 #include "../../hardware/PC-App-CLI/NeoLinkmasta.h"
-#include "ngp_cartridge_backup_task.h"
-#include "ngp_cartridge_verify_task.h"
-#include "ngp_cartridge_flash_task.h"
-#include "ngp_cartridge_backup_save_task.h"
-#include "ngp_cartridge_restore_save_task.h"
+#include "task/ngp_cartridge_backup_task.h"
+#include "task/ngp_cartridge_verify_task.h"
+#include "task/ngp_cartridge_flash_task.h"
+#include "task/ngp_cartridge_backup_save_task.h"
+#include "task/ngp_cartridge_restore_save_task.h"
 
 
 
