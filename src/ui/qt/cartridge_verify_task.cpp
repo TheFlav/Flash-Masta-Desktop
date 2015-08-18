@@ -19,7 +19,7 @@ void CartridgeVerifyTask::run_task()
   // Get source file from user
   QString filename = QFileDialog::getOpenFileName(
     (QWidget*) this->parent(), tr("Open File"), QString(),
-    tr("Neo Geo Pocket (*.ngp)"));
+    tr("WonderSwan Color (*.wsc)"));
   if (filename == QString::null)
   {
     // Quietly fail
