@@ -1,25 +1,25 @@
-#include "ngp_cartridge_verify_task.h"
+#include "ws_cartridge_verify_task.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-NgpCartridgeVerifyTask::NgpCartridgeVerifyTask(QWidget *parent) : NgpCartridgeTask(parent)
+WsCartridgeVerifyTask::WsCartridgeVerifyTask(QWidget *parent) : WsCartridgeTask(parent)
 {
   // Nothing else to do
 }
 
-NgpCartridgeVerifyTask::~NgpCartridgeVerifyTask()
+WsCartridgeVerifyTask::~WsCartridgeVerifyTask()
 {
   // Nothing else to do
 }
 
-void NgpCartridgeVerifyTask::run_task()
+void WsCartridgeVerifyTask::run_task()
 {
   // Get source file from user
   QString filename = QFileDialog::getOpenFileName(
     (QWidget*) this->parent(), tr("Open File"), QString(),
-    tr("Neo Geo Pocket (*.ngp)"));
+    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws)"));
   if (filename == QString::null)
   {
     // Quietly fail

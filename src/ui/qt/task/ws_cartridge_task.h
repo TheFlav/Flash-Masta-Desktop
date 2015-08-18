@@ -1,5 +1,5 @@
-#ifndef __NGP_CARTRIDGE_TASK_H__
-#define __NGP_CARTRIDGE_TASK_H__
+#ifndef __WS_CARTRIDGE_TASK_H__
+#define __WS_CARTRIDGE_TASK_H__
 
 #include <QObject>
 #include <mutex>
@@ -13,12 +13,12 @@ struct libusb_context;
 struct libusb_device;
 struct libusb_device_handle;
 
-class NgpCartridgeTask : public QObject, public task_controller
+class WsCartridgeTask : public QObject, public task_controller
 {
   Q_OBJECT
 public:
-  explicit              NgpCartridgeTask(QWidget *parent = 0);
-  virtual               ~NgpCartridgeTask();
+  explicit              WsCartridgeTask(QWidget *parent = 0);
+  virtual               ~WsCartridgeTask();
   
   virtual void          go();
   
@@ -34,7 +34,7 @@ protected:
   cartridge*            m_cartridge;
   
   static const unsigned short target_vendor_id = 0x20A0;
-  static const unsigned short target_device_id = 0x4178;
+  static const unsigned short target_device_id = 0x4252;
   
 private:
   std::mutex*           m_mutex;
@@ -49,4 +49,4 @@ private:
   libusb_device_handle* m_handle;
 };
 
-#endif // __NGP_CARTRIDGE_TASK_H__
+#endif // __WS_CARTRIDGE_TASK_H__

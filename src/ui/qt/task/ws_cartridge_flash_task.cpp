@@ -1,25 +1,27 @@
-#include "ngp_cartridge_verify_task.h"
+#include "ws_cartridge_flash_task.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-NgpCartridgeVerifyTask::NgpCartridgeVerifyTask(QWidget *parent) : NgpCartridgeTask(parent)
+WsCartridgeFlashTask::WsCartridgeFlashTask(QWidget* parent): WsCartridgeTask(parent)
 {
   // Nothing else to do
 }
 
-NgpCartridgeVerifyTask::~NgpCartridgeVerifyTask()
+WsCartridgeFlashTask::~WsCartridgeFlashTask()
 {
   // Nothing else to do
 }
 
-void NgpCartridgeVerifyTask::run_task()
+
+
+void WsCartridgeFlashTask::run_task()
 {
   // Get source file from user
   QString filename = QFileDialog::getOpenFileName(
     (QWidget*) this->parent(), tr("Open File"), QString(),
-    tr("Neo Geo Pocket (*.ngp)"));
+    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws)"));
   if (filename == QString::null)
   {
     // Quietly fail
@@ -37,30 +39,33 @@ void NgpCartridgeVerifyTask::run_task()
     return;
   }
   
-  set_progress_label("Verifying cartridge");
+  set_progress_label("Writing data to cartridge");
   
   // Begin task
   try
   {
-    if (m_cartridge->compare_cartridge_game_data(*m_fin, this) && !is_task_cancelled())
-    {
-      QMessageBox msgBox;
-      msgBox.setText("Cartridge and file match.");
-      msgBox.exec();
-    }
-    else if(!is_task_cancelled())
-    {
-      QMessageBox msgBox;
-      msgBox.setText("Cartridge data does not match the chosen file.");
-      msgBox.exec();
-    }
+    m_cartridge->restore_cartridge_game_data(*m_fin, this);
   }
   catch (std::exception& ex)
   {
     (void) ex;
     m_fin->close();
     delete m_fin;
+    
+    if (is_task_cancelled())
+    {
+      QMessageBox msgBox;
+      msgBox.setText("Operation aborted: cartridge may be in an unplayable state.");
+      msgBox.exec();
+    }
     throw;
+  }
+  
+  if (is_task_cancelled())
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Operation aborted: cartridge may be in an unplayable state.");
+    msgBox.exec();
   }
   
   // Cleanup

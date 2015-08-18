@@ -1,25 +1,25 @@
-#include "ngp_cartridge_backup_task.h"
+#include "ws_cartridge_backup_save_task.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-NgpCartridgeBackupTask::NgpCartridgeBackupTask(QWidget *parent) : NgpCartridgeTask(parent)
+WsCartridgeBackupSaveTask::WsCartridgeBackupSaveTask(QWidget *parent) : WsCartridgeTask(parent)
 {
   // Nothing else to do
 }
 
-NgpCartridgeBackupTask::~NgpCartridgeBackupTask()
+WsCartridgeBackupSaveTask::~WsCartridgeBackupSaveTask()
 {
   // Nothing else to do
 }
 
-void NgpCartridgeBackupTask::run_task()
+void WsCartridgeBackupSaveTask::run_task()
 {
   // Get destination file from user
   QString filename = QFileDialog::getSaveFileName(
-    (QWidget*) this->parent(), tr("Save File"), "backup.ngp",
-    tr("Neo Geo Pocket (*.ngp)"));
+    (QWidget*) this->parent(), tr("Save File"), "save_backup.wsc",
+    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws)"));
   if (filename == QString::null)
   {
     // Quietly fail
@@ -37,12 +37,12 @@ void NgpCartridgeBackupTask::run_task()
     return;
   }
   
-  set_progress_label("Creating cartridge backup");
+  set_progress_label("Creating game save backup");
   
   // Begin task
   try
   {
-    m_cartridge->backup_cartridge_game_data(*m_fout, this);
+    m_cartridge->backup_cartridge_save_data(*m_fout, this);
   }
   catch (std::exception& ex)
   {

@@ -1,29 +1,29 @@
-#include "ngp_cartridge_task.h"
+#include "ws_cartridge_task.h"
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QApplication>
 #include <fstream>
 #include <limits>
-#include "cartridge/ngp_cartridge.h"
+#include "cartridge/ws_cartridge.h"
 #include "usb/libusb_usb_device.h"
-#include "linkmasta_device/ngp_linkmasta_device.h"
+#include "linkmasta_device/ws_linkmasta_device.h"
 #include "libusb-1.0/libusb.h"
 
 using namespace usb;
 
-NgpCartridgeTask::NgpCartridgeTask(QWidget *parent) 
+WsCartridgeTask::WsCartridgeTask(QWidget *parent) 
   : QObject(parent), task_controller(), m_mutex(new std::mutex()),
     m_progress(nullptr), m_progress_label()
 {
   // Nothing else to do
 }
 
-NgpCartridgeTask::~NgpCartridgeTask()
+WsCartridgeTask::~WsCartridgeTask()
 {
   delete m_mutex;
 }
 
-void NgpCartridgeTask::go()
+void WsCartridgeTask::go()
 {
   // Initialize libusb
   if (libusb_init(&m_libusb) != 0)
@@ -35,7 +35,7 @@ void NgpCartridgeTask::go()
   }
   
   // Get handle to USB device
-  m_handle = libusb_open_device_with_vid_pid(m_libusb, NgpCartridgeTask::target_vendor_id, NgpCartridgeTask::target_device_id);
+  m_handle = libusb_open_device_with_vid_pid(m_libusb, WsCartridgeTask::target_vendor_id, WsCartridgeTask::target_device_id);
   if (m_handle == nullptr)
   {
     libusb_exit(m_libusb);
@@ -70,7 +70,7 @@ void NgpCartridgeTask::go()
   // Initialize linkmasta device
   try
   {
-    m_linkmasta = new ngp_linkmasta_device(m_usb);
+    m_linkmasta = new ws_linkmasta_device(m_usb);
     m_linkmasta->init();
   }
   catch (std::exception& ex)
@@ -85,9 +85,10 @@ void NgpCartridgeTask::go()
   }
   
   // Test for cartridge
+  /*
   try
   {
-    if (!ngp_cartridge::test_for_cartridge(m_linkmasta))
+    if (!ws_cartridge::test_for_cartridge(m_linkmasta))
     {
       delete m_linkmasta;
       libusb_unref_device(m_device);
@@ -108,11 +109,12 @@ void NgpCartridgeTask::go()
     msgBox.exec();
     return;
   }
+  */
   
   // Initialize cartridge
   try
   {
-    m_cartridge = new ngp_cartridge(m_linkmasta);
+    m_cartridge = new ws_cartridge(m_linkmasta);
     m_cartridge->init();
   }
   catch (std::exception& ex)
@@ -159,7 +161,7 @@ void NgpCartridgeTask::go()
 
 
 
-void NgpCartridgeTask::on_task_start(int work_expected)
+void WsCartridgeTask::on_task_start(int work_expected)
 {
   m_mutex->lock();
   task_controller::on_task_start(work_expected);
@@ -173,7 +175,7 @@ void NgpCartridgeTask::on_task_start(int work_expected)
   m_mutex->unlock();
 }
 
-void NgpCartridgeTask::on_task_update(task_status status, int work_progress)
+void WsCartridgeTask::on_task_update(task_status status, int work_progress)
 {
   m_mutex->lock();
   task_controller::on_task_update(status, work_progress);
@@ -182,14 +184,14 @@ void NgpCartridgeTask::on_task_update(task_status status, int work_progress)
   m_mutex->unlock();
 }
 
-void NgpCartridgeTask::on_task_end(task_status status, int work_total)
+void WsCartridgeTask::on_task_end(task_status status, int work_total)
 {
   m_mutex->lock();
   task_controller::on_task_end(status, work_total);
   m_mutex->unlock();
 }
 
-bool NgpCartridgeTask::is_task_cancelled() const
+bool WsCartridgeTask::is_task_cancelled() const
 {
   m_mutex->lock();
   auto r = m_progress->wasCanceled();
@@ -199,12 +201,12 @@ bool NgpCartridgeTask::is_task_cancelled() const
 
 
 
-QString NgpCartridgeTask::get_progress_label() const
+QString WsCartridgeTask::get_progress_label() const
 {
   return m_progress_label;
 }
 
-void NgpCartridgeTask::set_progress_label(QString label)
+void WsCartridgeTask::set_progress_label(QString label)
 {
   m_progress_label = label;
 }
