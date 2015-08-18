@@ -18,8 +18,8 @@ void CartridgeBackupTask::run_task()
 {
   // Get destination file from user
   QString filename = QFileDialog::getSaveFileName(
-    (QWidget*) this->parent(), tr("Save File"), "backup.ngp",
-    tr("Neo Geo Pocket (*.ngp)"));
+    (QWidget*) this->parent(), tr("Save File"), "backup.wsc",
+    tr("WonderSwan Color (*.wsc)"));
   if (filename == QString::null)
   {
     // Quietly fail
