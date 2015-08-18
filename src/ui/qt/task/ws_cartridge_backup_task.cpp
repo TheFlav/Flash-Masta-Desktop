@@ -1,25 +1,25 @@
-#include "cartridge_backup_task.h"
+#include "ws_cartridge_backup_task.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-CartridgeBackupTask::CartridgeBackupTask(QWidget *parent) : CartridgeTask(parent)
+WsCartridgeBackupTask::WsCartridgeBackupTask(QWidget *parent) : WsCartridgeTask(parent)
 {
   // Nothing else to do
 }
 
-CartridgeBackupTask::~CartridgeBackupTask()
+WsCartridgeBackupTask::~WsCartridgeBackupTask()
 {
   // Nothing else to do
 }
 
-void CartridgeBackupTask::run_task()
+void WsCartridgeBackupTask::run_task()
 {
   // Get destination file from user
   QString filename = QFileDialog::getSaveFileName(
-    (QWidget*) this->parent(), tr("Save File"), "backup.ngp",
-    tr("Neo Geo Pocket (*.ngp)"));
+    (QWidget*) this->parent(), tr("Save File"), "backup.wsc",
+    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws)"));
   if (filename == QString::null)
   {
     // Quietly fail

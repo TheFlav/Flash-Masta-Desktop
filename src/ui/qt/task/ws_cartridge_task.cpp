@@ -1,4 +1,4 @@
-#include "cartridge_task.h"
+#include "ws_cartridge_task.h"
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QApplication>
@@ -11,19 +11,19 @@
 
 using namespace usb;
 
-CartridgeTask::CartridgeTask(QWidget *parent) 
+WsCartridgeTask::WsCartridgeTask(QWidget *parent) 
   : QObject(parent), task_controller(), m_mutex(new std::mutex()),
     m_progress(nullptr), m_progress_label()
 {
   // Nothing else to do
 }
 
-CartridgeTask::~CartridgeTask()
+WsCartridgeTask::~WsCartridgeTask()
 {
   delete m_mutex;
 }
 
-void CartridgeTask::go()
+void WsCartridgeTask::go()
 {
   // Initialize libusb
   if (libusb_init(&m_libusb) != 0)
@@ -35,7 +35,7 @@ void CartridgeTask::go()
   }
   
   // Get handle to USB device
-  m_handle = libusb_open_device_with_vid_pid(m_libusb, 0x20A0, 0x4252);
+  m_handle = libusb_open_device_with_vid_pid(m_libusb, WsCartridgeTask::target_vendor_id, WsCartridgeTask::target_device_id);
   if (m_handle == nullptr)
   {
     libusb_exit(m_libusb);
@@ -161,7 +161,7 @@ void CartridgeTask::go()
 
 
 
-void CartridgeTask::on_task_start(int work_expected)
+void WsCartridgeTask::on_task_start(int work_expected)
 {
   m_mutex->lock();
   task_controller::on_task_start(work_expected);
@@ -175,7 +175,7 @@ void CartridgeTask::on_task_start(int work_expected)
   m_mutex->unlock();
 }
 
-void CartridgeTask::on_task_update(task_status status, int work_progress)
+void WsCartridgeTask::on_task_update(task_status status, int work_progress)
 {
   m_mutex->lock();
   task_controller::on_task_update(status, work_progress);
@@ -184,14 +184,14 @@ void CartridgeTask::on_task_update(task_status status, int work_progress)
   m_mutex->unlock();
 }
 
-void CartridgeTask::on_task_end(task_status status, int work_total)
+void WsCartridgeTask::on_task_end(task_status status, int work_total)
 {
   m_mutex->lock();
   task_controller::on_task_end(status, work_total);
   m_mutex->unlock();
 }
 
-bool CartridgeTask::is_task_cancelled() const
+bool WsCartridgeTask::is_task_cancelled() const
 {
   m_mutex->lock();
   auto r = m_progress->wasCanceled();
@@ -201,12 +201,12 @@ bool CartridgeTask::is_task_cancelled() const
 
 
 
-QString CartridgeTask::get_progress_label() const
+QString WsCartridgeTask::get_progress_label() const
 {
   return m_progress_label;
 }
 
-void CartridgeTask::set_progress_label(QString label)
+void WsCartridgeTask::set_progress_label(QString label)
 {
   m_progress_label = label;
 }
