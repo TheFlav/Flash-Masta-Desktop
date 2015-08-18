@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>400</height>
+    <width>450</width>
+    <height>405</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -42,6 +42,30 @@
     </item>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QComboBox" name="combobox_system_type">
+        <property name="currentIndex">
+         <number>-1</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>Neo Geo Pocket</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>WonderSwan</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QPushButton" name="button_flash_rom">
         <property name="text">
@@ -96,6 +120,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="button_cartridge_info">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Cartridge Info</string>
         </property>
@@ -116,6 +143,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="button_preferences">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Preferences</string>
         </property>
@@ -130,7 +160,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
+     <width>450</width>
      <height>22</height>
     </rect>
    </property>

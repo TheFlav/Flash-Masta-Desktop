@@ -1,27 +1,25 @@
-#include "cartridge_flash_task.h"
+#include "ngp_cartridge_verify_task.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-CartridgeFlashTask::CartridgeFlashTask(QWidget* parent): CartridgeTask(parent)
+NgpCartridgeVerifyTask::NgpCartridgeVerifyTask(QWidget *parent) : NgpCartridgeTask(parent)
 {
   // Nothing else to do
 }
 
-CartridgeFlashTask::~CartridgeFlashTask()
+NgpCartridgeVerifyTask::~NgpCartridgeVerifyTask()
 {
   // Nothing else to do
 }
 
-
-
-void CartridgeFlashTask::run_task()
+void NgpCartridgeVerifyTask::run_task()
 {
   // Get source file from user
   QString filename = QFileDialog::getOpenFileName(
     (QWidget*) this->parent(), tr("Open File"), QString(),
-    tr("WonderSwan Color (*.wsc)"));
+    tr("Neo Geo Pocket (*.ngp)"));
   if (filename == QString::null)
   {
     // Quietly fail
@@ -39,33 +37,30 @@ void CartridgeFlashTask::run_task()
     return;
   }
   
-  set_progress_label("Writing data to cartridge");
+  set_progress_label("Verifying cartridge");
   
   // Begin task
   try
   {
-    m_cartridge->restore_cartridge_game_data(*m_fin, this);
+    if (m_cartridge->compare_cartridge_game_data(*m_fin, this) && !is_task_cancelled())
+    {
+      QMessageBox msgBox;
+      msgBox.setText("Cartridge and file match.");
+      msgBox.exec();
+    }
+    else if(!is_task_cancelled())
+    {
+      QMessageBox msgBox;
+      msgBox.setText("Cartridge data does not match the chosen file.");
+      msgBox.exec();
+    }
   }
   catch (std::exception& ex)
   {
     (void) ex;
     m_fin->close();
     delete m_fin;
-    
-    if (is_task_cancelled())
-    {
-      QMessageBox msgBox;
-      msgBox.setText("Operation aborted: cartridge may be in an unplayable state.");
-      msgBox.exec();
-    }
     throw;
-  }
-  
-  if (is_task_cancelled())
-  {
-    QMessageBox msgBox;
-    msgBox.setText("Operation aborted: cartridge may be in an unplayable state.");
-    msgBox.exec();
   }
   
   // Cleanup

@@ -1,22 +1,22 @@
-#include "cartridge_restore_save_task.h"
+#include "ws_cartridge_restore_save_task.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-CartridgeRestoreSaveTask::CartridgeRestoreSaveTask(QWidget* parent): CartridgeTask(parent)
+WsCartridgeRestoreSaveTask::WsCartridgeRestoreSaveTask(QWidget* parent): WsCartridgeTask(parent)
 {
   // Nothing else to do
 }
 
-CartridgeRestoreSaveTask::~CartridgeRestoreSaveTask()
+WsCartridgeRestoreSaveTask::~WsCartridgeRestoreSaveTask()
 {
   // Nothing else to do
 }
 
 
 
-void CartridgeRestoreSaveTask::run_task()
+void WsCartridgeRestoreSaveTask::run_task()
 {
   // Get source file from user
   QString filename = QFileDialog::getOpenFileName(
