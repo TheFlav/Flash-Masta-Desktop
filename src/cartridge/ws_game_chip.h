@@ -27,7 +27,6 @@ public:
   {
     READ,
     AUTOSELECT,
-    BYPASS,
     ERASE
   };
   
@@ -42,7 +41,7 @@ public:
   device_id_t             get_device_id();
   device_id_t             get_size_id();
   protect_t               get_block_protection(address_t sector_address);
-  void                    program_byte(address_t address, data_t data);
+  void                    program_word(address_t address, word_t data);
   void                    unlock_bypass();
   void                    erase_chip();
   void                    erase_block(address_t block_address);
@@ -60,8 +59,6 @@ private:
   
   chip_mode               m_mode;
   address_t               m_last_erased_addr;
-  
-  bool                    m_supports_bypass;
   
   linkmasta_device* const m_linkmasta;
   chip_index_t const      m_chip_num;
