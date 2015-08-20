@@ -617,6 +617,9 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
   file_header.num_bytes += sizeof(block_header) * blocks_total;
   file_header.num_blocks = blocks_total;
   
+  // Write header to file
+  fout.write((char*) &file_header, sizeof(file_header));	
+  
   // Initialize markers
   unsigned int curr_chip = 0;
   unsigned int curr_block = 0;
@@ -631,9 +634,6 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
   {
     controller->on_task_start(bytes_total);
   }
-  
-  // Write header to file
-  fout.write((char*) &file_header, sizeof(file_header));	
   
   // Begin writing data block-by-block
   try
@@ -795,24 +795,10 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, task_controll
   unsigned int bytes_total = (unsigned int) fin.tellg();
   fin.seekg(0, fin.beg);
   
-  // Count number of unprotected bytes
-  unsigned int bytes_total_cart = 0;
-  for (unsigned int i = 0; i < descriptor()->num_chips; ++i)
-  {
-    for (unsigned int j = 0; j < descriptor()->chips[i]->num_blocks - 1; ++j)
-    {
-      if (!descriptor()->chips[i]->blocks[j]->is_protected)
-      {
-        bytes_total_cart += descriptor()->chips[i]->blocks[j]->num_bytes;
-      }
-    }
-  }
-  
-  // Ensure file will fit
-  if (bytes_total > bytes_total_cart)
-  {
-    throw std::runtime_error("ERROR"); // TODO
-  }
+  // Initialize file header structs and read header from file
+  NGFheader file_header;
+  NGFblock  block_header;
+  fin.read((char*) &file_header, sizeof(file_header));
   
   // Initialize markers
   unsigned int curr_chip = 0;
@@ -835,87 +821,121 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, task_controll
     // Open connection to NGP chip
     m_linkmasta->open();
     
-    while (bytes_written < bytes_total && (controller == nullptr || !controller->is_task_cancelled()))
+    
+    // Loop through all blocks in file
+    for (unsigned int i = 0; i < file_header.num_blocks; ++i)
     {
+      // Convenience functions
+      cartridge_descriptor::chip_descriptor* chip = nullptr;
+      cartridge_descriptor::chip_descriptor::block_descriptor* block = nullptr;
+      
+      // Read in the block header
+      fin.read((char*) &block_header, sizeof(block_header));
+      
+      // Account for Neo Geo Pocket virtual address offset
+      block_header.address -= 0x200000;
+      
+      // Determine the chip on which the block resides
+      for (curr_chip = 0; curr_chip < descriptor()->num_chips; ++curr_chip)
+      {
+        chip = descriptor()->chips[curr_chip];
+        if (chip->num_bytes)
+        {
+          break;
+        }
+        else
+        {
+          block_header.address -= chip->num_bytes;
+        }
+      }
+      
+      // Ensure integrity
+      if (curr_chip >= descriptor()->num_chips)
+      {
+        throw std::runtime_error("Save file does not fit on this cartridge");
+      }
+      
+      // Determine the block index on which the block resides
+      for (curr_block = 0; curr_block < chip->num_blocks; ++curr_block)
+      {
+        block = chip->blocks[curr_block];
+        if (block_header.address <= block->base_address)
+        {
+          break;
+        }
+      }
+      
+      // Ensure integrity
+      if (curr_block >= chip->num_blocks
+          || block_header.address != block->base_address
+          || block_header.num_bytes != block->num_bytes)
+      {
+        throw std::runtime_error("Save file does not fit on this cartridge");
+      }
+      
+      
+      
+      // With the destination block and chip found, transfer data from file
 #ifdef VERBOSE
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
 #endif
       
-      // Only write unprotected blocks
-      if (!descriptor()->chips[curr_chip]->blocks[curr_block]->is_protected)
+      // Calcualte number of expected bytes
+      unsigned bytes_expected = block->num_bytes;
+      if (bytes_expected > bytes_total - bytes_written)
       {
-        // Calcualte number of expected bytes
-        unsigned bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
-        if (bytes_expected > bytes_total - bytes_written)
-        {
-          bytes_expected = bytes_total - bytes_written;
-        }
-        
-        // Attempt to read bytes from file
-        fin.read((char*) buffer, bytes_expected);
-        buffer_size = ((unsigned int) fin.tellg()) - bytes_written;
-        
-        // Check for errors
-        if (buffer_size != bytes_expected)
-        {
-          if (controller != nullptr)
-          {
-            controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-          }
-          throw std::runtime_error("ERROR");
-        }
-        if (!fin.good() && (buffer_size + bytes_written) < bytes_total)
-        {
-          if (controller != nullptr)
-          {
-            controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-          }
-          throw std::runtime_error("ERROR");
-        }
-        
-        // Erase block from cartridge
-        m_chips[curr_chip]->erase_block(
-                                        descriptor()->chips[curr_chip]->blocks[curr_block]->base_address
-                                        );
-        
-        // Wait for erasure to complete
-        while (m_chips[curr_chip]->test_erasing());
-        
-        // Write buffer to cartridge
-        if (controller == nullptr)
-        {
-          m_chips[curr_chip]->program_bytes(
-                                            descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                            buffer, buffer_size
-                                            );
-        }
-        else
-        {
-          forwarding_task_controller fwd_controller(controller);
-          fwd_controller.scale_work_to(buffer_size);
-          try
-          {
-            m_chips[curr_chip]->program_bytes(
-                                              descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                              buffer, buffer_size, &fwd_controller
-                                              );
-          }
-          catch (std::exception& ex)
-          {
-            controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-            throw;
-          }
-        }
-        bytes_written += buffer_size;
+        bytes_expected = bytes_total - bytes_written;
       }
       
-      // Update markers
-      curr_block++;
-      if (curr_block >= descriptor()->chips[curr_chip]->num_blocks - 1)
+      // Attempt to read bytes from file
+      fin.read((char*) buffer, bytes_expected);
+      buffer_size = ((unsigned int) fin.tellg()) - bytes_written;
+      
+      // Check for errors
+      if (buffer_size != bytes_expected)
       {
-        curr_block = 0;
-        curr_chip++;
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
+        throw std::runtime_error("ERROR");
       }
+      if (!fin.good() && (buffer_size + bytes_written) < bytes_total)
+      {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
+        throw std::runtime_error("ERROR");
+      }
+      
+      // Erase block from cartridge
+      m_chips[curr_chip]->erase_block(block->base_address);
+      
+      // Wait for erasure to complete
+      while (m_chips[curr_chip]->test_erasing());
+      
+      // Write buffer to cartridge
+      if (controller == nullptr)
+      {
+        m_chips[curr_chip]->program_bytes(block->base_address, buffer, buffer_size);
+      }
+      else
+      {
+        forwarding_task_controller fwd_controller(controller);
+        fwd_controller.scale_work_to(buffer_size);
+        try
+        {
+          m_chips[curr_chip]->program_bytes(block->base_address, buffer, buffer_size, &fwd_controller);
+        }
+        catch (std::exception& ex)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+          throw;
+        }
+      }
+      
+      bytes_written += buffer_size;
     }
     
     // Clean up before returning
