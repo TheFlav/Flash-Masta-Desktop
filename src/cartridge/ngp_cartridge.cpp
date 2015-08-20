@@ -8,6 +8,22 @@
 using namespace std;
 
 #define DEFAULT_BLOCK_SIZE 0x10000
+#define NGF_HEADER_VERSION 0x0053
+
+
+
+struct NGFheader
+{
+  uint16_t version;
+  uint16_t num_blocks;
+  uint32_t num_bytes;
+};
+
+struct NGFblock
+{
+  uint32_t address;
+  uint32_t num_bytes;
+};
 
 
 
@@ -575,19 +591,31 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
     throw std::runtime_error("ERROR"); // TODO
   }
   
-  // Determine the total number of bytes to write
+  // Determine the total number of bytes and blocks to write
   unsigned int bytes_written = 0;
   unsigned int bytes_total = 0;
+  unsigned int blocks_total = 0;
   for (unsigned int i = 0; i < descriptor()->num_chips; ++i)
   {
+    // Loop through blocks. Note that we skip the last one since it's irrelevant
     for (unsigned int j = 0; j < descriptor()->chips[i]->num_blocks - 1; ++j)
     {
       if (!descriptor()->chips[i]->blocks[j]->is_protected)
       {
         bytes_total += descriptor()->chips[i]->blocks[j]->num_bytes;
+        blocks_total++;
       }
     }
   }
+  
+  // Create the file and block header structs and populate with data
+  NGFheader file_header;
+  NGFblock  block_header;
+  file_header.version = NGF_HEADER_VERSION;
+  file_header.num_bytes = sizeof(file_header);
+  file_header.num_bytes += bytes_total;
+  file_header.num_bytes += sizeof(block_header) * blocks_total;
+  file_header.num_blocks = blocks_total;
   
   // Initialize markers
   unsigned int curr_chip = 0;
@@ -603,11 +631,18 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
   {
     controller->on_task_start(bytes_total);
   }
+  
+  // Write header to file
+  fout.write((char*) &file_header, sizeof(file_header));	
+  
   // Begin writing data block-by-block
   try
   {
     // Open connection to NGP chip
     m_linkmasta->open();
+    
+    // Convenience variable
+    cartridge_descriptor::chip_descriptor::block_descriptor* block;
     
     while (bytes_written < bytes_total && curr_chip < descriptor()->num_chips && (controller == nullptr || !controller->is_task_cancelled()))
     {
@@ -615,11 +650,30 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
 #endif
       
+      block = descriptor()->chips[curr_chip]->blocks[curr_block];
+      
       // Only write unprotected blocks
-      if (!descriptor()->chips[curr_chip]->blocks[curr_block]->is_protected)
+      if (!block->is_protected)
       {
+        // Populate the header
+        block_header.address = block->base_address;
+        block_header.num_bytes = block->num_bytes;
+        
+        // Adjust for blocks not on the first chip
+        for (unsigned int i = curr_chip; i > 0; --i)
+        {
+          block_header.address += descriptor()->chips[i]->num_blocks;
+        }
+        
+        // Adjust for NGP virtual address offset
+        block_header.address += 0x200000;
+        
+        // Write block header to file
+        fout.write((char*) &block_header, sizeof(block_header));
+        
+        
         // Calcualte number of expected bytes
-        unsigned int bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
+        unsigned int bytes_expected = block->num_bytes;
         if (bytes_expected > bytes_total - bytes_written)
         {
           bytes_expected = bytes_total - bytes_written;
@@ -628,10 +682,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
         // Attempt to read bytes from cartridge
         if (controller == nullptr)
         {
-          buffer_size = m_chips[curr_chip]->read_bytes(
-                                                       descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                                       buffer, bytes_expected
-                                                       );
+          buffer_size = m_chips[curr_chip]->read_bytes(block->base_address, buffer, bytes_expected);
         }
         else
         {
@@ -640,10 +691,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
           fwd_controller.scale_work_to(bytes_expected);
           try
           {
-            buffer_size = m_chips[curr_chip]->read_bytes(
-                                                         descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                                         buffer, bytes_expected, &fwd_controller
-                                                         );
+            buffer_size = m_chips[curr_chip]->read_bytes(block->base_address, buffer, bytes_expected, &fwd_controller);
           }
           catch (std::exception& ex)
           {
