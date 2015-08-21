@@ -18,8 +18,8 @@ void NgpCartridgeBackupSaveTask::run_task()
 {
   // Get destination file from user
   QString filename = QFileDialog::getSaveFileName(
-    (QWidget*) this->parent(), tr("Save File"), "save_backup.ngp",
-    tr("Neo Geo Pocket (*.ngp)"));
+    (QWidget*) this->parent(), tr("Save File"), "save_backup.ngf",
+    tr("Neo Geo File (*.ngf);;All files (*)"));
   if (filename == QString::null)
   {
     // Quietly fail
