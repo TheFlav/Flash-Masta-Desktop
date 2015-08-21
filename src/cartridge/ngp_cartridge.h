@@ -4,6 +4,10 @@
  *  File containing the header information and declaration of the
  *  \ref ngp_cartridge class. This file includes the minimal number of files
  *  necessary to use any instance of the \ref ngp_cartridge class.
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-07-28
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
  */
 
 #ifndef __NGP_CARTRIDGE_H__
@@ -29,6 +33,12 @@ class ngp_chip;
 class ngp_cartridge: public cartridge
 {
 private:
+  /*! \brief The maximum number of chips to test for.
+   *  
+   *  Some Neo Geo Pocket cartridges can have multiple chips. This variable
+   *  limits the number of chips we test to the maximum number of chips observed
+   *  on a Neo Geo Pocket cartridge.
+   */
   static const unsigned int MAX_NUM_CHIPS = 2;
 
 public:
@@ -187,8 +197,10 @@ protected:
    */
   void                  build_chip_descriptor(unsigned int chip_i);
   
-  /*! \brief Creats and populates a \ref cartridge_descriptor::block_descriptor
-   *         struct using information gathered from the associated \ref linkmasta_device.
+  /*! \brief Creats and populates a
+   *         \ref cartridge_descriptor::chip_descriptor::block_descriptor
+   *         struct using information gathered from the associated
+   *         \ref linkmasta_device.
    *  
    *  Uses the associated \ref linkmasta_device to query for information on the
    *  specified chip's sectors. Gathers information on the sector's storage

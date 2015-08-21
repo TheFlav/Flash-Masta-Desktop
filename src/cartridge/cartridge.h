@@ -4,6 +4,10 @@
  *  File containing the header information and declaration of the \ref cartridge
  *  class. This file includes the minimal number of files necessary to use any
  *  instance of the \ref cartridge class.
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-07-28
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
  */
 
 #ifndef __CARTRIDGE_H__
@@ -50,6 +54,8 @@ public:
    *           with a Neo Geo Pocket or Neo Geo Pocket Color system.
    *  \returns \ref system_type::WONDERSWAN - The cartridge is compatible with a
    *           WonderSwan or a WonderSwan color system.
+   *  
+   *  \see system_type
    */
   virtual system_type system() const = 0;
   
@@ -63,6 +69,8 @@ public:
    *  
    *  If a call to this function is made before a call to \ref init() is made,
    *  the function will return a **nullptr**.
+   *  
+   *  \see cartridge_descriptor
    */
   virtual const cartridge_descriptor* descriptor() const = 0;
   
