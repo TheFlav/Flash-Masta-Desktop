@@ -597,8 +597,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
   unsigned int blocks_total = 0;
   for (unsigned int i = 0; i < descriptor()->num_chips; ++i)
   {
-    // Loop through blocks. Note that we skip the last one since it's irrelevant
-    for (unsigned int j = 0; j < descriptor()->chips[i]->num_blocks - 1; ++j)
+    for (unsigned int j = 0; j < descriptor()->chips[i]->num_blocks; ++j)
     {
       if (!descriptor()->chips[i]->blocks[j]->is_protected)
       {
@@ -725,7 +724,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
       
       // Update markers
       curr_block++;
-      if (curr_block >= descriptor()->chips[curr_chip]->num_blocks - 1)
+      if (curr_block >= descriptor()->chips[curr_chip]->num_blocks)
       {
         curr_block = 0;
         curr_chip++;
@@ -789,16 +788,19 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, task_controll
     throw std::runtime_error("ERROR"); // TODO
   }
   
-  // Determine the total number of bytes to write
-  fin.seekg(0, fin.end);
-  unsigned int bytes_written = 0;
-  unsigned int bytes_total = (unsigned int) fin.tellg();
+  // Seek to start of file
   fin.seekg(0, fin.beg);
   
   // Initialize file header structs and read header from file
   NGFheader file_header;
   NGFblock  block_header;
   fin.read((char*) &file_header, sizeof(file_header));
+  
+  // Determine the number of bytes to read
+  unsigned int bytes_written = 0;
+  unsigned int bytes_total = file_header.num_bytes;
+  bytes_total -= sizeof(file_header);
+  bytes_total -= sizeof(block_header) * file_header.num_blocks;
   
   // Initialize markers
   unsigned int curr_chip = 0;
@@ -839,7 +841,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, task_controll
       for (curr_chip = 0; curr_chip < descriptor()->num_chips; ++curr_chip)
       {
         chip = descriptor()->chips[curr_chip];
-        if (chip->num_bytes)
+        if (block_header.address < chip->num_bytes)
         {
           break;
         }
@@ -889,7 +891,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, task_controll
       
       // Attempt to read bytes from file
       fin.read((char*) buffer, bytes_expected);
-      buffer_size = ((unsigned int) fin.tellg()) - bytes_written;
+      buffer_size = fin.gcount();
       
       // Check for errors
       if (buffer_size != bytes_expected)
