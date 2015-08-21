@@ -192,6 +192,7 @@ bool ngp_cartridge_tester::run_tests()
   //////////////////////////////////////////////////////////// 4
   
   //// Backup cartridge ////
+  /*
   success = true;
   
   fout.open("/Users/Dan/Documents/ROMs/bkp.ngp", ios::binary);
@@ -217,10 +218,12 @@ bool ngp_cartridge_tester::run_tests()
   
   out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
   m_test_count[success ? 0 : 1]++;
+  */
   
   //////////////////////////////////////////////////////////// 5
   
   //// Write cartridge ////
+  /*
   success = true;
   
   fin.seekg(0, fin.beg);
@@ -243,10 +246,12 @@ bool ngp_cartridge_tester::run_tests()
   
   out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
   m_test_count[success ? 0 : 1]++;
+   */
   
   //////////////////////////////////////////////////////////// 6
   
   //// Verify cartridge ////
+  /*
   success = true;
   
   fin.seekg(0, fin.beg);
@@ -272,6 +277,37 @@ bool ngp_cartridge_tester::run_tests()
   
   out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
   m_test_count[success ? 0 : 1]++;
+  */
+  
+  ////////////////////////////////////////////////////////////
+  
+  //// Backup cartridge save game ////
+  success = true;
+  
+  fout.open("/Users/Dan/Desktop/test.ngf", ios::binary);
+  
+  try
+  {
+    if (fout.good())
+    {
+      m_cartridge->backup_cartridge_save_data(fout);
+    }
+    else
+    {
+      success = false;
+    }
+  }
+  catch (std::exception& e)
+  {
+    out << e.what() << endl;
+    success = false;
+  }
+  
+  fout.close();
+  
+  out << "  Test " << ++test_num << " " << (success ? "PASSED" : "FAILED") << endl;
+  m_test_count[success ? 0 : 1]++;
+
   
   //////////////////////////////////////////////////////////// 7
   

@@ -8,6 +8,22 @@
 using namespace std;
 
 #define DEFAULT_BLOCK_SIZE 0x10000
+#define NGF_HEADER_VERSION 0x0053
+
+
+
+struct NGFheader
+{
+  uint16_t version;
+  uint16_t num_blocks;
+  uint32_t num_bytes;
+};
+
+struct NGFblock
+{
+  uint32_t address;
+  uint32_t num_bytes;
+};
 
 
 
@@ -101,8 +117,14 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controll
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
 #endif
       
+      // Convenience variables
+      cartridge_descriptor::chip_descriptor* chip;
+      cartridge_descriptor::chip_descriptor::block_descriptor* block;
+      chip = descriptor()->chips[curr_chip];
+      block = chip->blocks[curr_block];
+      
       // Calcualte number of expected bytes
-      unsigned int bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
+      unsigned int bytes_expected = block->num_bytes;
       if (bytes_expected > bytes_total - bytes_written)
       {
         bytes_expected = bytes_total - bytes_written;
@@ -111,10 +133,7 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controll
       // Attempt to read bytes from cartridge
       if (controller == nullptr)
       {
-        buffer_size = m_chips[curr_chip]->read_bytes(
-                                                     descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                                     buffer, bytes_expected
-                                                     );
+        buffer_size = m_chips[curr_chip]->read_bytes(block->base_address, buffer, bytes_expected);
       }
       else
       {
@@ -123,10 +142,7 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controll
         fwd_controller.scale_work_to(bytes_expected);
         try
         {
-          buffer_size = m_chips[curr_chip]->read_bytes(
-                                                       descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                                       buffer, bytes_expected, &fwd_controller
-                                                       );
+          buffer_size = m_chips[curr_chip]->read_bytes(block->base_address, buffer, bytes_expected, &fwd_controller);
         }
         catch (std::exception& ex)
         {
@@ -159,7 +175,7 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controll
       // Update markers
       bytes_written += buffer_size;
       curr_block++;
-      if (curr_block >= descriptor()->chips[curr_chip]->num_blocks)
+      if (curr_block >= chip->num_blocks)
       {
         curr_block = 0;
         curr_chip++;
@@ -262,8 +278,13 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, task_controll
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
 #endif
       
+      cartridge_descriptor::chip_descriptor* chip;
+      cartridge_descriptor::chip_descriptor::block_descriptor* block;
+      chip = descriptor()->chips[curr_chip];
+      block = chip->blocks[curr_block];
+      
       // Calcualte number of expected bytes
-      unsigned bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
+      unsigned bytes_expected = block->num_bytes;
       if (bytes_expected > bytes_total - bytes_written)
       {
         bytes_expected = bytes_total - bytes_written;
@@ -271,7 +292,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, task_controll
       
       // Attempt to read bytes from file
       fin.read((char*) buffer, bytes_expected);
-      buffer_size = ((unsigned int) fin.tellg()) - bytes_written;
+      buffer_size = (unsigned int) fin.gcount();
       
       // Check for errors
       if (buffer_size != bytes_expected)
@@ -292,20 +313,21 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, task_controll
       }
       
       // Erase block from cartridge
-      m_chips[curr_chip]->erase_block(
-                                      descriptor()->chips[curr_chip]->blocks[curr_block]->base_address
-                                      );
+      m_chips[curr_chip]->erase_block(block->base_address);
       
       // Wait for erasure to complete
-      while (m_chips[curr_chip]->test_erasing());
+      while (m_chips[curr_chip]->test_erasing())
+      {
+        if (controller != nullptr)
+        {
+          controller->on_task_update(task_status::RUNNING,, 0);
+        }
+      }
       
       // Write buffer to cartridge
       if (controller == nullptr)
       {
-        m_chips[curr_chip]->program_bytes(
-                                          descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                          buffer, buffer_size
-                                          );
+        m_chips[curr_chip]->program_bytes(block->base_address, buffer, buffer_size);
       }
       else
       {
@@ -313,10 +335,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, task_controll
         fwd_controller.scale_work_to(buffer_size);
         try
         {
-          m_chips[curr_chip]->program_bytes(
-                                            descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                            buffer, buffer_size, &fwd_controller
-                                            );
+          m_chips[curr_chip]->program_bytes(block->base_address, buffer, buffer_size, &fwd_controller);
         }
         catch (std::exception& ex)
         {
@@ -328,7 +347,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, task_controll
       // Update markers
       bytes_written += buffer_size;
       curr_block++;
-      if (curr_block >= descriptor()->chips[curr_chip]->num_blocks)
+      if (curr_block >= chip->num_blocks)
       {
         curr_block = 0;
         curr_chip++;
@@ -433,8 +452,14 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, task_controll
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_compared << " B / " << bytes_total << " B (" << (bytes_compared * 100 / bytes_total) << "%)" << endl;
 #endif
       
+      // Convenience variables
+      cartridge_descriptor::chip_descriptor* chip;
+      cartridge_descriptor::chip_descriptor::block_descriptor* block;
+      chip = descriptor()->chips[curr_chip];
+      block = chip->blocks[curr_block];
+      
       // Calcualte number of expected bytes
-      unsigned bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
+      unsigned bytes_expected = block->num_bytes;
       if (bytes_expected > bytes_total - bytes_compared)
       {
         bytes_expected = bytes_total - bytes_compared;
@@ -442,7 +467,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, task_controll
       
       // Attempt to read bytes from file
       fin.read((char*) f_buffer, bytes_expected);
-      f_buffer_size = ((unsigned int) fin.tellg()) - bytes_compared;
+      f_buffer_size = (unsigned int) fin.gcount();
       
       // Check for errors
       if (f_buffer_size != bytes_expected)
@@ -465,10 +490,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, task_controll
       // Attempt to read bytes from cartridge
       if (controller == nullptr)
       {
-        c_buffer_size = m_chips[curr_chip]->read_bytes(
-                                                       descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                                       c_buffer, bytes_expected
-                                                       );
+        c_buffer_size = m_chips[curr_chip]->read_bytes(block->base_address, c_buffer, bytes_expected);
       }
       else
       {
@@ -477,10 +499,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, task_controll
         fwd_controller.scale_work_to(bytes_expected);
         try
         {
-          c_buffer_size = m_chips[curr_chip]->read_bytes(
-                                                         descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                                         c_buffer, bytes_expected, &fwd_controller
-                                                         );
+          c_buffer_size = m_chips[curr_chip]->read_bytes(block->base_address, c_buffer, bytes_expected, &fwd_controller);
         }
         catch (std::exception& ex)
         {
@@ -513,7 +532,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, task_controll
       // Update markers
       bytes_compared += f_buffer_size;
       curr_block++;
-      if (curr_block >= descriptor()->chips[curr_chip]->num_blocks)
+      if (curr_block >= chip->num_blocks)
       {
         curr_block = 0;
         curr_chip++;
@@ -575,19 +594,33 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
     throw std::runtime_error("ERROR"); // TODO
   }
   
-  // Determine the total number of bytes to write
+  // Determine the total number of bytes and blocks to write
   unsigned int bytes_written = 0;
   unsigned int bytes_total = 0;
+  unsigned int blocks_total = 0;
   for (unsigned int i = 0; i < descriptor()->num_chips; ++i)
   {
-    for (unsigned int j = 0; j < descriptor()->chips[i]->num_blocks - 1; ++j)
+    for (unsigned int j = 0; j < descriptor()->chips[i]->num_blocks; ++j)
     {
       if (!descriptor()->chips[i]->blocks[j]->is_protected)
       {
         bytes_total += descriptor()->chips[i]->blocks[j]->num_bytes;
+        blocks_total++;
       }
     }
   }
+  
+  // Create the file and block header structs and populate with data
+  NGFheader file_header;
+  NGFblock  block_header;
+  file_header.version = NGF_HEADER_VERSION;
+  file_header.num_bytes = sizeof(file_header);
+  file_header.num_bytes += bytes_total;
+  file_header.num_bytes += sizeof(block_header) * blocks_total;
+  file_header.num_blocks = blocks_total;
+  
+  // Write header to file
+  fout.write((char*) &file_header, sizeof(file_header));	
   
   // Initialize markers
   unsigned int curr_chip = 0;
@@ -603,6 +636,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
   {
     controller->on_task_start(bytes_total);
   }
+  
   // Begin writing data block-by-block
   try
   {
@@ -615,11 +649,34 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
 #endif
       
+      // Convenience variables
+      cartridge_descriptor::chip_descriptor* chip;
+      cartridge_descriptor::chip_descriptor::block_descriptor* block;
+      chip = descriptor()->chips[curr_chip];
+      block = chip->blocks[curr_block];
+      
       // Only write unprotected blocks
-      if (!descriptor()->chips[curr_chip]->blocks[curr_block]->is_protected)
+      if (!block->is_protected)
       {
+        // Populate the header
+        block_header.address = block->base_address;
+        block_header.num_bytes = block->num_bytes;
+        
+        // Adjust for blocks not on the first chip
+        for (unsigned int i = curr_chip; i > 0; --i)
+        {
+          block_header.address += descriptor()->chips[i]->num_blocks;
+        }
+        
+        // Adjust for NGP virtual address offset
+        block_header.address += 0x200000;
+        
+        // Write block header to file
+        fout.write((char*) &block_header, sizeof(block_header));
+        
+        
         // Calcualte number of expected bytes
-        unsigned int bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
+        unsigned int bytes_expected = block->num_bytes;
         if (bytes_expected > bytes_total - bytes_written)
         {
           bytes_expected = bytes_total - bytes_written;
@@ -628,10 +685,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
         // Attempt to read bytes from cartridge
         if (controller == nullptr)
         {
-          buffer_size = m_chips[curr_chip]->read_bytes(
-                                                       descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                                       buffer, bytes_expected
-                                                       );
+          buffer_size = m_chips[curr_chip]->read_bytes(block->base_address, buffer, bytes_expected);
         }
         else
         {
@@ -640,10 +694,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
           fwd_controller.scale_work_to(bytes_expected);
           try
           {
-            buffer_size = m_chips[curr_chip]->read_bytes(
-                                                         descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                                         buffer, bytes_expected, &fwd_controller
-                                                         );
+            buffer_size = m_chips[curr_chip]->read_bytes(block->base_address, buffer, bytes_expected, &fwd_controller);
           }
           catch (std::exception& ex)
           {
@@ -677,7 +728,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
       
       // Update markers
       curr_block++;
-      if (curr_block >= descriptor()->chips[curr_chip]->num_blocks - 1)
+      if (curr_block >= chip->num_blocks)
       {
         curr_block = 0;
         curr_chip++;
@@ -741,30 +792,19 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, task_controll
     throw std::runtime_error("ERROR"); // TODO
   }
   
-  // Determine the total number of bytes to write
-  fin.seekg(0, fin.end);
-  unsigned int bytes_written = 0;
-  unsigned int bytes_total = (unsigned int) fin.tellg();
+  // Seek to start of file
   fin.seekg(0, fin.beg);
   
-  // Count number of unprotected bytes
-  unsigned int bytes_total_cart = 0;
-  for (unsigned int i = 0; i < descriptor()->num_chips; ++i)
-  {
-    for (unsigned int j = 0; j < descriptor()->chips[i]->num_blocks - 1; ++j)
-    {
-      if (!descriptor()->chips[i]->blocks[j]->is_protected)
-      {
-        bytes_total_cart += descriptor()->chips[i]->blocks[j]->num_bytes;
-      }
-    }
-  }
+  // Initialize file header structs and read header from file
+  NGFheader file_header;
+  NGFblock  block_header;
+  fin.read((char*) &file_header, sizeof(file_header));
   
-  // Ensure file will fit
-  if (bytes_total > bytes_total_cart)
-  {
-    throw std::runtime_error("ERROR"); // TODO
-  }
+  // Determine the number of bytes to read
+  unsigned int bytes_written = 0;
+  unsigned int bytes_total = file_header.num_bytes;
+  bytes_total -= sizeof(file_header);
+  bytes_total -= sizeof(block_header) * file_header.num_blocks;
   
   // Initialize markers
   unsigned int curr_chip = 0;
@@ -787,87 +827,127 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, task_controll
     // Open connection to NGP chip
     m_linkmasta->open();
     
-    while (bytes_written < bytes_total && (controller == nullptr || !controller->is_task_cancelled()))
+    
+    // Loop through all blocks in file
+    for (unsigned int i = 0; i < file_header.num_blocks; ++i)
     {
+      // Convenience functions
+      cartridge_descriptor::chip_descriptor* chip = nullptr;
+      cartridge_descriptor::chip_descriptor::block_descriptor* block = nullptr;
+      
+      // Read in the block header
+      fin.read((char*) &block_header, sizeof(block_header));
+      
+      // Account for Neo Geo Pocket virtual address offset
+      block_header.address -= 0x200000;
+      
+      // Determine the chip on which the block resides
+      for (curr_chip = 0; curr_chip < descriptor()->num_chips; ++curr_chip)
+      {
+        chip = descriptor()->chips[curr_chip];
+        if (block_header.address < chip->num_bytes)
+        {
+          break;
+        }
+        else
+        {
+          block_header.address -= chip->num_bytes;
+        }
+      }
+      
+      // Ensure integrity
+      if (curr_chip >= descriptor()->num_chips)
+      {
+        throw std::runtime_error("Save file does not fit on this cartridge");
+      }
+      
+      // Determine the block index on which the block resides
+      for (curr_block = 0; curr_block < chip->num_blocks; ++curr_block)
+      {
+        block = chip->blocks[curr_block];
+        if (block_header.address <= block->base_address)
+        {
+          break;
+        }
+      }
+      
+      // Ensure integrity
+      if (curr_block >= chip->num_blocks
+          || block_header.address != block->base_address
+          || block_header.num_bytes != block->num_bytes)
+      {
+        throw std::runtime_error("Save file does not fit on this cartridge");
+      }
+      
+      
+      
+      // With the destination block and chip found, transfer data from file
 #ifdef VERBOSE
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
 #endif
       
-      // Only write unprotected blocks
-      if (!descriptor()->chips[curr_chip]->blocks[curr_block]->is_protected)
+      // Calcualte number of expected bytes
+      unsigned bytes_expected = block->num_bytes;
+      if (bytes_expected > bytes_total - bytes_written)
       {
-        // Calcualte number of expected bytes
-        unsigned bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
-        if (bytes_expected > bytes_total - bytes_written)
-        {
-          bytes_expected = bytes_total - bytes_written;
-        }
-        
-        // Attempt to read bytes from file
-        fin.read((char*) buffer, bytes_expected);
-        buffer_size = ((unsigned int) fin.tellg()) - bytes_written;
-        
-        // Check for errors
-        if (buffer_size != bytes_expected)
-        {
-          if (controller != nullptr)
-          {
-            controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-          }
-          throw std::runtime_error("ERROR");
-        }
-        if (!fin.good() && (buffer_size + bytes_written) < bytes_total)
-        {
-          if (controller != nullptr)
-          {
-            controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-          }
-          throw std::runtime_error("ERROR");
-        }
-        
-        // Erase block from cartridge
-        m_chips[curr_chip]->erase_block(
-                                        descriptor()->chips[curr_chip]->blocks[curr_block]->base_address
-                                        );
-        
-        // Wait for erasure to complete
-        while (m_chips[curr_chip]->test_erasing());
-        
-        // Write buffer to cartridge
-        if (controller == nullptr)
-        {
-          m_chips[curr_chip]->program_bytes(
-                                            descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                            buffer, buffer_size
-                                            );
-        }
-        else
-        {
-          forwarding_task_controller fwd_controller(controller);
-          fwd_controller.scale_work_to(buffer_size);
-          try
-          {
-            m_chips[curr_chip]->program_bytes(
-                                              descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                              buffer, buffer_size, &fwd_controller
-                                              );
-          }
-          catch (std::exception& ex)
-          {
-            controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-            throw;
-          }
-        }
-        bytes_written += buffer_size;
+        bytes_expected = bytes_total - bytes_written;
       }
       
-      // Update markers
-      curr_block++;
-      if (curr_block >= descriptor()->chips[curr_chip]->num_blocks - 1)
+      // Attempt to read bytes from file
+      fin.read((char*) buffer, bytes_expected);
+      buffer_size = (unsigned int) fin.gcount();
+      
+      // Check for errors
+      if (buffer_size != bytes_expected)
       {
-        curr_block = 0;
-        curr_chip++;
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
+        throw std::runtime_error("ERROR");
       }
+      if (!fin.good() && (buffer_size + bytes_written) < bytes_total)
+      {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
+        throw std::runtime_error("ERROR");
+      }
+      
+      // Erase block from cartridge
+      m_chips[curr_chip]->erase_block(block->base_address);
+      
+      // Wait for erasure to complete
+      while (m_chips[curr_chip]->test_erasing())
+      {
+        if (controller != nullptr)
+        {
+          controller->on_task_update(task_status::RUNNING, 0);
+        }
+      }
+      
+      // Write buffer to cartridge
+      if (controller == nullptr)
+      {
+        m_chips[curr_chip]->program_bytes(block->base_address, buffer, buffer_size);
+      }
+      else
+      {
+        forwarding_task_controller fwd_controller(controller);
+        fwd_controller.scale_work_to(buffer_size);
+        try
+        {
+          m_chips[curr_chip]->program_bytes(block->base_address, buffer, buffer_size, &fwd_controller);
+        }
+        catch (std::exception& ex)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+          throw;
+        }
+      }
+      
+      bytes_written += buffer_size;
     }
     
     // Clean up before returning
@@ -920,36 +1000,25 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
     throw std::invalid_argument("Standard input cannot be used in cartridge operations");
   }
   
-  // Ensure class was initialized
+  // Ensure class was intiialized
   if (!m_was_init)
   {
     throw std::runtime_error("ERROR"); // TODO
   }
   
-  // determine the total number of bytes to compare
-  fin.seekg(0, fin.end);
-  unsigned int bytes_compared = 0;
-  unsigned int bytes_total = (unsigned int) fin.tellg();
+  // Seek to start of file
   fin.seekg(0, fin.beg);
   
-  // Count number of unprotected bytes
-  unsigned int bytes_total_cart = 0;
-  for (unsigned int i = 0; i < descriptor()->num_chips; ++i)
-  {
-    for (unsigned int j = 0; j < descriptor()->chips[i]->num_blocks - 1; ++j)
-    {
-      if (!descriptor()->chips[i]->blocks[j]->is_protected)
-      {
-        bytes_total_cart += descriptor()->chips[i]->blocks[j]->num_bytes;
-      }
-    }
-  }
+  // Initialize file header structs and read header from file
+  NGFheader file_header;
+  NGFblock  block_header;
+  fin.read((char*) &file_header, sizeof(file_header));
   
-  // Ensure file will fit
-  if (bytes_total > bytes_total_cart)
-  {
-    return false;
-  }
+  // Determine the number of bytes to read
+  unsigned int bytes_written = 0;
+  unsigned int bytes_total = file_header.num_bytes;
+  bytes_total -= sizeof(file_header);
+  bytes_total -= sizeof(block_header) * file_header.num_blocks;
   
   // Initialize markers
   unsigned int curr_chip = 0;
@@ -969,107 +1038,144 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
     controller->on_task_start(bytes_total);
   }
   
-  // Begin comparing data block-by-block
+  // Begin writing data block-by-block
   try
   {
     // Open connection to NGP chip
     m_linkmasta->open();
     
-    while (bytes_compared < bytes_total && matched && (controller == nullptr || !controller->is_task_cancelled()))
+    
+    // Loop through all blocks in file
+    for (unsigned int i = 0; i < file_header.num_blocks && matched; ++i)
     {
-#ifdef VERBOSE
-      std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_compared << " B / " << bytes_total << " B (" << (bytes_compared * 100 / bytes_total) << "%)" << endl;
-#endif
+      // Convenience functions
+      cartridge_descriptor::chip_descriptor* chip = nullptr;
+      cartridge_descriptor::chip_descriptor::block_descriptor* block = nullptr;
       
-      // Only compare unprotected bytes
-      if (!descriptor()->chips[curr_chip]->blocks[curr_block]->is_protected)
+      // Read in the block header
+      fin.read((char*) &block_header, sizeof(block_header));
+      
+      // Account for Neo Geo Pocket virtual address offset
+      block_header.address -= 0x200000;
+      
+      // Determine the chip on which the block resides
+      for (curr_chip = 0; curr_chip < descriptor()->num_chips; ++curr_chip)
       {
-        // Calcualte number of expected bytes
-        unsigned bytes_expected = descriptor()->chips[curr_chip]->blocks[curr_block]->num_bytes;
-        if (bytes_expected > bytes_total - bytes_compared)
+        chip = descriptor()->chips[curr_chip];
+        if (block_header.address < chip->num_bytes)
         {
-          bytes_expected = bytes_total - bytes_compared;
-        }
-        
-        // Attempt to read bytes from file
-        fin.read((char*) f_buffer, bytes_expected);
-        f_buffer_size = ((unsigned int) fin.tellg()) - bytes_compared;
-        
-        // Check for errors
-        if (f_buffer_size != bytes_expected)
-        {
-          if (controller != nullptr)
-          {
-            controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-          }
-          throw std::runtime_error("ERROR");
-        }
-        if (!fin.good() && (f_buffer_size + bytes_compared) < bytes_total)
-        {
-          if (controller != nullptr)
-          {
-            controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-          }
-          throw std::runtime_error("ERROR");
-        }
-        
-        // Attempt to read bytes from cartridge
-        if (controller == nullptr)
-        {
-          c_buffer_size = m_chips[curr_chip]->read_bytes(
-                                                         descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                                         c_buffer, bytes_expected
-                                                         );
+          break;
         }
         else
         {
-          // Use a forwarding controller to pass progress updates to our controller
-          forwarding_task_controller fwd_controller(controller);
-          fwd_controller.scale_work_to(bytes_expected);
-          try
-          {
-            c_buffer_size = m_chips[curr_chip]->read_bytes(
-                                                           descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
-                                                           c_buffer, bytes_expected, &fwd_controller
-                                                           );
-          }
-          catch (std::exception& ex)
-          {
-            // Inform controller of error
-            controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-            throw;
-          }
+          block_header.address -= chip->num_bytes;
         }
-        
-        // Check for errors
-        if (c_buffer_size != bytes_expected)
-        {
-          if (controller != nullptr)
-          {
-            controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-          }
-          throw std::runtime_error("ERROR");
-        }
-        
-        // Compare contents of buffers
-        for (unsigned int i = 0; i < f_buffer_size && i < c_buffer_size; ++i)
-        {
-          if (f_buffer[i] != c_buffer[i])
-          {
-            matched = false;
-            break;
-          }
-        }
-        bytes_compared += f_buffer_size;
       }
       
-      // Update markers
-      curr_block++;
-      if (curr_block >= descriptor()->chips[curr_chip]->num_blocks - 1)
+      // Ensure integrity
+      if (curr_chip >= descriptor()->num_chips)
       {
-        curr_block = 0;
-        curr_chip++;
+        throw std::runtime_error("Save file does not fit on this cartridge");
       }
+      
+      // Determine the block index on which the block resides
+      for (curr_block = 0; curr_block < chip->num_blocks; ++curr_block)
+      {
+        block = chip->blocks[curr_block];
+        if (block_header.address <= block->base_address)
+        {
+          break;
+        }
+      }
+      
+      // Ensure integrity
+      if (curr_block >= chip->num_blocks
+          || block_header.address != block->base_address
+          || block_header.num_bytes != block->num_bytes)
+      {
+        throw std::runtime_error("Save file does not fit on this cartridge");
+      }
+      
+      
+      
+      // With the destination block and chip found, transfer data from file
+#ifdef VERBOSE
+      std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
+#endif
+      
+      // Calcualte number of expected bytes
+      unsigned bytes_expected = block->num_bytes;
+      if (bytes_expected > bytes_total - bytes_written)
+      {
+        bytes_expected = bytes_total - bytes_written;
+      }
+      
+      // Attempt to read bytes from file
+      fin.read((char*) f_buffer, bytes_expected);
+      f_buffer_size = (unsigned int) fin.gcount();
+      
+      // Check for errors
+      if (f_buffer_size != bytes_expected)
+      {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
+        throw std::runtime_error("ERROR");
+      }
+      if (!fin.good() && (f_buffer_size + bytes_written) < bytes_total)
+      {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
+        throw std::runtime_error("ERROR");
+      }
+      
+      // Attempt to read bytes from cartridge
+      if (controller == nullptr)
+      {
+        c_buffer_size = m_chips[curr_chip]->read_bytes(block->base_address, c_buffer, bytes_expected);
+      }
+      else
+      {
+        // Use a forwarding controller to pass progress updates to our controller
+        forwarding_task_controller fwd_controller(controller);
+        fwd_controller.scale_work_to(bytes_expected);
+        try
+        {
+          c_buffer_size = m_chips[curr_chip]->read_bytes(block->base_address, c_buffer, bytes_expected, &fwd_controller);
+        }
+        catch (std::exception& ex)
+        {
+          // Inform controller of error
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+          throw;
+        }
+      }
+      
+      // Check for errors
+      if (c_buffer_size != bytes_expected)
+      {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
+        throw std::runtime_error("ERROR");
+      }
+      
+      
+      // Compare contents of buffers
+      for (unsigned int i = 0; i < f_buffer_size && i < c_buffer_size; ++i)
+      {
+        if (f_buffer[i] != c_buffer[i])
+        {
+          matched = false;
+          break;
+        }
+      }
+      
+      bytes_written += f_buffer_size;
     }
     
     // Clean up before returning
@@ -1078,7 +1184,6 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
   catch (std::exception& ex)
   {
     // Error occured! Clean up and pass error on to caller
-    // Note: I appologize for the change in style: it's to save lines
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
       while (m_chips[curr_chip]->is_erasing());
@@ -1099,24 +1204,20 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
       // Well... this is awkward
     }
     
-    // Inform controller that error
     if (controller != nullptr)
     {
       controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
     }
-    delete [] f_buffer;
-    delete [] c_buffer;
+    delete [] buffer;
     throw;
   }
   
   // Inform controller that task has ended
   if (controller != nullptr)
   {
-    controller->on_task_end(controller->is_task_cancelled() && bytes_compared < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_compared);
+    controller->on_task_end(controller->is_task_cancelled() && bytes_written < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_written);
   }
-  delete [] f_buffer;
-  delete [] c_buffer;
-  return matched;
+  delete [] buffer;
 }
 
 
