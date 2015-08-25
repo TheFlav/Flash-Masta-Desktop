@@ -1,18 +1,18 @@
 //
-//  ws_game_chip.h
+//  ws_rom_chip.h
 //  FlashMasta
 //
 //  Created by Dan on 8/17/15.
 //  Copyright (c) 2015 7400 Circuits. All rights reserved.
 //
 
-#ifndef __WS_GAME_CHIP_H__
-#define __WS_GAME_CHIP_H__
+#ifndef __WS_ROM_CHIP_H__
+#define __WS_ROM_CHIP_H__
 
 class linkmasta_device;
 class task_controller;
 
-class ws_game_chip
+class ws_rom_chip
 {
 public:
   typedef unsigned char    data_t;
@@ -30,8 +30,8 @@ public:
     ERASE
   };
   
-  /* constructor */       ws_game_chip(linkmasta_device* linkmasta_device);
-  /* destructor  */       ~ws_game_chip();
+  /* constructor */       ws_rom_chip(linkmasta_device* linkmasta_device);
+  /* destructor  */       ~ws_rom_chip();
   
   word_t                  read(address_t address);
   void                    write(address_t address, word_t data);
@@ -64,4 +64,4 @@ private:
   chip_index_t const      m_chip_num;
 };
 
-#endif /* defined(__WS_GAME_CHIP_H__) */
+#endif /* defined(__WS_ROM_CHIP_H__) */

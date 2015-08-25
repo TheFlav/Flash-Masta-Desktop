@@ -8,7 +8,8 @@
 
 #include "ws_cartridge.h"
 #include "linkmasta_device/linkmasta_device.h"
-#include "ws_game_chip.h"
+#include "ws_rom_chip.h"
+#include "ws_sram_chip.h"
 #include "tasks/task_controller.h"
 #include "tasks/forwarding_task_controller.h"
 #include <fstream>
@@ -25,7 +26,7 @@ using namespace std;
 
 ws_cartridge::ws_cartridge(linkmasta_device* linkmasta)
   : m_was_init(false), m_linkmasta(linkmasta), m_descriptor(nullptr),
-    m_game_chip(nullptr)
+    m_rom_chip(nullptr)
 {
   // Nothing else to do
 }
@@ -146,7 +147,7 @@ bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, task_controlle
       // Attempt to read bytes from cartridge
       if (controller == nullptr)
       {
-        c_buffer_size = m_game_chip->read_bytes(
+        c_buffer_size = m_rom_chip->read_bytes(
           descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
           c_buffer, bytes_expected
         );
@@ -158,7 +159,7 @@ bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, task_controlle
         fwd_controller.scale_work_to(bytes_expected);
         try
         {
-          c_buffer_size = m_game_chip->read_bytes(
+          c_buffer_size = m_rom_chip->read_bytes(
             descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
             c_buffer, bytes_expected, &fwd_controller
           );
@@ -210,14 +211,14 @@ bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, task_controlle
     // Note: I appologize for the change in style: it's to save lines
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
-      while (m_game_chip->is_erasing());
+      while (m_rom_chip->is_erasing());
     } catch (exception ex2) {
       // Well... this is awkward
     }
     
     try {
       // Attempt to reset the chip
-      m_game_chip->reset();
+      m_rom_chip->reset();
     } catch (exception ex2) {
       // Well... this is awkward
     }
@@ -325,12 +326,12 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, task_controlle
       }
       
       // Erase block from cartridge
-      m_game_chip->erase_block(
+      m_rom_chip->erase_block(
         descriptor()->chips[curr_chip]->blocks[curr_block]->base_address
       );
       
       // Wait for erasure to complete
-      while (m_game_chip->test_erasing())
+      while (m_rom_chip->test_erasing())
       {
         // Give UI an opportunity to update
         if (controller != nullptr)
@@ -342,7 +343,7 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, task_controlle
       // Write buffer to cartridge
       if (controller == nullptr)
       {
-        m_game_chip->program_bytes(
+        m_rom_chip->program_bytes(
           descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
           buffer, buffer_size
         );
@@ -353,7 +354,7 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, task_controlle
         fwd_controller.scale_work_to(buffer_size);
         try
         {
-          m_game_chip->program_bytes(
+          m_rom_chip->program_bytes(
             descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
             buffer, buffer_size, &fwd_controller
           );
@@ -383,14 +384,14 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, task_controlle
     // Error occured! Clean up and pass error on to caller
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
-      while (m_game_chip->is_erasing());
+      while (m_rom_chip->is_erasing());
     } catch (exception ex2) {
       // Well... this is awkward
     }
     
     try {
       // Attempt to reset the chip
-      m_game_chip->reset();
+      m_rom_chip->reset();
     } catch (exception ex2) {
       // Well... this is awkward
     }
@@ -466,7 +467,7 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controlle
       // Attempt to read bytes from cartridge
       if (controller == nullptr)
       {
-        buffer_size = m_game_chip->read_bytes(
+        buffer_size = m_rom_chip->read_bytes(
           descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
           buffer, bytes_expected
         );
@@ -478,7 +479,7 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controlle
         fwd_controller.scale_work_to(bytes_expected);
         try
         {
-          buffer_size = m_game_chip->read_bytes(
+          buffer_size = m_rom_chip->read_bytes(
             descriptor()->chips[curr_chip]->blocks[curr_block]->base_address,
             buffer, bytes_expected, &fwd_controller
           );
@@ -529,14 +530,14 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controlle
     // Error occured! Clean up and pass error on to caller
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
-      while (m_game_chip->is_erasing());
+      while (m_rom_chip->is_erasing());
     } catch (std::exception& ex2) {
       // Well... this is awkward
     }
     
     try {
       // Attempt to reset the chip
-      m_game_chip->reset();
+      m_rom_chip->reset();
     } catch (std::exception& ex2) {
       // Well... this is awkward
     }
@@ -596,9 +597,9 @@ void ws_cartridge::build_cartridge_destriptor()
     m_descriptor = nullptr;
   }
   
-  ws_game_chip* chip;
+  ws_rom_chip* chip;
   
-  chip = new ws_game_chip(m_linkmasta);
+  chip = new ws_rom_chip(m_linkmasta);
   
   // Check if chip exists or not
   if (chip->get_manufacturer_id() == 0x90 && chip->get_device_id() == 0x90)
@@ -607,7 +608,7 @@ void ws_cartridge::build_cartridge_destriptor()
     return;
   }
   
-  m_game_chip = chip;
+  m_rom_chip = chip;
   
   // Initialize cartridge descriptor
   m_descriptor = new cartridge_descriptor(1);
@@ -621,14 +622,14 @@ void ws_cartridge::build_cartridge_destriptor()
 
 void ws_cartridge::build_chip_descriptor(unsigned int chip_i)
 {
-  ws_game_chip* chip = m_game_chip;
+  ws_rom_chip* chip = m_rom_chip;
   cartridge_descriptor::chip_descriptor* chip_desc;
   unsigned int num_bytes;
   unsigned int num_blocks;
   
-  ws_game_chip::manufact_id_t manufacturer = chip->get_manufacturer_id();
-  ws_game_chip::device_id_t   device_id    = chip->get_device_id();
-  ws_game_chip::device_id_t   size_id      = chip->get_size_id();
+  ws_rom_chip::manufact_id_t manufacturer = chip->get_manufacturer_id();
+  ws_rom_chip::device_id_t   device_id    = chip->get_device_id();
+  ws_rom_chip::device_id_t   size_id      = chip->get_size_id();
   
   // Confirm that chip exists
   if (manufacturer == 0x90 && device_id == 0x90)
@@ -682,7 +683,7 @@ void ws_cartridge::build_chip_descriptor(unsigned int chip_i)
 
 void ws_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int block_i)
 {
-  ws_game_chip* chip = m_game_chip;
+  ws_rom_chip* chip = m_rom_chip;
   
   // Initialize block descriptor
   cartridge_descriptor::chip_descriptor::block_descriptor* block;

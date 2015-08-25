@@ -1,12 +1,12 @@
 //
-//  ws_game_chip.cpp
+//  ws_rom_chip.cpp
 //  FlashMasta
 //
 //  Created by Dan on 8/17/15.
 //  Copyright (c) 2015 7400 Circuits. All rights reserved.
 //
 
-#include "ws_game_chip.h"
+#include "ws_rom_chip.h"
 #include "linkmasta_device/linkmasta_device.h"
 #include "tasks/task_controller.h"
 #include "tasks/forwarding_task_controller.h"
@@ -22,43 +22,43 @@
 
 #define MASK_SECTOR   0xFFFE0000
 
-typedef ws_game_chip::data_t        data_t;
-typedef ws_game_chip::word_t        word_t;
-typedef ws_game_chip::chip_index_t  chip_index_t;
-typedef ws_game_chip::manufact_id_t manufact_id_t;
-typedef ws_game_chip::device_id_t   device_id_t;
-typedef ws_game_chip::protect_t     protect_t;
-typedef ws_game_chip::address_t     address_t;
+typedef ws_rom_chip::data_t        data_t;
+typedef ws_rom_chip::word_t        word_t;
+typedef ws_rom_chip::chip_index_t  chip_index_t;
+typedef ws_rom_chip::manufact_id_t manufact_id_t;
+typedef ws_rom_chip::device_id_t   device_id_t;
+typedef ws_rom_chip::protect_t     protect_t;
+typedef ws_rom_chip::address_t     address_t;
 
 
 
-ws_game_chip::ws_game_chip(linkmasta_device* linkmasta_device)
+ws_rom_chip::ws_rom_chip(linkmasta_device* linkmasta_device)
   : m_mode(READ), m_last_erased_addr(0),
     m_linkmasta(linkmasta_device), m_chip_num(CHIP_INDEX)
 {
   // Nothing else to do
 }
 
-ws_game_chip::~ws_game_chip()
+ws_rom_chip::~ws_rom_chip()
 {
   // Nothing to do
 }
 
 
 
-word_t ws_game_chip::read(address_t address)
+word_t ws_rom_chip::read(address_t address)
 {
   return m_linkmasta->read_word(m_chip_num, address);
 }
 
-void ws_game_chip::write(address_t address, word_t data)
+void ws_rom_chip::write(address_t address, word_t data)
 {
   return m_linkmasta->write_word(m_chip_num, address, data);
 }
 
 
 
-void ws_game_chip::reset()
+void ws_rom_chip::reset()
 {
   if (is_erasing())
   {
@@ -75,7 +75,7 @@ void ws_game_chip::reset()
   m_mode = READ;
 }
 
-manufact_id_t ws_game_chip::get_manufacturer_id()
+manufact_id_t ws_rom_chip::get_manufacturer_id()
 {
   if (is_erasing())
   {
@@ -103,7 +103,7 @@ manufact_id_t ws_game_chip::get_manufacturer_id()
   }
 }
 
-device_id_t ws_game_chip::get_device_id()
+device_id_t ws_rom_chip::get_device_id()
 {
   if (is_erasing())
   {
@@ -131,7 +131,7 @@ device_id_t ws_game_chip::get_device_id()
   }
 }
 
-device_id_t ws_game_chip::get_size_id()
+device_id_t ws_rom_chip::get_size_id()
 {
   if (is_erasing())
   {
@@ -159,13 +159,13 @@ device_id_t ws_game_chip::get_size_id()
   }
 }
 
-protect_t ws_game_chip::get_block_protection(address_t sector_address)
+protect_t ws_rom_chip::get_block_protection(address_t sector_address)
 {
   (void) sector_address;
   return 0;
 }
 
-void ws_game_chip::program_word(address_t address, word_t data)
+void ws_rom_chip::program_word(address_t address, word_t data)
 {
   if (is_erasing())
   {
@@ -185,7 +185,7 @@ void ws_game_chip::program_word(address_t address, word_t data)
   write(address, data);
 }
 
-void ws_game_chip::erase_chip()
+void ws_rom_chip::erase_chip()
 {
   if (is_erasing())
   {
@@ -219,7 +219,7 @@ void ws_game_chip::erase_chip()
   m_mode = ERASE;
 }
 
-void ws_game_chip::erase_block(address_t block_address)
+void ws_rom_chip::erase_block(address_t block_address)
 {
   if (is_erasing())
   {
@@ -255,17 +255,17 @@ void ws_game_chip::erase_block(address_t block_address)
 
 
 
-ws_game_chip::chip_mode ws_game_chip::current_mode() const
+ws_rom_chip::chip_mode ws_rom_chip::current_mode() const
 {
   return m_mode;
 }
 
-bool ws_game_chip::is_erasing() const
+bool ws_rom_chip::is_erasing() const
 {
   return (current_mode() == ERASE);
 }
 
-bool ws_game_chip::test_erasing()
+bool ws_rom_chip::test_erasing()
 {
   if (current_mode() != ERASE)
   {
@@ -279,7 +279,7 @@ bool ws_game_chip::test_erasing()
   return is_erasing();
 }
 
-unsigned int ws_game_chip::read_bytes(address_t address, data_t* data, unsigned int num_bytes, task_controller* controller)
+unsigned int ws_rom_chip::read_bytes(address_t address, data_t* data, unsigned int num_bytes, task_controller* controller)
 {
   if (is_erasing())
   {
@@ -370,7 +370,7 @@ unsigned int ws_game_chip::read_bytes(address_t address, data_t* data, unsigned 
   }
 }
 
-unsigned int ws_game_chip::program_bytes(address_t address, const data_t* data, unsigned int num_bytes, task_controller* controller)
+unsigned int ws_rom_chip::program_bytes(address_t address, const data_t* data, unsigned int num_bytes, task_controller* controller)
 {
   if (is_erasing())
   {
@@ -478,7 +478,7 @@ unsigned int ws_game_chip::program_bytes(address_t address, const data_t* data, 
 
 
 
-void ws_game_chip::enter_autoselect()
+void ws_rom_chip::enter_autoselect()
 {
   write(ADDR_COMMAND1, 0xAA);
   write(ADDR_COMMAND2, 0x55);
