@@ -320,7 +320,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, task_controll
       {
         if (controller != nullptr)
         {
-          controller->on_task_update(task_status::RUNNING,, 0);
+          controller->on_task_update(task_status::RUNNING, 0);
         }
       }
       
@@ -1208,7 +1208,8 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
     {
       controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
     }
-    delete [] buffer;
+    delete [] f_buffer;
+    delete [] c_buffer;
     throw;
   }
   
@@ -1217,7 +1218,10 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
   {
     controller->on_task_end(controller->is_task_cancelled() && bytes_written < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_written);
   }
-  delete [] buffer;
+  
+  delete [] f_buffer;
+  delete [] c_buffer;
+  return matched;
 }
 
 
