@@ -27,7 +27,7 @@ class task_controller;
  *  Abstract class representing a generic game cartridge for an unknown game
  *  system. Provides functions for performing high-level operations on a
  *  cartridge.
- *
+ *  
  *  This class is *not* thread-safe. use caution when working in a multithreaded
  *  environment.
  */

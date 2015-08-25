@@ -18,7 +18,8 @@
 class linkmasta_device;
 class ngp_chip;
 
-/*! \brief ngp_cartridge
+/*! \class ngp_cartridge
+ *  \brief Class representing a Neo Geo Pocket game cartridge.
  *  
  *  Class representing a Neo Geo Pocket game cartridge. Stores information
  *  relevant to cartridge storage and hardware information, such as the number
