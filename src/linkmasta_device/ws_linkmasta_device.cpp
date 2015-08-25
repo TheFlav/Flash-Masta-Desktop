@@ -183,7 +183,7 @@ word_t ws_linkmasta_device::read_word(chip_index chip, address_t address)
   uint16_t data;
   data_t buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
   
-  build_read16_command(buffer, address);
+  build_read16_command(buffer, address, chip);
   m_usb_device->write(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
   
   m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
@@ -208,7 +208,7 @@ void ws_linkmasta_device::write_word(chip_index chip, address_t address, word_t 
   uint8_t result;
   data_t buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
   
-  build_write16_command(buffer, address, data);
+  build_write16_command(buffer, address, data, chip);
   m_usb_device->write(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
   
   m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
@@ -270,7 +270,7 @@ unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_ad
       num_packets = std::numeric_limits<uint8_t>::max();
     }
     
-    build_read64xN_command(_buffer, start_address + offset, num_packets);
+    build_read64xN_command(_buffer, start_address + offset, num_packets, chip);
     m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
     
     for (unsigned int packets_i = 0; packets_i < num_packets; ++packets_i)
@@ -291,32 +291,68 @@ unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_ad
   }
   
   // Get any remaining bytes of data individually
-  while (num_bytes - offset > 0
-         && (controller == nullptr || !controller->is_task_cancelled()))
+  // Treat reads from flash and sram differently
+  switch (chip)
   {
-    build_read16_command(_buffer, start_address + offset);
-    m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
-    
-    m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
-    
-    uint32_t address;
-    uint16_t data;
-    if (get_read16_reply(_buffer, &address, &data) == MSG_RESULT_SUCCESS)
+  case target_enum::TARGET_ROM:
+    while (num_bytes - offset > 0
+           && (controller == nullptr || !controller->is_task_cancelled()))
     {
-      buffer[offset] = (data_t) (data >> 8);
-      buffer[offset+1] = (data_t) (data);
+      build_read16_command(_buffer, start_address + offset, chip);
+      m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+      
+      m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+      
+      uint32_t address;
+      uint16_t data;
+      if (get_read16_reply(_buffer, &address, &data) == MSG_RESULT_SUCCESS)
+      {
+        buffer[offset] = (data_t) (data >> 8);
+        buffer[offset+1] = (data_t) (data);
+      }
+      else
+      {
+        throw std::runtime_error("ERROR");
+      }
+      
+      // Update offset and inform controller of progress
+      offset += 2;
+      if (controller != nullptr)
+      {
+        controller->on_task_update(task_status::RUNNING, 1);
+      }
     }
-    else
-    {
-      throw std::runtime_error("ERROR");
-    }
+    break;
     
-    // Update offset and inform controller of progress
-    offset += 2;
-    if (controller != nullptr)
+  case target_enum::TARGET_SRAM:
+  default:
+    while (num_bytes - offset > 0
+           && (controller == nullptr || !controller->is_task_cancelled()))
     {
-      controller->on_task_update(task_status::RUNNING, 1);
+      build_read8_command(_buffer, start_address + offset, chip);
+      m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+      
+      m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+      
+      uint32_t address;
+      uint8_t data;
+      if (get_read8_reply(_buffer, &address, &data) == MSG_RESULT_SUCCESS)
+      {
+        buffer[offset] = (data_t) (data);
+      }
+      else
+      {
+        throw std::runtime_error("ERROR");
+      }
+      
+      // Update offset and inform controller of progress
+      offset += 1;
+      if (controller != nullptr)
+      {
+        controller->on_task_update(task_status::RUNNING, 1);
+      }
     }
+    break;
   }
   
   // Inform controller that task is complete
@@ -332,6 +368,13 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
   if (!m_was_init || !m_is_open)
   {
     throw std::runtime_error("ERROR");
+  }
+  
+  // Validate chip index
+  if (chip != target_enum::TARGET_ROM
+      && chip != target_enum::TARGET_SRAM)
+  {
+    throw std::invalid_argument("Unexpected chip value " + std::to_string(chip));
   }
   
   // Some working variables
@@ -360,13 +403,34 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
       num_packets = std::numeric_limits<uint8_t>::max();
     }
     
-    build_flash_write64xN_command(_buffer, start_address + offset, num_packets);
+    // Treat writes to flash and sram differently
+    switch (chip)
+    {
+    case target_enum::TARGET_ROM:
+      build_flash_write64xN_command(_buffer, start_address + offset, num_packets);
+      break;
+      
+    case target_enum::TARGET_SRAM:
+      build_sram_write64xN_command(_buffer, start_address + offset, num_packets);
+      break;
+    }
     m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
     
     // Send chunks of 64 bytes to device
     for (unsigned int packet_i = 0; packet_i < num_packets; ++packet_i)
     {
-      build_flash_write64xN_data_packet(_buffer, &buffer[offset]);
+      // Tread writes to flash and sram differently
+      switch (chip)
+      {
+      case target_enum::TARGET_ROM:
+        build_flash_write64xN_data_packet(_buffer, &buffer[offset]);
+        break;
+        
+      case target_enum::TARGET_SRAM:
+        build_sram_write64xN_data_packet(_buffer, &buffer[offset]);
+        break;
+      }
+
       m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
       
       // Update offset and inform controller of progress
@@ -380,7 +444,7 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
     // Verify that operaton worked
     uint8_t packets_processed;
     m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
-    get_flash_write64xN_reply(_buffer, &result, &packets_processed);
+    get_write64xN_reply(_buffer, &result, &packets_processed);
     
     if(result != MSG_WRITE64xN_REPLY)
     {
@@ -393,8 +457,10 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
   }
   
   // If at least 32 bytes remain, write them
+  // Only do this if we're programming the flash chip
   while (num_bytes - offset >= WS_LINKMASTA_USB_RXTX_SIZE / 2
-         && (controller == nullptr || !controller->is_task_cancelled()))
+         && (controller == nullptr || !controller->is_task_cancelled())
+         && chip == target_enum::TARGET_ROM)
   {
     build_flash_write_32_command(_buffer, start_address + offset, &buffer[offset]);
     m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
@@ -419,32 +485,65 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
   while (num_bytes - offset > 0
          && (controller == nullptr || !controller->is_task_cancelled()))
   {
-    unsigned int num_bytes_ = num_bytes;
-    if (num_bytes_ >= WS_LINKMASTA_USB_RXTX_SIZE / 2)
+    switch (chip)
     {
-      num_bytes_ = (WS_LINKMASTA_USB_RXTX_SIZE / 2) - 1;
-    }
-    
-    build_flash_write_N_command(_buffer, start_address + offset, &buffer[offset], num_bytes_ - offset);
-    m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
-    
-    // Verify that operation worked
-    m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
-    get_result_reply(_buffer, &result);
-    if (result != MSG_RESULT_SUCCESS)
-    {
-      if (controller != nullptr)
+    case target_enum::TARGET_ROM:
       {
-        controller->on_task_end(task_status::ERROR, offset);
+        unsigned int num_bytes_ = num_bytes;
+        if (num_bytes_ >= WS_LINKMASTA_USB_RXTX_SIZE / 2)
+        {
+          num_bytes_ = (WS_LINKMASTA_USB_RXTX_SIZE / 2) - 1;
+        }
+        
+        build_flash_write_N_command(_buffer, start_address + offset, &buffer[offset], num_bytes_ - offset);
+        m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+        
+        // Verify that operation worked
+        m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+        get_result_reply(_buffer, &result);
+        if (result != MSG_RESULT_SUCCESS)
+        {
+          if (controller != nullptr)
+          {
+            controller->on_task_end(task_status::ERROR, offset);
+          }
+          throw std::runtime_error("ERROR"); // TODO
+        }
+        
+        // Update offset and inform controller of progress
+        offset += num_bytes_ - offset;
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::RUNNING, num_bytes - offset);
+        }
       }
-      throw std::runtime_error("ERROR"); // TODO
-    }
-    
-    // Update offset and inform controller of progress
-    offset += num_bytes_ - offset;
-    if (controller != nullptr)
-    {
-      controller->on_task_end(task_status::RUNNING, num_bytes - offset);
+      break;
+      
+    case target_enum::TARGET_SRAM:
+      {
+        build_write8_command(_buffer, start_address + offset, buffer[offset], chip);
+        m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+        
+        // Verify that operation worked
+        m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+        get_result_reply(_buffer, &result);
+        if (result != MSG_RESULT_SUCCESS)
+        {
+          if (controller != nullptr)
+          {
+            controller->on_task_end(task_status::ERROR, offset);
+          }
+          throw std::runtime_error("ERROR"); // TODO
+        }
+        
+        // Update offset and inform controller of progress
+        offset += 1;
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::RUNNING, 1);
+        }
+      }
+      break;
     }
   }
   

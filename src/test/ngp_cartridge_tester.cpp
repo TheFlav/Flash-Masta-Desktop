@@ -111,7 +111,7 @@ bool ngp_cartridge_tester::run_tests()
 {
   int test_num = 0;
   bool success = true;
-  ifstream& fin = *m_fin;
+  //ifstream& fin = *m_fin;
   ofstream fout;
   
   //////////////////////////////////////////////////////////// 1

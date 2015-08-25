@@ -13,6 +13,8 @@
 
 
 
+#define CHIP_INDEX    0
+
 #define ADDR_DONTCARE 0x00000000
 #define ADDR_COMMAND1 0x00002AAA
 #define ADDR_COMMAND2 0x00005555
@@ -32,7 +34,7 @@ typedef ws_game_chip::address_t     address_t;
 
 ws_game_chip::ws_game_chip(linkmasta_device* linkmasta_device)
   : m_mode(READ), m_last_erased_addr(0),
-    m_linkmasta(linkmasta_device), m_chip_num(0)
+    m_linkmasta(linkmasta_device), m_chip_num(CHIP_INDEX)
 {
   // Nothing else to do
 }
