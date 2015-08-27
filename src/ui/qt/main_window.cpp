@@ -11,6 +11,8 @@
 #include "task/ws_cartridge_backup_task.h"
 #include "task/ws_cartridge_verify_task.h"
 #include "task/ws_cartridge_flash_task.h"
+#include "task/ws_cartridge_backup_save_task.h"
+#include "task/ws_cartridge_restore_save_task.h"
 
 
 MainWindow::MainWindow(QWidget *parent) 
@@ -64,7 +66,7 @@ void MainWindow::on_combobox_system_type_currentIndexChanged(int index)
     break;
     
   case 1:
-    enable_buttons(ROM_FLASH | ROM_BACKUP | ROM_VERIFY);
+    enable_buttons(ROM_FLASH | ROM_BACKUP | ROM_VERIFY | SAVE_RESTORE | SAVE_BACKUP);
     m_target_system = system_type::WONDERSWAN;
     break;
     
@@ -135,6 +137,7 @@ void MainWindow::on_button_backup_save_clicked()
     break;
     
   default:
+    WsCartridgeBackupSaveTask(this).go();
     break;
   }
 }
@@ -148,6 +151,7 @@ void MainWindow::on_button_restore_save_clicked()
     break;
     
   default:
+    WsCartridgeRestoreSaveTask(this).go();
     break;
   }
 }

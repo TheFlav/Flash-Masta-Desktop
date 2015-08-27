@@ -21,7 +21,7 @@ void WsCartridgeRestoreSaveTask::run_task()
   // Get source file from user
   QString filename = QFileDialog::getOpenFileName(
     (QWidget*) this->parent(), tr("Open File"), QString(),
-    tr("Neo Geo Pocket (*.ngp)"));
+    tr("WonderSwan File (*.wsf);;All Files (*)"));
   if (filename == QString::null)
   {
     // Quietly fail

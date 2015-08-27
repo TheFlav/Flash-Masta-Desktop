@@ -12,7 +12,8 @@
 #include "cartridge.h"
 
 class linkmasta_device;
-class ws_game_chip;
+class ws_rom_chip;
+class ws_sram_chip;
 
 class ws_cartridge: public cartridge
 {
@@ -41,7 +42,8 @@ private:
   
   linkmasta_device*     m_linkmasta;
   cartridge_descriptor* m_descriptor;
-  ws_game_chip*         m_game_chip;
+  ws_rom_chip*          m_rom_chip;
+  ws_sram_chip*         m_sram_chip;
 };
 
 #endif /* defined(__WS_CARTRIDGE_H__) */

@@ -4,10 +4,10 @@
 #include "ws_cartridge_task.h"
 #include <iosfwd>
 
-class WsCartridgeBackupSaveTask : public WsCartridgeTask
+class WsCartridgeBackupSaveTask: public WsCartridgeTask
 {
 public:
-  explicit WsCartridgeBackupSaveTask(QWidget *parent = 0);
+  explicit WsCartridgeBackupSaveTask(QWidget* parent = 0);
   ~WsCartridgeBackupSaveTask();
   
 protected:
@@ -16,5 +16,6 @@ protected:
 private:
   std::ofstream* m_fout;
 };
+
 
 #endif // __WS_CARTRIDGE_BACKUP_SAVE_TASK_H__
