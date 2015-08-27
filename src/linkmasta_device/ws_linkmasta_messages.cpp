@@ -1,13 +1,4 @@
-//
-//  ws_linkmasta_messages.cpp
-//  FlashMasta
-//
-//  Created by Dan on 8/14/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
-
 #include "ws_linkmasta_messages.h"
-
 #include <stdio.h>
 
 #if defined(OS_WINDOWS)
@@ -26,6 +17,7 @@
 #define MSG_FLASHWRITE32_CMD        0x05
 #define MSG_FLASHWRITE_N_CMD        0x06
 #define MSG_FLASHWRITE64xN_CMD      0x07
+#define MSG_WRITE64xN_REPLY         0x08
 #define MSG_BLINK_LED               0x09
 #define MSG_SPI_SEND_RECV_CMD       0x0A
 #define MSG_SET_UNSET_LINES_CMD     0x0B
@@ -33,9 +25,13 @@
 #define MSG_SET_DATA_LINES_CMD      0x0D
 #define MSG_WRITE16_CMD             0x0E
 #define MSG_READ16_CMD              0x0F
+#define MSG_SRAMWRITE64xN_CMD       0x10
 
 #define MSG_EEPROMWRITE_N_CMD       0x80
 #define MSG_EEPROMREAD_N_CMD        0x81
+
+#define MSG_RESULT_FAIL             0x10
+#define MSG_RESULT_SUCCESS          0x11
 
 #define MSG_TYPE_OFFSET             0
 
@@ -49,12 +45,18 @@
 #define MSG_ADDRMB_OFFSET           2
 #define MSG_ADDRLB_OFFSET           3
 
-#define MSG_DATAHB_OFFSET           4
-#define MSG_DATALB_OFFSET           5
+#define MSG_DATA16HB_OFFSET         4
+#define MSG_DATA16LB_OFFSET         5
+
+#define MSG_DATA8_OFFSET            5
+
 #define MSG_64B_PACKET_COUNT        6
 #define MSG_FWRITE_BYTE_COUNT       7
 #define MSG_FWRITE_UBYPASS_MODE     8
 #define MSG_ADDRNEGATIVEONE_OFFSET  9
+
+#define MSG_TARGET_OFFSET           10
+
 #define MSG_FWRITE_PAYLOAD_OFFSET  32
 
 //when calling build_read64xN_command, this is the recommended value for N
@@ -66,14 +68,13 @@
 #define LINE_CART45     0x08
 #define LINE_CLK        0x10
 
-
 namespace wsmsg
 {
 
 void build_blink_led_command(uint8_t *buf, uint8_t blinkCount)
 {
   buf[MSG_TYPE_OFFSET] = MSG_BLINK_LED;
-  buf[MSG_DATALB_OFFSET] = blinkCount;
+  buf[MSG_DATA8_OFFSET] = blinkCount;
 }
 
 void build_getversion_command(uint8_t *buf)
@@ -126,9 +127,9 @@ void get_getversion_reply(uint8_t *buf, uint8_t *majVer, uint8_t *minVer)
 //3     address low byte    (addr&0xFF)
 //4     data (8bits)
 
-void build_write8_command(uint8_t *buf, uint32_t addr_host, uint8_t data)
+void build_write8_command(uint8_t *buf, uint32_t addr_host, uint8_t data, uint8_t target)
 {
-  buf[MSG_TYPE_OFFSET] = MSG_WRITE16_CMD;
+  buf[MSG_TYPE_OFFSET] = MSG_WRITE8_CMD;
   
   buf[MSG_ADDRNEGATIVEONE_OFFSET] = addr_host & 1;
   addr_host >>= 1;
@@ -137,17 +138,21 @@ void build_write8_command(uint8_t *buf, uint32_t addr_host, uint8_t data)
   buf[MSG_ADDRMB_OFFSET] = addr_host>>8;
   buf[MSG_ADDRLB_OFFSET] = addr_host;
   
-  buf[MSG_ADDRNEGATIVEONE_OFFSET] = 0;
+  buf[MSG_DATA8_OFFSET] = data;
   
-  buf[MSG_DATAHB_OFFSET] = 0;
-  buf[MSG_DATALB_OFFSET] = data;
+  buf[MSG_TARGET_OFFSET] = target;//SRAM, PORT_IO, etc.
   
 #if (defined(OS_WINDOWS) || defined(OS_MACOSX)) && defined(DEBUG)
-  printf("write addr %02X %02X %02X\n", buf[MSG_ADDRHB_OFFSET], buf[MSG_ADDRMB_OFFSET], buf[MSG_ADDRLB_OFFSET]);
+  printf("write 0x%02X to addr %02X %02X %02X %s\n", buf[MSG_DATA8_OFFSET], buf[MSG_ADDRHB_OFFSET], buf[MSG_ADDRMB_OFFSET], buf[MSG_ADDRLB_OFFSET], buf[MSG_ADDRNEGATIVEONE_OFFSET] ? "1" : "0");
 #endif
 }
 
-void build_write16_command(uint8_t *buf, uint32_t addr_host, uint16_t data)
+void build_write8_SRAM_command(uint8_t *buf, uint32_t addr_host, uint8_t data)
+{
+  build_write8_command(buf, addr_host, data, TARGET_SRAM);
+}
+
+void build_write16_command(uint8_t *buf, uint32_t addr_host, uint16_t data, uint8_t target)
 {
   buf[MSG_TYPE_OFFSET] = MSG_WRITE16_CMD;
   
@@ -158,11 +163,13 @@ void build_write16_command(uint8_t *buf, uint32_t addr_host, uint16_t data)
   buf[MSG_ADDRMB_OFFSET] = addr_host>>8;
   buf[MSG_ADDRLB_OFFSET] = addr_host;
   
-  buf[MSG_DATAHB_OFFSET] = data>>8;
-  buf[MSG_DATALB_OFFSET] = data;
+  buf[MSG_DATA16HB_OFFSET] = data>>8;
+  buf[MSG_DATA16LB_OFFSET] = data;
+  
+  buf[MSG_TARGET_OFFSET] = target;//SRAM, PORT_IO, etc.
   
 #if (defined(OS_WINDOWS) || defined(OS_MACOSX)) && defined(DEBUG)
-  printf("write addr %02X %02X %02X\n", buf[MSG_ADDRHB_OFFSET], buf[MSG_ADDRMB_OFFSET], buf[MSG_ADDRLB_OFFSET]);
+  printf("write addr 0x%04X to %02X %02X %02X\n", (buf[MSG_DATA16HB_OFFSET] << 8) | buf[MSG_DATA16LB_OFFSET], buf[MSG_ADDRHB_OFFSET], buf[MSG_ADDRMB_OFFSET], buf[MSG_ADDRLB_OFFSET]);
 #endif
 }
 
@@ -220,6 +227,12 @@ void build_flash_write64xN_command(uint8_t *buf, uint32_t addr_host, uint8_t n)
   buf[MSG_ADDRLB_OFFSET] = addr_host;
   
   buf[MSG_64B_PACKET_COUNT] = n;
+  
+#if (defined(OS_WINDOWS) || defined(OS_MACOSX)) && defined(DEBUG)
+  printf("flash write addr 0x%02X %02X %02X (%d 64-byte packets = %d bytes)\n", buf[MSG_ADDRHB_OFFSET], buf[MSG_ADDRMB_OFFSET], buf[MSG_ADDRLB_OFFSET],
+         buf[MSG_64B_PACKET_COUNT], buf[MSG_64B_PACKET_COUNT] * 64);
+#endif
+  
 }
 
 void build_flash_write64xN_data_packet(uint8_t *buf, const uint8_t *data)
@@ -229,7 +242,28 @@ void build_flash_write64xN_data_packet(uint8_t *buf, const uint8_t *data)
     buf[i] = data[i];
 }
 
-void build_read8_command(uint8_t *buf, uint32_t addr_host)
+void build_sram_write64xN_command(uint8_t *buf, uint32_t addr_host, uint8_t n)
+{
+  buf[MSG_TYPE_OFFSET] = MSG_SRAMWRITE64xN_CMD;
+  
+  buf[MSG_ADDRNEGATIVEONE_OFFSET] = addr_host & 1;  //for 8bit addresses, we need to save this bit and pass it on
+  addr_host >>= 1;
+  
+  buf[MSG_ADDRHB_OFFSET] = addr_host>>16;
+  buf[MSG_ADDRMB_OFFSET] = addr_host>>8;
+  buf[MSG_ADDRLB_OFFSET] = addr_host;
+  
+  buf[MSG_64B_PACKET_COUNT] = n;
+}
+
+void build_sram_write64xN_data_packet(uint8_t *buf, const uint8_t *data)
+{
+  int i;
+  for(i=0;i<64;i++)
+    buf[i] = data[i];
+}
+
+void build_read8_command(uint8_t *buf, uint32_t addr_host, uint8_t target)
 {
   buf[MSG_TYPE_OFFSET] = MSG_READ8_CMD;
   
@@ -240,12 +274,19 @@ void build_read8_command(uint8_t *buf, uint32_t addr_host)
   buf[MSG_ADDRMB_OFFSET] = addr_host>>8;
   buf[MSG_ADDRLB_OFFSET] = addr_host;
   
+  buf[MSG_TARGET_OFFSET] = target;
+  
 #if (defined(OS_WINDOWS) || defined(OS_MACOSX)) && defined(DEBUG)
-  printf("read addr %02X %02X %02X %c\n", buf[MSG_ADDRHB_OFFSET], buf[MSG_ADDRMB_OFFSET], buf[MSG_ADDRLB_OFFSET], buf[MSG_ADDRNEGATIVEONE_OFFSET]);
+  printf("read8 addr %02X %02X %02X %s\n", buf[MSG_ADDRHB_OFFSET], buf[MSG_ADDRMB_OFFSET], buf[MSG_ADDRLB_OFFSET], buf[MSG_ADDRNEGATIVEONE_OFFSET] ? "1" : "0");
 #endif
 }
 
-void build_read16_command(uint8_t *buf, uint32_t addr_host)
+void build_read8_SRAM_command(uint8_t *buf, uint32_t addr_host)
+{
+  build_read8_command(buf, addr_host, TARGET_SRAM);
+}
+
+void build_read16_command(uint8_t *buf, uint32_t addr_host, uint8_t target)
 {
   //a 16bit read should only be to
   buf[MSG_TYPE_OFFSET] = MSG_READ16_CMD;
@@ -257,12 +298,14 @@ void build_read16_command(uint8_t *buf, uint32_t addr_host)
   buf[MSG_ADDRMB_OFFSET] = addr_host>>8;
   buf[MSG_ADDRLB_OFFSET] = addr_host;
   
+  buf[MSG_TARGET_OFFSET] = target;
+  
 #if (defined(OS_WINDOWS) || defined(OS_MACOSX)) && defined(DEBUG)
-  printf("read addr %02X %02X %02X\n", buf[MSG_ADDRHB_OFFSET], buf[MSG_ADDRMB_OFFSET], buf[MSG_ADDRLB_OFFSET]);
+  printf("read16 addr %02X %02X %02X\n", buf[MSG_ADDRHB_OFFSET], buf[MSG_ADDRMB_OFFSET], buf[MSG_ADDRLB_OFFSET]);
 #endif
 }
 
-void build_read64xN_command(uint8_t *buf, uint32_t addr_host, uint8_t n)
+void build_read64xN_command(uint8_t *buf, uint32_t addr_host, uint8_t n, uint8_t target_chip)
 {
   //count better not be 0!
   buf[MSG_TYPE_OFFSET] = MSG_READ64xN_CMD;
@@ -274,12 +317,14 @@ void build_read64xN_command(uint8_t *buf, uint32_t addr_host, uint8_t n)
   buf[MSG_ADDRMB_OFFSET] = addr_host>>8;
   buf[MSG_ADDRLB_OFFSET] = addr_host;
   
+  buf[MSG_TARGET_OFFSET] = target_chip;
+  
   buf[MSG_64B_PACKET_COUNT] = n;
 }
 
-void build_read64_command(uint8_t *buf, uint32_t addr)
+void build_read64_command(uint8_t *buf, uint32_t addr, uint8_t target_chip)
 {
-  build_read64xN_command(buf, addr, 1);
+  build_read64xN_command(buf, addr, 1, target_chip);
 }
 
 void build_eeprom_write_N_command(uint8_t *buf, uint32_t addr_host, uint8_t *data, uint8_t n)
@@ -322,8 +367,7 @@ void build_read8_reply(uint8_t *buf, uint8_t addrHB, uint8_t addrMB, uint8_t add
   buf[MSG_ADDRMB_OFFSET] = addrMB;
   buf[MSG_ADDRLB_OFFSET] = addrLB;
   buf[MSG_ADDRNEGATIVEONE_OFFSET] = addrNO;
-  buf[MSG_DATAHB_OFFSET] = 0;
-  buf[MSG_DATALB_OFFSET] = data;
+  buf[MSG_DATA8_OFFSET] = data;
 }
 
 void build_read16_reply(uint8_t *buf, uint8_t addrHB, uint8_t addrMB, uint8_t addrLB, uint8_t dataHigh, uint8_t dataLow)
@@ -333,11 +377,11 @@ void build_read16_reply(uint8_t *buf, uint8_t addrHB, uint8_t addrMB, uint8_t ad
   buf[MSG_ADDRMB_OFFSET] = addrMB;
   buf[MSG_ADDRLB_OFFSET] = addrLB;
   buf[MSG_ADDRNEGATIVEONE_OFFSET] = 0;
-  buf[MSG_DATAHB_OFFSET] = dataHigh;
-  buf[MSG_DATALB_OFFSET] = dataLow;
+  buf[MSG_DATA16HB_OFFSET] = dataHigh;
+  buf[MSG_DATA16LB_OFFSET] = dataLow;
 }
 
-void build_flash_write64xN_reply(uint8_t *buf, uint8_t packetsProcessed)
+void build_write64xN_reply(uint8_t *buf, uint8_t packetsProcessed)
 {
   buf[MSG_TYPE_OFFSET] = MSG_WRITE64xN_REPLY;
   buf[MSG_64B_PACKET_COUNT] = packetsProcessed;
@@ -380,11 +424,24 @@ void get_flash_write64xN_message(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB,
   *n = buf[MSG_64B_PACKET_COUNT];
 }
 
-void get_read64xN_message(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *n)
+void get_sram_write64xN_message(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *addrNO, uint8_t *n)
 {
   *addrHB = buf[MSG_ADDRHB_OFFSET];
   *addrMB = buf[MSG_ADDRMB_OFFSET];
   *addrLB = buf[MSG_ADDRLB_OFFSET];
+  *addrNO = buf[MSG_ADDRNEGATIVEONE_OFFSET];
+  
+  *n = buf[MSG_64B_PACKET_COUNT];
+}
+
+void get_read64xN_message(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *addrNO, uint8_t *n, uint8_t *targetChip)
+{
+  *addrHB = buf[MSG_ADDRHB_OFFSET];
+  *addrMB = buf[MSG_ADDRMB_OFFSET];
+  *addrLB = buf[MSG_ADDRLB_OFFSET];
+  *addrNO = buf[MSG_ADDRNEGATIVEONE_OFFSET];
+  
+  *targetChip = buf[MSG_TARGET_OFFSET];
   
   *n = buf[MSG_64B_PACKET_COUNT];
 }
@@ -428,41 +485,44 @@ void build_set_data16_command(uint8_t *buf, uint16_t data)
 {
   buf[MSG_TYPE_OFFSET] = MSG_SET_DATA_LINES_CMD;
   
-  buf[MSG_DATAHB_OFFSET] = data>>8;
-  buf[MSG_DATALB_OFFSET] = data;
+  buf[MSG_DATA16HB_OFFSET] = data>>8;
+  buf[MSG_DATA16LB_OFFSET] = data;
 }
 
 void get_set_data16_message(uint8_t *buf, uint8_t *dataHB, uint8_t *dataLB)
 {
-  *dataHB = buf[MSG_DATAHB_OFFSET];
-  *dataLB = buf[MSG_DATALB_OFFSET];
+  *dataHB = buf[MSG_DATA16HB_OFFSET];
+  *dataLB = buf[MSG_DATA16LB_OFFSET];
 }
 
 
-void get_read_message(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *addrNO)
+void get_read_message(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *addrNO, uint8_t *targetChip)
 {
   *addrHB = buf[MSG_ADDRHB_OFFSET];
   *addrMB = buf[MSG_ADDRMB_OFFSET];
   *addrLB = buf[MSG_ADDRLB_OFFSET];
   *addrNO = buf[MSG_ADDRNEGATIVEONE_OFFSET];
+  *targetChip = buf[MSG_TARGET_OFFSET];
 }
 
-void get_write8_message(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *addrNO, uint8_t *dataLB)
+void get_write8_message(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *addrNO, uint8_t *data8, uint8_t *targetChip)
 {
   *addrHB = buf[MSG_ADDRHB_OFFSET];
   *addrMB = buf[MSG_ADDRMB_OFFSET];
   *addrLB = buf[MSG_ADDRLB_OFFSET];
   *addrNO = buf[MSG_ADDRNEGATIVEONE_OFFSET];
-  *dataLB = buf[MSG_DATALB_OFFSET];
+  *data8 = buf[MSG_DATA8_OFFSET];
+  *targetChip = buf[MSG_TARGET_OFFSET];
 }
 
-void get_write16_message(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *dataHB, uint8_t *dataLB)
+void get_write16_message(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *dataHB, uint8_t *dataLB, uint8_t *targetChip)
 {
   *addrHB = buf[MSG_ADDRHB_OFFSET];
   *addrMB = buf[MSG_ADDRMB_OFFSET];
   *addrLB = buf[MSG_ADDRLB_OFFSET];
-  *dataHB = buf[MSG_DATAHB_OFFSET];
-  *dataLB = buf[MSG_DATALB_OFFSET];
+  *dataHB = buf[MSG_DATA16HB_OFFSET];
+  *dataLB = buf[MSG_DATA16LB_OFFSET];
+  *targetChip = buf[MSG_TARGET_OFFSET];
 }
 /*
  void get_SPI_send_recv_message(uint8_t *buf, uint8_t *data)
@@ -486,7 +546,7 @@ int get_read8_reply(uint8_t *buf, uint32_t *addr32, uint8_t *data)
   
   *addr32 = addr;
   
-  *data   = buf[MSG_DATALB_OFFSET];
+  *data   = buf[MSG_DATA8_OFFSET];
   
 #if (defined(OS_WINDOWS) || defined(OS_MACOSX)) && defined(DEBUG)
   printf("read reply addr %02X %02X %02X, data %02X\n", (addr>>16) & 0xff, (addr>>8) & 0xff, addr & 0xff, *data);
@@ -515,7 +575,7 @@ int get_read16_reply(uint8_t *buf, uint32_t *addr32, uint16_t *data)
   *addr32 = ntohl(((uint32_t)buf[MSG_ADDRHB_OFFSET] << 8) | ((uint32_t)buf[MSG_ADDRMB_OFFSET] << 16) | ((uint32_t)buf[MSG_ADDRLB_OFFSET] << 24));
 #endif
   
-  *data   = buf[MSG_DATALB_OFFSET] | (buf[MSG_DATAHB_OFFSET] << 8);
+  *data   = buf[MSG_DATA16LB_OFFSET] | (buf[MSG_DATA16HB_OFFSET] << 8);
   
 #if (defined(OS_WINDOWS) || defined(OS_MACOSX)) && defined(DEBUG)
   printf("read reply addr %02X %02X %02X, data %02X\n", (addr>>16) & 0xff, (addr>>8) & 0xff, addr & 0xff, *data);
@@ -525,7 +585,7 @@ int get_read16_reply(uint8_t *buf, uint32_t *addr32, uint16_t *data)
   return 1;
 }
 
-void get_flash_write64xN_reply(uint8_t *buf, uint8_t *msgType, uint8_t *packetsProcessed)
+void get_write64xN_reply(uint8_t *buf, uint8_t *msgType, uint8_t *packetsProcessed)
 {
   *msgType = buf[MSG_TYPE_OFFSET];
   *packetsProcessed = buf[MSG_64B_PACKET_COUNT];
@@ -538,8 +598,7 @@ void get_result_reply(uint8_t *buf, uint8_t *result)
 
 void get_blink_led_message(uint8_t *buf, uint8_t *blinkCount)
 {
-  *blinkCount = buf[MSG_DATALB_OFFSET];
+  *blinkCount = buf[MSG_DATA8_OFFSET];
 }
 
 };
-
