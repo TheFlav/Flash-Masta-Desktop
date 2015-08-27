@@ -336,7 +336,7 @@ unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_ad
       
       uint32_t address;
       uint8_t data;
-      if (get_read8_reply(_buffer, &address, &data) == MSG_RESULT_SUCCESS)
+      if (get_read8_reply(_buffer, &address, &data))
       {
         buffer[offset] = (data_t) (data);
       }
@@ -392,7 +392,7 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
     controller->on_task_start(num_bytes);
   }
   
-  // Program in packets of 64 bytes
+  // Read in packets of 64 bytes
   while ((num_bytes - offset) / WS_LINKMASTA_USB_RXTX_SIZE >= 1
          && (controller == nullptr || !controller->is_task_cancelled()))
   {
