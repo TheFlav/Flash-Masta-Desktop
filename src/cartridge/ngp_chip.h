@@ -306,7 +306,43 @@ public:
    */
   void                    erase_block(address_t block_address);
   
+  
+  
+  /*! \brief Gets the currently assumed mode that the chip is in.
+   *  
+   *  Gets the currently assumed mode that the chip is in. This value is not
+   *  guaranteed to be true because the device may have been in an unknown state
+   *  when this class was created.
+   *  
+   *  \returns The current \ref chip_mode that the device is assumed to be in.
+   *  
+   *  \see chip_mode
+   */
   chip_mode               current_mode() const;
+  
+  /*! \brief Gets whether or not the current chip supports
+   *         \ref chip_mode::BYPASS mode.
+   *  
+   *  Gets whether or not the current chip supports \ref chip_mode::BYPASS mode.
+   *  Not all chips can support this faster means of programming memory, and
+   *  thus it is important to not assume that the given chip supports this
+   *  functionality.
+   *  
+   *  Rarely will an outside function need to know if the chip supports bypass
+   *  mode. Once a test has been made, this class will store the result and will
+   *  use it in future program operations.
+   *  
+   *  This function does not query the chip to determine if it supports bypass
+   *  mode. Instead, it checks an internally cached variable. To perform a test
+   *  on the device to see if it supports bypass mode, use
+   *  \ref test_bypass_support().
+   *  
+   *  \returns **true** if the chip supports bypass mode, and **false** if the
+   *           chip does not.
+   *  
+   *  \see chip_mode
+   *  \see test_bypass_support()
+   */
   bool                    supports_bypass() const;
   bool                    test_bypass_support();
   bool                    is_erasing() const;
