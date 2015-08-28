@@ -344,9 +344,115 @@ public:
    *  \see test_bypass_support()
    */
   bool                    supports_bypass() const;
+  
+  /*! \brief Tests the chip for whether or not it supports
+   *         \ref chip_mode::BYPASS mode.
+   *  
+   *  Tests the chip for whether or not it supports \ref chip_mode::BYPASS mode.
+   *  Uses various command sequences to query metadata on the chip to make this
+   *  determination. The result is then cached internally and can be retrieved
+   *  without querying the chip using \ref supports_bypass().
+   *  
+   *  This function is a blocking function that can take several seconds to
+   *  complete.
+   *  
+   *  Causes the device to enter \ref chip_mode::AUTOSELECT mode.
+   *  
+   *  \returns **true** if the chip supports \ref chip_mode::BYPASS mode,
+   *           **false** if it does not.
+   *  
+   *  \see chip_mode
+   *  \see supports_bypass()
+   */
   bool                    test_bypass_support();
+  
+  /*! \brief Gets whether or not the chip was last determined to be in
+   *         \ref chip_mode::ERASE mode.
+   *  
+   *  Gets whether or not the chip was last determined to be in
+   *  \ref chip_mode::ERASE mode. This function does not query the chip, and
+   *  thus may not be a true representation of whether or not the chip is
+   *  actually erasing anything at the moment. To explicitly query the chip to
+   *  determine if it is currently erasing, use \ref test_erasing(). The result
+   *  of this function will not change until a call to \ref test_erasing()
+   *  determines that the chip is no longer erasing or if a call to
+   *  \ref erase_chip() or \ref erase_block(address_t block_address) puts the
+   *  chip into \ref chip_mode::ERASE mode.
+   *  
+   *  \returns **true** if the chip was last determined to be in
+   *           \ref chip_mode::ERASE mode, **false** if not.
+   *  
+   *  \see chip_mode
+   *  \see test_erasing()
+   *  \see erase_chip()
+   *  \see erase_block(address_t block_address)
+   */
   bool                    is_erasing() const;
+  
+  /*! \brief Tests the chip to determine whether it is in \ref chip_mode::ERASE
+   *         mode or not.
+   *  
+   *  Tests the chip to determine whether it is in \ref chip_mode::ERASE mode or
+   *  not. It is the responsibility of whatever controls this class to call this
+   *  function repeatedly after making a call to \ref erase_chip() or
+   *  \ref erase_blocK(address_t block_address) until this function returns
+   *  **false**.
+   *  
+   *  This function is a blocking function that can take several seconds to
+   *  complete.
+   *  
+   *  If this function detects that the chip has just finished erasing, it will
+   *  put the chip into \ref chip_mode::READ mode.
+   *  
+   *  \code
+   *  // Begin erasing chip
+   *  erase_chip();
+   *  
+   *  // Wait here until erasing ends
+   *  while (test_erasing());
+   *  \endcode
+   *  
+   *  \returns **true** if the chip is still erasing, **false** if not.
+   *  
+   *  \see chip_mode
+   *  \see erase_chip()
+   *  \see erase_block(address_t block_address)
+   */
   bool                    test_erasing();
+  
+  /*! \brief Reads a series of sequential bytes of data from the chip.
+   *  
+   *  Reads a series of sequential bytes of data from the chip. Does not modify
+   *  the chip's contents. If the chip is not already in \ref chip_mode::READ
+   *  mode, will cause the chip to enter \ref chip_mode::READ mode.
+   *  
+   *  Will read the specified number of bytes from the chip starting at the
+   *  given address and will write them to the given data array.
+   *  
+   *  This function is a blocking function that can take several seconds to
+   *  complete. A \ref task_controller object may be optionally provided to
+   *  allow for mid-process communication and progress updates. If no controller
+   *  is supplied or **nullptr** is given, then this feature will be ignored.
+   *  
+   *  Causes the device to enter \ref chip_mode::READ mode.
+   *  
+   *  \param [in] address The address on the chip to begin reading bytes.
+   *  \param [out] address The buffer to write the results of the operation to.
+   *         This value must be a valid pointer to an already allocated array
+   *         of \ref data_t objects. These objects do not need to be initialized
+   *         before hand.
+   *  \param [in] num_bytes The number of bytes to read from the chip.
+   *  \param [in,out] controller The \ref task_controller to report progress to.
+   *         This value must be a valid pointer a \ref task_controller object or
+   *         **nullptr**.
+   *  
+   *  \returns The number of bytes successfully read from the chip.
+   *  
+   *  \see address_t
+   *  \see data_t
+   *  \see task_controller
+   *  \see chip_mode
+   */
   unsigned int            read_bytes(address_t address, data_t* data, unsigned int num_bytes, task_controller* controller = nullptr);
   unsigned int            program_bytes(address_t address, const data_t* data, unsigned int num_bytes, task_controller* controller = nullptr);
   
