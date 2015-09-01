@@ -42,7 +42,7 @@ void WsCartridgeBackupSaveTask::run_task()
   // Begin task
   try
   {
-    m_cartridge->backup_cartridge_save_data(*m_fout, this);
+    m_cartridge->backup_cartridge_save_data(*m_fout, cartridge::SLOT_ALL, this);
   }
   catch (std::exception& ex)
   {

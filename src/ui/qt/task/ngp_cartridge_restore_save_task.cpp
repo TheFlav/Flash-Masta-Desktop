@@ -44,7 +44,7 @@ void NgpCartridgeRestoreSaveTask::run_task()
   // Begin task
   try
   {
-    m_cartridge->restore_cartridge_save_data(*m_fin, this);
+    m_cartridge->restore_cartridge_save_data(*m_fin, cartridge::SLOT_ALL, this);
   }
   catch (std::exception& ex)
   {

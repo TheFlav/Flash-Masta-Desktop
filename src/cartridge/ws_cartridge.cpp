@@ -79,7 +79,7 @@ void ws_cartridge::init()
   m_was_init = true;
 }
 
-bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, task_controller* controller)
+bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, task_controller* controller)
 {
   // Ensure class was initialized
   if (!m_was_init)
@@ -263,7 +263,7 @@ bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, task_controlle
   return matched;
 }
 
-void ws_cartridge::restore_cartridge_game_data(std::istream& fin, task_controller* controller)
+void ws_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task_controller* controller)
 {
   // Ensure class was intiialized
   if (!m_was_init)
@@ -430,7 +430,7 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, task_controlle
   delete [] buffer;
 }
 
-void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controller* controller)
+void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task_controller* controller)
 {
   // Ensure class was intiialized
   if (!m_was_init)
@@ -577,7 +577,7 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controlle
   delete [] buffer;
 }
 
-void ws_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controller* controller)
+void ws_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, task_controller* controller)
 {
   // Ensure class was intiialized
   if (!m_was_init)
@@ -694,7 +694,7 @@ void ws_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controlle
   delete [] buffer;
 }
 
-void ws_cartridge::restore_cartridge_save_data(std::istream& fin, task_controller* controller)
+void ws_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, task_controller* controller)
 {
   // Ensure class was intiialized
   if (!m_was_init)
@@ -812,7 +812,7 @@ void ws_cartridge::restore_cartridge_save_data(std::istream& fin, task_controlle
   delete [] buffer;
 }
 
-bool ws_cartridge::compare_cartridge_save_data(std::istream& fin, task_controller* controller)
+bool ws_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, task_controller* controller)
 {
   
   // Ensure class was initialized
@@ -960,6 +960,39 @@ bool ws_cartridge::compare_cartridge_save_data(std::istream& fin, task_controlle
   delete [] f_buffer;
   delete [] c_buffer;
   return matched;
+}
+
+unsigned int ws_cartridge::num_slots() const
+{
+  // This functionality is not implemented for this cartridge yet.
+  
+  // Ensure class was initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  return 1;
+}
+
+unsigned int ws_cartridge::slot_size(int slot) const
+{
+  // This functionality is not implemented for this cartridge yet.
+  
+  // Ensure class was initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  if (slot == SLOT_ALL || slot == 0)
+  {
+    return descriptor()->num_bytes;
+  }
+  else
+  {
+    throw std::runtime_error("INVALID SLOT");
+  }
 }
 
 

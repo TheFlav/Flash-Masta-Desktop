@@ -42,7 +42,7 @@ void NgpCartridgeVerifyTask::run_task()
   // Begin task
   try
   {
-    if (m_cartridge->compare_cartridge_game_data(*m_fin, this) && !is_task_cancelled())
+    if (m_cartridge->compare_cartridge_game_data(*m_fin, cartridge::SLOT_ALL, this) && !is_task_cancelled())
     {
       QMessageBox msgBox;
       msgBox.setText("Cartridge and file match.");
