@@ -35,6 +35,8 @@ class cartridge
 {
 public:
   
+  static int const    SLOT_ALL = -1;
+  
   /*! \brief Cass destructor.
    *  
    *  Destructor for the class. Cleans up and frees resources.
@@ -108,13 +110,16 @@ public:
    *  this function will throw an exception and no other action will be taken.
    *  
    *  \param [out] fout The output stream to write to.
+   *  \param [in] slot The game slot on the cartridge to back up in the case of
+   *         multiple games on a single cartridge. Set to \ref SLOT_ALL to
+   *         backup the entire cartridge.
    *  \param [in,out] controller (optional) The controller object to send
    *         progress updates. **nullptr** is an accepted value.
    *  
    *  \see std::ofstream
    *  \see task_controller
    */
-  virtual void        backup_cartridge_game_data(std::ostream& fout, task_controller* controller = nullptr) = 0;
+  virtual void        backup_cartridge_game_data(std::ostream& fout, int slot = SLOT_ALL, task_controller* controller = nullptr) = 0;
   
   /*! \brief Overwrites a cartridge's game data with data from an input stream.
    *  
@@ -140,6 +145,9 @@ public:
    *  
    *  \param [in] fin The input stream to read from. Cannot be any of the
    *         standard input streams, e.g. \ref std::cin.
+   *  \param [in] slot The game slot on the cartridge to write to in the case of
+   *         multiple games on a single cartridge. Set to \ref SLOT_ALL to
+   *         overwrite the entire cartridge.
    *  \param [in,out] controller (optional) The controller object to send
    *         progress updates. **nullptr** is an accepted value.
    *  
@@ -148,7 +156,7 @@ public:
    *  \see std::istream
    *  \see task_controller
    */
-  virtual void        restore_cartridge_game_data(std::istream& fin, task_controller* controller = nullptr) = 0;
+  virtual void        restore_cartridge_game_data(std::istream& fin, int slot = SLOT_ALL, task_controller* controller = nullptr) = 0;
   
   /*! \brief Compares the cartridge's game data with the contents of an input
    *         stream.
@@ -175,6 +183,9 @@ public:
    *  
    *  \param [in] fout The input stream to read from. Cannot be any of the
    *         standard input streams, e.g. \ref std::cin.
+   *  \param [in] slot The game slot on the cartridge to compare in the case of
+   *         multiple games on a single cartridge. Set to \ref SLOT_ALL to
+   *         compare the entire cartridge.
    *  \param [in,out] controller (optional) The controller object to send
    *         progress updates. **nullptr** is an accepted value.
    *  
@@ -187,7 +198,7 @@ public:
    *  \see std::istream
    *  \see task_controller
    */
-  virtual bool        compare_cartridge_game_data(std::istream& fin, task_controller* controller = nullptr) = 0;
+  virtual bool        compare_cartridge_game_data(std::istream& fin, int slot = SLOT_ALL, task_controller* controller = nullptr) = 0;
   
   /*! \brief Saves a cartridge's game save data to an output stream.
    *
@@ -210,13 +221,16 @@ public:
    *  this function will throw an exception and no other action will be taken.
    *  
    *  \param [out] fout The output stream to write to.
+   *  \param [in] slot The game slot on the cartridge to backup save data from
+   *         in the case of multiple games on a single cartridge. Set to
+   *         \ref SLOT_ALL to backup save data from all slots on the cartridge.
    *  \param [in,out] controller (optional) The controller object to send
    *         progress updates. **nullptr** is an accepted value.
    *  
    *  \see std::ofstream
    *  \see task_controller
    */
-  virtual void        backup_cartridge_save_data(std::ostream& fout, task_controller* controller = nullptr) = 0;
+  virtual void        backup_cartridge_save_data(std::ostream& fout, int slot = SLOT_ALL, task_controller* controller = nullptr) = 0;
   
   /*! \brief Overwrites a cartridge's game save data with the contents of an
    *         input stream.
@@ -243,6 +257,9 @@ public:
    *  
    *  \param [in] fin The input stream to read from. Cannot be any of the
    *         standard input streams, e.g. \ref std::cin.
+   *  \param [in] slot The game slot on the cartridge to restore save data to
+   *         in the case of multiple games on a single cartridge. Set to
+   *         \ref SLOT_ALL to restore save data to all slots on the cartridge.
    *  \param [in,out] controller (optional) The controller object to send
    *         progress updates. **nullptr** is an accepted value.
    *  
@@ -251,7 +268,7 @@ public:
    *  \see std::istream
    *  \see task_controller
    */
-  virtual void        restore_cartridge_save_data(std::istream& fin, task_controller* controller = nullptr) = 0;
+  virtual void        restore_cartridge_save_data(std::istream& fin, int slot = SLOT_ALL, task_controller* controller = nullptr) = 0;
   
   /*! \brief Compares the cartridge's game save data with the contents of an
    *         input stream.
@@ -278,6 +295,10 @@ public:
    *  
    *  \param [in] fout The input stream to read from. Cannot be any of the
    *         standard input streams, e.g. \ref std::cin.
+   *  \param [in] slot The game slot on the cartridge to compare save data to
+   *         in the case of multiple games on a single cartridge. Set to
+   *         \ref SLOT_ALL to compare against save data from all slots on the
+   *         cartridge.
    *  \param [in,out] controller (optional) The controller object to send
    *         progress updates. **nullptr** is an accepted value.
    *  
@@ -291,7 +312,23 @@ public:
    *  \see std::istream
    *  \see task_controller
    */
-  virtual bool        compare_cartridge_save_data(std::istream& fin, task_controller* controller = nullptr) = 0;
+  virtual bool        compare_cartridge_save_data(std::istream& fin, int slot = SLOT_ALL, task_controller* controller = nullptr) = 0;
+  
+  /*! \brief Gets the number of game data slots exist on the cartridge.
+   *  
+   *  Reports the number of game "slots" that the cartridge can hold. This can
+   *  be used for determining the maximum number of games a cartridge can hold.
+   *  
+   *  \returns The maximum number of slots a cartridge can support.
+   */
+  virtual unsigned int num_slots() const = 0;
+  
+  /*! \brief Gets the number of bytes in a given game slot.
+   *  
+   *  Gets the number of bytes in a given game slot. Can be used to check if a
+   *  file will fit in a single slot size on a cartridge.
+   */
+  virtual unsigned int slot_size(int slot) const = 0;
 };
 
 #endif // __CARTRIDGE_H__

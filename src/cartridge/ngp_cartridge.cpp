@@ -11,7 +11,6 @@ using namespace std;
 #define NGF_HEADER_VERSION 0x0053
 
 
-
 struct NGFheader
 {
   uint16_t version;
@@ -78,20 +77,46 @@ void ngp_cartridge::init()
 
 
 
-void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controller* controller)
+void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task_controller* controller)
 {
-  // Ensure class was intiialized
+  // Ensure class was initialized
   if (!m_was_init)
   {
     throw std::runtime_error("ERROR"); // TODO
   }
   
+  unsigned int chip_lower_bound;
+  unsigned int chip_upper_bound;
+  
+  // Validate slot number
+  if (slot == SLOT_ALL)
+  {
+    // Adjust chip bounds to entire cartridge
+    chip_lower_bound = 0;
+    chip_upper_bound = descriptor()->num_chips;
+  }
+  else if (slot < num_slots())
+  {
+    // Adjust chip bounds to just the given slot
+    chip_lower_bound = slot;
+    chip_upper_bound = slot + 1;
+  }
+  else
+  {
+    // Throw error for invalid slot number
+    throw std::runtime_error("INVALID SLOT"); // TODO
+  }
+  
   // Determine the total number of bytes to write
   unsigned int bytes_written = 0;
-  unsigned int bytes_total = descriptor()->num_bytes;
+  unsigned int bytes_total = 0;
+  for (unsigned int i = chip_lower_bound; i < chip_upper_bound; ++i)
+  {
+    bytes_total += descriptor()->chips[i]->num_bytes;
+  }
   
   // Initialize markers
-  unsigned int curr_chip = 0;
+  unsigned int curr_chip = chip_lower_bound;
   unsigned int curr_block = 0;
   
   // Allocate a buffer with max size of a block
@@ -111,7 +136,7 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controll
     // Open connection to NGP chip
     m_linkmasta->open();
     
-    while (bytes_written < bytes_total && curr_chip < descriptor()->num_chips && (controller == nullptr || !controller->is_task_cancelled()))
+    while (bytes_written < bytes_total && curr_chip < chip_upper_bound && (controller == nullptr || !controller->is_task_cancelled()))
     {
 #ifdef VERBOSE
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
@@ -123,7 +148,7 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controll
       chip = descriptor()->chips[curr_chip];
       block = chip->blocks[curr_block];
       
-      // Calcualte number of expected bytes
+      // Calculate number of expected bytes
       unsigned int bytes_expected = block->num_bytes;
       if (bytes_expected > bytes_total - bytes_written)
       {
@@ -225,7 +250,7 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, task_controll
   delete [] buffer;
 }
 
-void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, task_controller* controller)
+void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task_controller* controller)
 {
   // Ensure argument type is not the standard input
   if (&fin == &std::cin)
@@ -233,10 +258,32 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, task_controll
     throw std::invalid_argument("Standard input cannot be used in cartridge operations");
   }
   
-  // Ensure class was intiialized
+  // Ensure class was initialized
   if (!m_was_init)
   {
     throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  unsigned int chip_lower_bound;
+  unsigned int chip_upper_bound;
+  
+  // Validate slot number
+  if (slot == SLOT_ALL)
+  {
+    // Adjust chip bounds to entire cartridge
+    chip_lower_bound = 0;
+    chip_upper_bound = descriptor()->num_chips;
+  }
+  else if (slot < num_slots())
+  {
+    // Adjust chip bounds to just the given slot
+    chip_lower_bound = slot;
+    chip_upper_bound = slot + 1;
+  }
+  else
+  {
+    // Throw error for invalid slot number
+    throw std::runtime_error("INVALID SLOT"); // TODO
   }
   
   // Determine the total number of bytes to write
@@ -245,14 +292,20 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, task_controll
   unsigned int bytes_total = (unsigned int) fin.tellg();
   fin.seekg(0, fin.beg);
   
+  unsigned int bytes_chip_sum  = 0;
+  for (unsigned int i = chip_lower_bound; i < chip_upper_bound; ++i)
+  {
+    bytes_chip_sum += descriptor()->chips[i]->num_bytes;
+  }
+  
   // Ensure file will fit
-  if (bytes_total > descriptor()->num_bytes)
+  if (bytes_total > bytes_chip_sum)
   {
     throw std::runtime_error("ERROR"); // TODO
   }
   
   // Initialize markers
-  unsigned int curr_chip = 0;
+  unsigned int curr_chip = chip_lower_bound;
   unsigned int curr_block = 0;
   
   // Allocate a buffer with max size of a block
@@ -283,7 +336,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, task_controll
       chip = descriptor()->chips[curr_chip];
       block = chip->blocks[curr_block];
       
-      // Calcualte number of expected bytes
+      // Calculate number of expected bytes
       unsigned bytes_expected = block->num_bytes;
       if (bytes_expected > bytes_total - bytes_written)
       {
@@ -396,7 +449,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, task_controll
   delete [] buffer;
 }
 
-bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, task_controller* controller)
+bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, task_controller* controller)
 {
   // Ensure argument type is not the standard input
   if (&fin == &std::cin)
@@ -410,20 +463,48 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, task_controll
     throw std::runtime_error("ERROR"); // TODO
   }
   
+  unsigned int chip_lower_bound;
+  unsigned int chip_upper_bound;
+  
+  // Validate slot number
+  if (slot == SLOT_ALL)
+  {
+    // Adjust chip bounds to entire cartridge
+    chip_lower_bound = 0;
+    chip_upper_bound = descriptor()->num_chips;
+  }
+  else if (slot < num_slots())
+  {
+    // Adjust chip bounds to just the given slot
+    chip_lower_bound = slot;
+    chip_upper_bound = slot + 1;
+  }
+  else
+  {
+    // Throw error for invalid slot number
+    throw std::runtime_error("INVALID SLOT"); // TODO
+  }
+  
   // determine the total number of bytes to compare
   fin.seekg(0, fin.end);
   unsigned int bytes_compared = 0;
   unsigned int bytes_total = (unsigned int) fin.tellg();
   fin.seekg(0, fin.beg);
   
+  unsigned int bytes_chip_sum  = 0;
+  for (unsigned int i = chip_lower_bound; i < chip_upper_bound; ++i)
+  {
+    bytes_chip_sum += descriptor()->chips[i]->num_bytes;
+  }
+  
   // Ensure file will fit
-  if (bytes_total > descriptor()->num_bytes)
+  if (bytes_total > bytes_chip_sum)
   {
     return false;
   }
   
   // Initialize markers
-  unsigned int curr_chip = 0;
+  unsigned int curr_chip = chip_lower_bound;
   unsigned int curr_block = 0;
   bool         matched = true;
   
@@ -458,7 +539,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, task_controll
       chip = descriptor()->chips[curr_chip];
       block = chip->blocks[curr_block];
       
-      // Calcualte number of expected bytes
+      // Calculate number of expected bytes
       unsigned bytes_expected = block->num_bytes;
       if (bytes_expected > bytes_total - bytes_compared)
       {
@@ -586,19 +667,41 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, task_controll
   return matched;
 }
 
-void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controller* controller)
+void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, task_controller* controller)
 {
-  // Ensure class was intiialized
+  // Ensure class was initialized
   if (!m_was_init)
   {
     throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  unsigned int chip_lower_bound;
+  unsigned int chip_upper_bound;
+  
+  // Validate slot number
+  if (slot == SLOT_ALL)
+  {
+    // Adjust chip bounds to entire cartridge
+    chip_lower_bound = 0;
+    chip_upper_bound = descriptor()->num_chips;
+  }
+  else if (slot < num_slots())
+  {
+    // Adjust chip bounds to just the given slot
+    chip_lower_bound = slot;
+    chip_upper_bound = slot + 1;
+  }
+  else
+  {
+    // Throw error for invalid slot number
+    throw std::runtime_error("INVALID SLOT"); // TODO
   }
   
   // Determine the total number of bytes and blocks to write
   unsigned int bytes_written = 0;
   unsigned int bytes_total = 0;
   unsigned int blocks_total = 0;
-  for (unsigned int i = 0; i < descriptor()->num_chips; ++i)
+  for (unsigned int i = chip_lower_bound; i < chip_upper_bound; ++i)
   {
     for (unsigned int j = 0; j < descriptor()->chips[i]->num_blocks; ++j)
     {
@@ -623,7 +726,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
   fout.write((char*) &file_header, sizeof(file_header));	
   
   // Initialize markers
-  unsigned int curr_chip = 0;
+  unsigned int curr_chip = chip_lower_bound;
   unsigned int curr_block = 0;
   
   // Allocate a buffer with max size of a block
@@ -643,7 +746,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
     // Open connection to NGP chip
     m_linkmasta->open();
     
-    while (bytes_written < bytes_total && curr_chip < descriptor()->num_chips && (controller == nullptr || !controller->is_task_cancelled()))
+    while (bytes_written < bytes_total && curr_chip < chip_upper_bound && (controller == nullptr || !controller->is_task_cancelled()))
     {
 #ifdef VERBOSE
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
@@ -662,20 +765,14 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
         block_header.address = block->base_address;
         block_header.num_bytes = block->num_bytes;
         
-        // Adjust for blocks not on the first chip
-        for (unsigned int i = curr_chip; i > 0; --i)
-        {
-          block_header.address += descriptor()->chips[i]->num_blocks;
-        }
-        
         // Adjust for NGP virtual address offset
-        block_header.address += 0x200000;
+        block_header.address += 0x200000 + 0x600000 * (curr_block - chip_lower_bound);
         
         // Write block header to file
         fout.write((char*) &block_header, sizeof(block_header));
         
         
-        // Calcualte number of expected bytes
+        // Calculate number of expected bytes
         unsigned int bytes_expected = block->num_bytes;
         if (bytes_expected > bytes_total - bytes_written)
         {
@@ -778,7 +875,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, task_controll
   delete [] buffer;
 }
 
-void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, task_controller* controller)
+void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, task_controller* controller)
 {
   // Ensure argument type is not the standard input
   if (&fin == &std::cin)
@@ -786,10 +883,32 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, task_controll
     throw std::invalid_argument("Standard input cannot be used in cartridge operations");
   }
   
-  // Ensure class was intiialized
+  // Ensure class was initialized
   if (!m_was_init)
   {
     throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  unsigned int chip_lower_bound;
+  unsigned int chip_upper_bound;
+  
+  // Validate slot number
+  if (slot == SLOT_ALL)
+  {
+    // Adjust chip bounds to entire cartridge
+    chip_lower_bound = 0;
+    chip_upper_bound = descriptor()->num_chips;
+  }
+  else if (slot < num_slots())
+  {
+    // Adjust chip bounds to just the given slot
+    chip_lower_bound = slot;
+    chip_upper_bound = slot + 1;
+  }
+  else
+  {
+    // Throw error for invalid slot number
+    throw std::runtime_error("INVALID SLOT"); // TODO
   }
   
   // Seek to start of file
@@ -842,18 +961,10 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, task_controll
       block_header.address -= 0x200000;
       
       // Determine the chip on which the block resides
-      for (curr_chip = 0; curr_chip < descriptor()->num_chips; ++curr_chip)
-      {
-        chip = descriptor()->chips[curr_chip];
-        if (block_header.address < chip->num_bytes)
-        {
-          break;
-        }
-        else
-        {
-          block_header.address -= chip->num_bytes;
-        }
-      }
+      curr_chip = block_header.address / 0x600000;
+      curr_chip += chip_lower_bound;
+      chip = descriptor()->chips[curr_chip];
+      block_header.address %= 0x600000;
       
       // Ensure integrity
       if (curr_chip >= descriptor()->num_chips)
@@ -886,7 +997,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, task_controll
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
 #endif
       
-      // Calcualte number of expected bytes
+      // Calculate number of expected bytes
       unsigned bytes_expected = block->num_bytes;
       if (bytes_expected > bytes_total - bytes_written)
       {
@@ -992,7 +1103,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, task_controll
   delete [] buffer;
 }
 
-bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controller* controller)
+bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, task_controller* controller)
 {
   // Ensure argument type is not the standard input
   if (&fin == &std::cin)
@@ -1000,10 +1111,32 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
     throw std::invalid_argument("Standard input cannot be used in cartridge operations");
   }
   
-  // Ensure class was intiialized
+  // Ensure class was initialized
   if (!m_was_init)
   {
     throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  unsigned int chip_lower_bound;
+  unsigned int chip_upper_bound;
+  
+  // Validate slot number
+  if (slot == SLOT_ALL)
+  {
+    // Adjust chip bounds to entire cartridge
+    chip_lower_bound = 0;
+    chip_upper_bound = descriptor()->num_chips;
+  }
+  else if (slot < num_slots())
+  {
+    // Adjust chip bounds to just the given slot
+    chip_lower_bound = slot;
+    chip_upper_bound = slot + 1;
+  }
+  else
+  {
+    // Throw error for invalid slot number
+    throw std::runtime_error("INVALID SLOT"); // TODO
   }
   
   // Seek to start of file
@@ -1021,7 +1154,7 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
   bytes_total -= sizeof(block_header) * file_header.num_blocks;
   
   // Initialize markers
-  unsigned int curr_chip = 0;
+  unsigned int curr_chip = chip_lower_bound;
   unsigned int curr_block = 0;
   bool         matched = true;
   
@@ -1038,7 +1171,7 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
     controller->on_task_start(bytes_total);
   }
   
-  // Begin writing data block-by-block
+  // Begin comparing data block-by-block
   try
   {
     // Open connection to NGP chip
@@ -1048,7 +1181,7 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
     // Loop through all blocks in file
     for (unsigned int i = 0; i < file_header.num_blocks && matched; ++i)
     {
-      // Convenience functions
+      // Convenience variables
       cartridge_descriptor::chip_descriptor* chip = nullptr;
       cartridge_descriptor::chip_descriptor::block_descriptor* block = nullptr;
       
@@ -1059,18 +1192,10 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
       block_header.address -= 0x200000;
       
       // Determine the chip on which the block resides
-      for (curr_chip = 0; curr_chip < descriptor()->num_chips; ++curr_chip)
-      {
-        chip = descriptor()->chips[curr_chip];
-        if (block_header.address < chip->num_bytes)
-        {
-          break;
-        }
-        else
-        {
-          block_header.address -= chip->num_bytes;
-        }
-      }
+      curr_chip = block_header.address / 0x600000;
+      curr_chip += chip_lower_bound;
+      chip = descriptor()->chips[curr_chip];
+      block_header.address %= 0x600000;
       
       // Ensure integrity
       if (curr_chip >= descriptor()->num_chips)
@@ -1103,7 +1228,7 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
       std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
 #endif
       
-      // Calcualte number of expected bytes
+      // Calculate number of expected bytes
       unsigned bytes_expected = block->num_bytes;
       if (bytes_expected > bytes_total - bytes_written)
       {
@@ -1222,6 +1347,39 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, task_controll
   delete [] f_buffer;
   delete [] c_buffer;
   return matched;
+}
+
+unsigned int ngp_cartridge::num_slots() const
+{
+  // Ensure class was initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  return descriptor()->num_chips;
+}
+
+unsigned int ngp_cartridge::slot_size(int slot) const
+{
+  // Ensure class was initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  if (slot == SLOT_ALL)
+  {
+    return descriptor()->num_bytes;
+  }
+  else if (slot < descriptor()->num_chips)
+  {
+    return descriptor()->chips[slot]->num_bytes;
+  }
+  else
+  {
+    throw std::runtime_error("INVALID SLOT");
+  }
 }
 
 

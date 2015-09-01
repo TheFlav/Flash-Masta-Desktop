@@ -25,12 +25,14 @@ public:
   const cartridge_descriptor* descriptor() const;
   
   void                  init();
-  bool                  compare_cartridge_game_data(std::istream& fin, task_controller* controller = nullptr);
-  void                  restore_cartridge_game_data(std::istream& fin, task_controller* controller = nullptr);
-  void                  backup_cartridge_game_data(std::ostream& fout, task_controller* controller = nullptr);
-  void                  backup_cartridge_save_data(std::ostream& fout, task_controller* controller = nullptr);
-  void                  restore_cartridge_save_data(std::istream& fin, task_controller* controller = nullptr);
-  bool                  compare_cartridge_save_data(std::istream& fin, task_controller* controller = nullptr);
+  bool                  compare_cartridge_game_data(std::istream& fin, int slot = SLOT_ALL, task_controller* controller = nullptr);
+  void                  restore_cartridge_game_data(std::istream& fin, int slot = SLOT_ALL, task_controller* controller = nullptr);
+  void                  backup_cartridge_game_data(std::ostream& fout, int slot = SLOT_ALL, task_controller* controller = nullptr);
+  void                  backup_cartridge_save_data(std::ostream& fout, int slot = SLOT_ALL, task_controller* controller = nullptr);
+  void                  restore_cartridge_save_data(std::istream& fin, int slot = SLOT_ALL, task_controller* controller = nullptr);
+  bool                  compare_cartridge_save_data(std::istream& fin, int slot = SLOT_ALL, task_controller* controller = nullptr);
+  unsigned int          num_slots() const;
+  unsigned int          slot_size(int slot) const;
 
 protected:
   void                  build_cartridge_destriptor();
