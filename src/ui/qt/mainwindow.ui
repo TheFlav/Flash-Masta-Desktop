@@ -2,18 +2,10 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>450</width>
-    <height>405</height>
-   </rect>
-  </property>
   <property name="minimumSize">
    <size>
-    <width>400</width>
-    <height>400</height>
+    <width>557</width>
+    <height>350</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -25,145 +17,100 @@
   <property name="windowTitle">
    <string>NeoLinkMasta</string>
   </property>
-  <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
-     <widget class="QTextBrowser" name="textBrowser">
-      <property name="acceptDrops">
-       <bool>false</bool>
-      </property>
-      <property name="lineWrapMode">
-       <enum>QTextEdit::NoWrap</enum>
-      </property>
-      <property name="textInteractionFlags">
-       <set>Qt::TextSelectableByMouse</set>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QComboBox" name="combobox_system_type">
-        <property name="currentIndex">
-         <number>-1</number>
-        </property>
-        <item>
-         <property name="text">
-          <string>Neo Geo Pocket</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>WonderSwan</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="button_flash_rom">
-        <property name="text">
-         <string>Flash ROM</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="button_verify_rom">
-        <property name="text">
-         <string>Verify ROM</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="button_backup_rom">
-        <property name="text">
-         <string>Backup ROM</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line">
-        <property name="frameShadow">
-         <enum>QFrame::Sunken</enum>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="button_backup_save">
-        <property name="text">
-         <string>Backup Save</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="button_restore_save">
-        <property name="text">
-         <string>Restore Save</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="button_cartridge_info">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Cartridge Info</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="button_preferences">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Preferences</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
+  <widget class="QSplitter" name="mainSplitter">
+   <property name="lineWidth">
+    <number>0</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="opaqueResize">
+    <bool>true</bool>
+   </property>
+   <property name="handleWidth">
+    <number>1</number>
+   </property>
+   <property name="childrenCollapsible">
+    <bool>false</bool>
+   </property>
+   <widget class="QListWidget" name="deviceListWidget">
+    <property name="minimumSize">
+     <size>
+      <width>150</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>300</width>
+      <height>16777215</height>
+     </size>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="QScrollArea" name="deviceInfoScrollArea">
+    <property name="minimumSize">
+     <size>
+      <width>400</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>0</number>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>400</width>
+       <height>304</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
+  <widget class="QMenuBar" name="mainMenuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>450</width>
+     <width>557</width>
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuCartridge">
+    <property name="title">
+     <string>Cartridge</string>
+    </property>
+    <addaction name="actionBackupROM"/>
+    <addaction name="actionRestoreROM"/>
+    <addaction name="actionVerifyROM"/>
+    <addaction name="separator"/>
+    <addaction name="actionBackupSave"/>
+    <addaction name="actionRestoreSave"/>
+   </widget>
+   <addaction name="menuCartridge"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -172,15 +119,56 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-  </widget>
-  <widget class="QStatusBar" name="statusBar">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
+   <addaction name="actionBackupROM"/>
+   <addaction name="actionRestoreROM"/>
+   <addaction name="actionVerifyROM"/>
+   <addaction name="separator"/>
+   <addaction name="actionBackupSave"/>
+   <addaction name="actionRestoreSave"/>
   </widget>
   <action name="actionHi">
    <property name="text">
     <string>Hi</string>
+   </property>
+  </action>
+  <action name="actionBackupROM">
+   <property name="text">
+    <string>Backup ROM</string>
+   </property>
+   <property name="toolTip">
+    <string>Back up game data from selected slot on selected cartridge to a file on your computer.</string>
+   </property>
+  </action>
+  <action name="actionRestoreROM">
+   <property name="text">
+    <string>Restore ROM</string>
+   </property>
+   <property name="toolTip">
+    <string>Write a compatible ROM file from your computer to the selected slot on the selected cartridge.</string>
+   </property>
+  </action>
+  <action name="actionVerifyROM">
+   <property name="text">
+    <string>Verify ROM</string>
+   </property>
+   <property name="toolTip">
+    <string>Compare game data from the selected slot on the selected cartridge to game data from a file on your computer.</string>
+   </property>
+  </action>
+  <action name="actionBackupSave">
+   <property name="text">
+    <string>Backup Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Back up the save game data from the selected slot on the selected cartridge to a file on your computer.</string>
+   </property>
+  </action>
+  <action name="actionRestoreSave">
+   <property name="text">
+    <string>Restore Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Restores game save data from a file on your computer to the selected slot on the selected cartridge.</string>
    </property>
   </action>
  </widget>
