@@ -1,8 +1,11 @@
 #include "main_window.h"
 #include "ui_mainwindow.h"
-#include <qfontdatabase.h>
-#include <qfiledialog.h>
-#include "../../hardware/PC-App-CLI/NeoLinkmasta.h"
+
+#include <vector>
+#include <QString>
+#include <string>
+#include "flash_masta.h"
+#include "device_manager.h"
 #include "task/ngp_cartridge_backup_task.h"
 #include "task/ngp_cartridge_verify_task.h"
 #include "task/ngp_cartridge_flash_task.h"
@@ -15,24 +18,22 @@
 #include "task/ws_cartridge_restore_save_task.h"
 #include "libusb-1.0/libusb.h"
 
+using namespace std;
+
 
 MainWindow::MainWindow(QWidget *parent) 
   : QMainWindow(parent), ui(new Ui::MainWindow),
-    m_target_system(system_type::UNKNOWN), m_timer(this)
+    m_target_system(system_type::UNKNOWN), m_timer(this), m_device_ids()
 {
   ui->setupUi(this);
   
-  ui->deviceListWidget->addItem("Neo Geo Pocket Linkmasta");
-  ui->deviceListWidget->addItem("WonderSwan FlashMasta");
-  
-  connect(&m_timer, SIGNAL(timeout()), this, SLOT(on_checkDevices_timer()));
-  m_timer.start(1000);
+  // Start the automatic list refresh timer
+  connect(&m_timer, SIGNAL(timeout()), this, SLOT(on_refreshDeviceList_timeout()));
+  m_timer.start(10);
 }
 
 MainWindow::~MainWindow()
 {
-  m_timer.stop();
-  
   delete ui;
 }
 
@@ -108,50 +109,57 @@ void MainWindow::on_actionRestoreSave_triggered()
   }
 }
 
-
-
-void MainWindow::on_checkDevices_timer()
+void MainWindow::on_refreshDeviceList_timeout()
 {
-  int ngp_count = 0;
-  int ws_count = 0;
+  vector<unsigned int> devices;
   
-  libusb_context* libusb;
-  libusb_device** devices;
-  
-  libusb_init(&libusb);
-  int num_devices = libusb_get_device_list(libusb, &devices);
-  
-  for (int i = 0; i < num_devices; ++i)
+  if (FlashMasta::get_instance()->get_device_manager()->try_get_connected_devices(devices))
   {
-    libusb_device_descriptor desc;
-    libusb_get_device_descriptor(devices[i], &desc);
-    if (desc.idVendor == 0x20A0 && desc.idProduct == 0x4178)
+    // Compare known devices with new devices and update list
+    for (int i = 0, j = 0; i < m_device_ids.size() || j < devices.size();)
     {
-      ++ngp_count;
-    }
-    if (desc.idVendor == 0x20A0 && desc.idProduct == 0x4252)
-    {
-      ++ws_count;
+      if (i < m_device_ids.size() && j < devices.size())
+      {
+        if (m_device_ids[i] < devices[j])
+        {
+          // Device has been disconnected
+          delete ui->deviceListWidget->takeItem(i);
+          m_device_ids.erase(m_device_ids.begin() + i);
+        }
+        else if (m_device_ids[i] > devices[j])
+        {
+          // Devices was skipped/added in the middle
+          ui->deviceListWidget->insertItem(i, QString(std::to_string(devices[j]).c_str()));
+          m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
+          
+          ++i;
+          ++j;
+        }
+        else
+        {
+          ++i;
+          ++j;
+        }
+      }
+      else if (i < m_device_ids.size())
+      {
+        // Device was disconnected
+        delete ui->deviceListWidget->takeItem(i);
+        m_device_ids.erase(m_device_ids.begin() + i);
+      }
+      else if (j < devices.size())
+      {
+        // Device was connected
+        ui->deviceListWidget->insertItem(i, QString(std::to_string(devices[j]).c_str()));
+        m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
+        
+        ++i;
+        ++j;
+      }
     }
   }
   
-  libusb_free_device_list(devices, 1);
-  libusb_exit(libusb);
-  
-  if (ui->deviceListWidget->count() != (ngp_count + ws_count))
-  {
-    ui->deviceListWidget->clear();
-    for (int i = 0; i < ngp_count; ++i)
-    {
-      ui->deviceListWidget->addItem("NGP");
-    }
-    for (int i = 0; i < ws_count; ++i)
-    {
-      ui->deviceListWidget->addItem("WS");
-    }
-  }
-  
-  m_timer.start(1000);
+  m_timer.start(10);
 }
 
 
