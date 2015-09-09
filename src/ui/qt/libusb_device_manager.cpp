@@ -209,7 +209,8 @@ void LibusbDeviceManager::refresh_device_list()
 
 bool LibusbDeviceManager::is_supported(unsigned int vendor_id, unsigned int product_id)
 {
-  return ((vendor_id == 0x20A0 && product_id == 0x4178)       // NGP
+  return ((vendor_id == 0x20A0 && product_id == 0x4178)       // NGP (linkmasta)
+          || (vendor_id == 0x20A0 && product_id == 0x4256)    // NGP (new flashmasta)
           || (vendor_id == 0x20A0 && product_id == 0x4252));  // WS
 }
 

@@ -129,7 +129,7 @@ void MainWindow::on_refreshDeviceList_timeout()
         else if (m_device_ids[i] > devices[j])
         {
           // Devices was skipped/added in the middle
-          ui->deviceListWidget->insertItem(i, QString(std::to_string(devices[j]).c_str()));
+          ui->deviceListWidget->insertItem(i, QString::number(devices[j]));
           m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
           
           ++i;
@@ -150,7 +150,11 @@ void MainWindow::on_refreshDeviceList_timeout()
       else if (j < devices.size())
       {
         // Device was connected
-        ui->deviceListWidget->insertItem(i, QString(std::to_string(devices[j]).c_str()));
+        QListWidgetItem *item = new QListWidgetItem(QString::number(devices[j]));
+        auto size = item->sizeHint();
+        size.setHeight(40);
+        item->setSizeHint(size);
+        ui->deviceListWidget->insertItem(i, item);
         m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
         
         ++i;
