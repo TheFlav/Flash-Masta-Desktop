@@ -23,8 +23,10 @@ typedef ngp_linkmasta_device::chip_index chip_index;
 
 
 
-#define NGP_LINKMASTA_VENDOR_ID         0x20A0
-#define NGP_LINKMASTA_PRODUCT_ID        0x4178
+#define NGP_LINKMASTA_VENDOR_ID_1       0x20A0
+#define NGP_LINKMASTA_PRODUCT_ID_1      0x4178
+#define NGP_LINKMASTA_VENDOR_ID_2       0x20A0
+#define NGP_LINKMASTA_PRODUCT_ID_2      0x4256
 #define NGP_LINKMASTA_USB_CONFIGURATION 0x01
 #define NGP_LINKMASTA_USB_INTERFACE     0X00
 #define NGP_LINKMASTA_USB_ALT_SETTING   0X00
@@ -75,8 +77,8 @@ void ngp_linkmasta_device::init()
   const usb_device::device_description* desc;
   desc = m_usb_device->get_device_description();
   
-  if (desc->vendor_id != NGP_LINKMASTA_VENDOR_ID
-      || desc->product_id != NGP_LINKMASTA_PRODUCT_ID)
+  if ((desc->vendor_id != NGP_LINKMASTA_VENDOR_ID_1 || desc->product_id != NGP_LINKMASTA_PRODUCT_ID_1)
+      && (desc->vendor_id != NGP_LINKMASTA_VENDOR_ID_2 || desc->product_id != NGP_LINKMASTA_PRODUCT_ID_2))
   {
     throw std::runtime_error("USB Device not identified as Neo Linkmasta");
   }
