@@ -183,4 +183,4 @@ device_endpoint::device_endpoint(const device_endpoint& other)
   // Nothing else to do here
 }
 
-};
+}
