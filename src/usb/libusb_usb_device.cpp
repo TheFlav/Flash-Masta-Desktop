@@ -191,7 +191,7 @@ std::string libusb_usb_device::get_manufacturer_string()
     }
     
     // Fetch the English version of the string
-    libusb_get_string_descriptor(m_device_handle, desc.iManufacturer, 0x0409, (unsigned char*) buffer, 512);
+    libusb_get_string_descriptor_ascii(m_device_handle, desc.iManufacturer, /* 0x0409, */ (unsigned char*) buffer, 512);
     
     if (!was_open)
     {
@@ -230,7 +230,7 @@ std::string libusb_usb_device::get_product_string()
     }
     
     // Fetch the English version of the string
-    libusb_get_string_descriptor(m_device_handle, desc.iProduct, 0x0409, (unsigned char*) buffer, 512);
+    libusb_get_string_descriptor_ascii(m_device_handle, desc.iProduct, /* 0x0409, */ (unsigned char*) buffer, 512);
     
     if (!was_open)
     {
@@ -269,7 +269,7 @@ std::string libusb_usb_device::get_serial_number()
     }
     
     // Fetch the English version of the string
-    libusb_get_string_descriptor(m_device_handle, desc.iSerialNumber, 0x0409, (unsigned char*) buffer, 512);
+    libusb_get_string_descriptor_ascii(m_device_handle, desc.iSerialNumber, /* 0x0409, */ (unsigned char*) buffer, 512);
     
     if (!was_open)
     {

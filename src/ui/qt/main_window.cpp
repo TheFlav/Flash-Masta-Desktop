@@ -1,8 +1,11 @@
 #include "main_window.h"
 #include "ui_mainwindow.h"
-#include <qfontdatabase.h>
-#include <qfiledialog.h>
-#include "../../hardware/PC-App-CLI/NeoLinkmasta.h"
+
+#include <vector>
+#include <QString>
+#include <string>
+#include "flash_masta.h"
+#include "device_manager.h"
 #include "task/ngp_cartridge_backup_task.h"
 #include "task/ngp_cartridge_verify_task.h"
 #include "task/ngp_cartridge_flash_task.h"
@@ -13,23 +16,20 @@
 #include "task/ws_cartridge_flash_task.h"
 #include "task/ws_cartridge_backup_save_task.h"
 #include "task/ws_cartridge_restore_save_task.h"
+#include "libusb-1.0/libusb.h"
+
+using namespace std;
 
 
 MainWindow::MainWindow(QWidget *parent) 
   : QMainWindow(parent), ui(new Ui::MainWindow),
-    m_target_system(system_type::UNKNOWN)
+    m_target_system(system_type::UNKNOWN), m_timer(this), m_device_ids()
 {
   ui->setupUi(this);
   
-  const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-  ui->textBrowser->setFont(fixedFont);
-  ui->combobox_system_type->setCurrentIndex(0);
-  
-  print_to_console("");
-  print_to_console("-=> NeoLinkMasta GUI v%d.%d build %d <=-", 1, 2, 1001);
-  print_to_console("");
-  print_to_console("     (c) Mr.Spiv & Flavor in 2011.");
-  print_to_console("");
+  // Start the automatic list refresh timer
+  connect(&m_timer, SIGNAL(timeout()), this, SLOT(on_refreshDeviceList_timeout()));
+  m_timer.start(10);
 }
 
 MainWindow::~MainWindow()
@@ -39,136 +39,135 @@ MainWindow::~MainWindow()
 
 
 
-void MainWindow::print_to_console(const char* message, ...)
+void MainWindow::on_actionBackupROM_triggered()
 {
-  char buf[1024];
-  va_list args;
-  
-  // Format string and arguments and store in buffer
-  va_start(args, message);
-  vsprintf(buf, message, args);
-  
-  // Append message to console
-  ui->textBrowser->append(buf);
-  
-  va_end(args);
-}
-
-
-
-void MainWindow::on_combobox_system_type_currentIndexChanged(int index)
-{
-  switch (index)
+  switch (ui->deviceListWidget->currentRow())
   {
   case 0:
-    enable_buttons(ROM_FLASH | ROM_BACKUP | ROM_VERIFY | SAVE_RESTORE | SAVE_BACKUP);
-    m_target_system = system_type::NEO_GEO_POCKET;
-    break;
-    
-  case 1:
-    enable_buttons(ROM_FLASH | ROM_BACKUP | ROM_VERIFY | SAVE_RESTORE | SAVE_BACKUP);
-    m_target_system = system_type::WONDERSWAN;
-    break;
-    
-  default:
-    enable_buttons(0);
-    m_target_system = system_type::UNKNOWN;
-    break;
-  }
-}
-
-void MainWindow::on_button_backup_rom_clicked()
-{
-  switch (m_target_system)
-  {
-  case NEO_GEO_POCKET:
     NgpCartridgeBackupTask(this).go();
     break;
     
-  case WONDERSWAN:    
+  case 1:
     WsCartridgeBackupTask(this).go();
     break;
-    
-  default:
-    break;
   }
 }
 
-void MainWindow::on_button_verify_rom_clicked()
+void MainWindow::on_actionRestoreROM_triggered()
 {
-  switch (m_target_system)
+  switch (ui->deviceListWidget->currentRow())
   {
-  case NEO_GEO_POCKET:
-    NgpCartridgeVerifyTask(this).go();
-    break;
-    
-  case WONDERSWAN:
-    WsCartridgeVerifyTask(this).go();
-    break;
-    
-  default:
-    break;
-  }
-}
-
-void MainWindow::on_button_flash_rom_clicked()
-{
-  switch (m_target_system)
-  {
-  case NEO_GEO_POCKET:
+  case 0:
     NgpCartridgeFlashTask(this).go();
     break;
     
-  case WONDERSWAN:
+  case 1:
     WsCartridgeFlashTask(this).go();
-    break;
-    
-  default:
     break;
   }
 }
 
-void MainWindow::on_button_backup_save_clicked()
+void MainWindow::on_actionVerifyROM_triggered()
 {
-  switch (m_target_system)
+  switch (ui->deviceListWidget->currentRow())
   {
-  case NEO_GEO_POCKET:
+  case 0:
+    NgpCartridgeVerifyTask(this).go();
+    break;
+    
+  case 1:
+    WsCartridgeVerifyTask(this).go();
+    break;
+  }
+}
+
+void MainWindow::on_actionBackupSave_triggered()
+{
+  switch (ui->deviceListWidget->currentRow())
+  {
+  case 0:
     NgpCartridgeBackupSaveTask(this).go();
     break;
     
-  default:
+  case 1:
     WsCartridgeBackupSaveTask(this).go();
     break;
   }
 }
 
-void MainWindow::on_button_restore_save_clicked()
+void MainWindow::on_actionRestoreSave_triggered()
 {
-  switch (m_target_system)
+  switch (ui->deviceListWidget->currentRow())
   {
-  case NEO_GEO_POCKET:
+  case 0:
     NgpCartridgeRestoreSaveTask(this).go();
     break;
     
-  default:
+  case 1:
     WsCartridgeRestoreSaveTask(this).go();
     break;
   }
 }
 
-
-
-void MainWindow::enable_buttons(int buttons)
+void MainWindow::on_refreshDeviceList_timeout()
 {
-  Ui::MainWindow* ui= this->ui;
+  vector<unsigned int> devices;
   
-  ui->button_flash_rom->setEnabled((buttons & button_flags::ROM_FLASH) != 0);
-  ui->button_backup_rom->setEnabled((buttons & button_flags::ROM_BACKUP) != 0);
-  ui->button_verify_rom->setEnabled((buttons & button_flags::ROM_VERIFY) != 0);
-  ui->button_restore_save->setEnabled((buttons & button_flags::SAVE_RESTORE) != 0);
-  ui->button_backup_save->setEnabled((buttons & button_flags::SAVE_BACKUP) != 0);
-  ui->button_cartridge_info->setEnabled((buttons & button_flags::CARTRIDGE_INFO) != 0);
-  ui->button_preferences->setEnabled((buttons & button_flags::PREFERENCES) != 0);
+  if (FlashMasta::get_instance()->get_device_manager()->try_get_connected_devices(devices))
+  {
+    // Compare known devices with new devices and update list
+    for (int i = 0, j = 0; i < m_device_ids.size() || j < devices.size();)
+    {
+      if (i < m_device_ids.size() && j < devices.size())
+      {
+        if (m_device_ids[i] < devices[j])
+        {
+          // Device has been disconnected
+          delete ui->deviceListWidget->takeItem(i);
+          m_device_ids.erase(m_device_ids.begin() + i);
+        }
+        else if (m_device_ids[i] > devices[j])
+        {
+          // Devices was skipped/added in the middle
+          QListWidgetItem *item = new QListWidgetItem(QString(FlashMasta::get_instance()->get_device_manager()->get_product_string(devices[j]).c_str()));
+          auto size = item->sizeHint();
+          size.setHeight(40);
+          item->setSizeHint(size);
+          ui->deviceListWidget->insertItem(i, item);
+          m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
+          
+          ++i;
+          ++j;
+        }
+        else
+        {
+          ++i;
+          ++j;
+        }
+      }
+      else if (i < m_device_ids.size())
+      {
+        // Device was disconnected
+        delete ui->deviceListWidget->takeItem(i);
+        m_device_ids.erase(m_device_ids.begin() + i);
+      }
+      else if (j < devices.size())
+      {
+        // Device was connected
+        QListWidgetItem *item = new QListWidgetItem(QString(FlashMasta::get_instance()->get_device_manager()->get_product_string(devices[j]).c_str()));
+        auto size = item->sizeHint();
+        size.setHeight(40);
+        item->setSizeHint(size);
+        ui->deviceListWidget->insertItem(i, item);
+        m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
+        
+        ++i;
+        ++j;
+      }
+    }
+  }
+  
+  m_timer.start(10);
 }
 
 
