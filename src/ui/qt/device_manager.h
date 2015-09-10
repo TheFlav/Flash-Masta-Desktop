@@ -24,6 +24,9 @@ public:
   virtual bool                      is_connected(unsigned int id) = 0;
   virtual unsigned int              get_vendor_id(unsigned int id) = 0;
   virtual unsigned int              get_product_id(unsigned int id) = 0;
+  virtual std::string               get_manufacturer_string(unsigned int id) = 0;
+  virtual std::string               get_product_string(unsigned int id) = 0;
+  virtual std::string               get_serial_number(unsigned int id) = 0;
   virtual linkmasta_device*         get_linkmasta_device(unsigned int id) = 0;
   
   

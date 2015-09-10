@@ -1,5 +1,4 @@
 #include "libusb_device_manager.h"
-#include <string>
 #include "libusb-1.0/libusb.h"
 #include "usb/libusb_usb_device.h"
 #include "linkmasta_device/linkmasta_device.h"
@@ -114,6 +113,63 @@ unsigned int LibusbDeviceManager::get_product_id(unsigned int id)
   return id;
 }
 
+string LibusbDeviceManager::get_manufacturer_string(unsigned int id)
+{
+  m_connected_devices_mutex.lock(); // LOCK m_connected_devices
+  
+  auto it = m_connected_devices.find(id);
+  
+  if (it == m_connected_devices.end())
+  {
+    m_connected_devices_mutex.unlock(); // UNLOCK m_connected_devices
+    throw std::invalid_argument("Unknown connected device ID " + std::to_string(id));
+  }
+  
+  auto r = it->second.manufacturer_string;
+  
+  m_connected_devices_mutex.unlock(); // UNLOCK m_connected_devices
+  
+  return r;
+}
+
+string LibusbDeviceManager::get_product_string(unsigned int id)
+{
+  m_connected_devices_mutex.lock(); // LOCK m_connected_devices
+  
+  auto it = m_connected_devices.find(id);
+  
+  if (it == m_connected_devices.end())
+  {
+    m_connected_devices_mutex.unlock(); // UNLOCK m_connected_devices
+    throw std::invalid_argument("Unknown connected device ID " + std::to_string(id));
+  }
+  
+  auto r = it->second.product_string;
+  
+  m_connected_devices_mutex.unlock(); // UNLOCK m_connected_devices
+  
+  return r;
+}
+
+string LibusbDeviceManager::get_serial_number(unsigned int id)
+{
+  m_connected_devices_mutex.lock(); // LOCK m_connected_devices
+  
+  auto it = m_connected_devices.find(id);
+  
+  if (it == m_connected_devices.end())
+  {
+    m_connected_devices_mutex.unlock(); // UNLOCK m_connected_devices
+    throw std::invalid_argument("Unknown connected device ID " + std::to_string(id));
+  }
+  
+  auto r = it->second.serial_number;
+  
+  m_connected_devices_mutex.unlock(); // UNLOCK m_connected_devices
+  
+  return r;
+}
+
 linkmasta_device* LibusbDeviceManager::get_linkmasta_device(unsigned int id)
 {
   m_connected_devices_mutex.lock();
@@ -183,7 +239,12 @@ void LibusbDeviceManager::refresh_device_list()
       
       usb::libusb_usb_device* usb_device = new usb::libusb_usb_device(new_device.device);
       usb_device->init();
-      new_device.linkmasta = build_linkmasta_device(new usb::libusb_usb_device(new_device.device));
+      usb_device->open();
+      new_device.manufacturer_string = usb_device->get_manufacturer_string();
+      new_device.product_string = usb_device->get_product_string();
+      new_device.serial_number = usb_device->get_serial_number();
+      usb_device->close();
+      new_device.linkmasta = build_linkmasta_device(usb_device);
       
       m_connected_devices[new_device.id] = new_device;
       libusb_ref_device(device_list[i]);
