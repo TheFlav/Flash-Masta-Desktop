@@ -26,6 +26,9 @@ public:
   endpoint_t            input_endpoint() const;
   endpoint_t            output_endpoint() const;
   const device_description* get_device_description() const;
+  std::string           get_manufacturer_string();
+  std::string           get_product_string();
+  std::string           get_serial_number();
 
   void                  set_timeout(timeout_t timeout);
   void                  set_configuration(configuration_t configuration);
@@ -69,8 +72,14 @@ private:
   libusb_device* const  m_device;
   libusb_device_handle* m_device_handle;
   device_description*   m_device_description;
+  std::string           m_manufacturer_string;
+  bool                  m_manufacturer_string_set;
+  std::string           m_product_string;
+  bool                  m_product_string_set;
+  std::string           m_serial_number;
+  bool                  m_serial_number_set;
 };
 
-};
+}
 
 #endif /* defined(__LIBUSB_USB_DEVICE_H__) */

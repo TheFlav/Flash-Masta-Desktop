@@ -47,7 +47,13 @@ libusb_usb_device::libusb_usb_device(libusb_device* device)
     m_alt_setting        (0),
     m_device             (device),
     m_device_handle      (nullptr),
-    m_device_description (nullptr)
+    m_device_description (nullptr),
+    m_manufacturer_string(),
+    m_manufacturer_string_set(false),
+    m_product_string     (),
+    m_product_string_set (false),
+    m_serial_number      (),
+    m_serial_number_set  (false)
 {
   // Increment the reference counter for the device
   libusb_ref_device(m_device);
@@ -159,6 +165,123 @@ const device_description* libusb_usb_device::get_device_description() const
   if (!m_was_initialized) throw uninitialized_exception(CLASS_NAME);
   
   return m_device_description;
+}
+
+std::string libusb_usb_device::get_manufacturer_string()
+{
+  if (!m_was_initialized) throw uninitialized_exception(CLASS_NAME);
+  
+  if (!m_manufacturer_string_set)
+  {
+    bool was_open = m_is_open;
+    char buffer[512] = "";
+    
+    if (!was_open)
+    {
+      open();
+    }
+    
+    // Get descriptor so we can find string indexes
+    libusb_device_descriptor desc;
+    int error = libusb_get_device_descriptor(m_device, &desc);
+    if (libusb_error_occured(error))
+    {
+      throw_libusb_exception(error, timeout());
+      return nullptr;
+    }
+    
+    // Fetch the English version of the string
+    libusb_get_string_descriptor(m_device_handle, desc.iManufacturer, 0x0409, (unsigned char*) buffer, 512);
+    
+    if (!was_open)
+    {
+      close();
+    }
+    
+    // Copy string over
+    m_manufacturer_string = std::string(buffer);
+    m_manufacturer_string_set = true;
+  }
+  
+  return m_manufacturer_string;
+}
+
+std::string libusb_usb_device::get_product_string()
+{
+  if (!m_was_initialized) throw uninitialized_exception(CLASS_NAME);
+  
+  if (!m_product_string_set)
+  {
+    bool was_open = m_is_open;
+    char buffer[512] = "";
+    
+    if (!was_open)
+    {
+      open();
+    }
+    
+    // Get descriptor so we can find string indexes
+    libusb_device_descriptor desc;
+    int error = libusb_get_device_descriptor(m_device, &desc);
+    if (libusb_error_occured(error))
+    {
+      throw_libusb_exception(error, timeout());
+      return nullptr;
+    }
+    
+    // Fetch the English version of the string
+    libusb_get_string_descriptor(m_device_handle, desc.iProduct, 0x0409, (unsigned char*) buffer, 512);
+    
+    if (!was_open)
+    {
+      close();
+    }
+    
+    // Copy string over
+    m_product_string = std::string(buffer);
+    m_product_string_set = true;
+  }
+  
+  return m_product_string;
+}
+
+std::string libusb_usb_device::get_serial_number()
+{
+  if (!m_was_initialized) throw uninitialized_exception(CLASS_NAME);
+  
+  if (!m_serial_number_set)
+  {
+    bool was_open = m_is_open;
+    char buffer[512] = "";
+    
+    if (!was_open)
+    {
+      open();
+    }
+    
+    // Get descriptor so we can find string indexes
+    libusb_device_descriptor desc;
+    int error = libusb_get_device_descriptor(m_device, &desc);
+    if (libusb_error_occured(error))
+    {
+      throw_libusb_exception(error, timeout());
+      return nullptr;
+    }
+    
+    // Fetch the English version of the string
+    libusb_get_string_descriptor(m_device_handle, desc.iSerialNumber, 0x0409, (unsigned char*) buffer, 512);
+    
+    if (!was_open)
+    {
+      close();
+    }
+    
+    // Copy string over
+    m_serial_number = std::string(buffer);
+    m_serial_number_set = true;
+  }
+  
+  return m_serial_number;
 }
 
 
@@ -824,4 +947,4 @@ void libusb_usb_device::throw_libusb_exception(int libusb_error, timeout_t timeo
   }
 }
 
-};
+}

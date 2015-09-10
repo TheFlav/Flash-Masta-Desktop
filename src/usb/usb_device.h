@@ -2,6 +2,7 @@
 #define __USB_DEVICE_H__
 
 #include "usbfwd.h"
+#include <string>
 
 #define TIMEOUT_UNSET_VALUE       ((timeout_t) 0xFFFFFFFF)
 #define CONFIGURATION_UNSET_VALUE ((configuration_t) 0xFFFFFFFF)
@@ -78,6 +79,9 @@ public:
   virtual endpoint_t input_endpoint() const = 0;
   virtual endpoint_t output_endpoint() const = 0;
   virtual const device_description* get_device_description() const = 0;
+  virtual std::string get_manufacturer_string() = 0;
+  virtual std::string get_product_string() = 0;
+  virtual std::string get_serial_number() = 0;
   
   /**
    * Sets the maximum number of miliseconds to wait before giving up.
@@ -115,69 +119,71 @@ public:
 
 struct usb_device::device_description
 {
-  explicit device_description(unsigned int num_configurations);
-  device_description(const device_description& other);
-  ~device_description();
+  //////////////// METHODS ////////////////
+  explicit                device_description(unsigned int num_configurations);
+                          device_description(const device_description& other);
+                          ~device_description();
   
-  int device_class;
-  int vendor_id;
-  int product_id;
-  const unsigned int num_configurations;
-  device_configuration** const configurations;  
+  //////////////// DATA ////////////////
+  int                     device_class;
+  int                     vendor_id;
+  int                     product_id;
+  const unsigned int      num_configurations;
+  device_configuration**  const configurations;
 };
-
-
 
 struct usb_device::device_configuration  
 {
-  explicit device_configuration(unsigned int num_interfaces);
-  device_configuration(const device_configuration& other);
-  ~device_configuration();
+  //////////////// METHODS ////////////////
+  explicit                  device_configuration(unsigned int num_interfaces);
+                            device_configuration(const device_configuration& other);
+                            ~device_configuration();
   
-  unsigned int config_id;
-  const unsigned int num_interfaces;
-  device_interface** const interfaces;
+  //////////////// DATA ////////////////
+  unsigned int              config_id;
+  const unsigned int        num_interfaces;
+  device_interface** const  interfaces;
 };
-
-
 
 struct usb_device::device_interface
 {
-  explicit device_interface(unsigned int num_alt_settings);
-  device_interface(const device_interface& other);
-  ~device_interface();
+  //////////////// METHODS ////////////////
+  explicit                device_interface(unsigned int num_alt_settings);
+                          device_interface(const device_interface& other);
+                          ~device_interface();
   
+  //////////////// DATA ////////////////
   usb_device::interface_t interface_id;
-  const unsigned int num_alt_settings;
-  device_alt_setting** const alt_settings;
+  const unsigned int      num_alt_settings;
+  device_alt_setting**    const alt_settings;
 };
-
-
 
 struct usb_device::device_alt_setting
 {
-  explicit device_alt_setting(unsigned int num_endpoints);
-  device_alt_setting(const device_alt_setting& other);
-  ~device_alt_setting();
+  //////////////// METHODS ////////////////
+  explicit                  device_alt_setting(unsigned int num_endpoints);
+                            device_alt_setting(const device_alt_setting& other);
+                            ~device_alt_setting();
   
-  usb_device::interface_t interface_id;
+  //////////////// DATA ////////////////
+  usb_device::interface_t   interface_id;
   usb_device::alt_setting_t alt_setting_id;
-  const unsigned int num_endpoints;
-  device_endpoint** const endpoints;
+  const unsigned int        num_endpoints;
+  device_endpoint** const   endpoints;
 };
-
-
 
 struct usb_device::device_endpoint
 {
-  device_endpoint();
-  device_endpoint(const device_endpoint& other);
+  //////////////// METHODS ////////////////
+                                      device_endpoint();
+                                      device_endpoint(const device_endpoint& other);
   
-  usb_device::endpoint_t address;
-  usb_device::endpoint_transfer_type transfer_type;
-  usb_device::endpoint_direction direction;
+  //////////////// DATA ////////////////
+  usb_device::endpoint_t              address;
+  usb_device::endpoint_transfer_type  transfer_type;
+  usb_device::endpoint_direction      direction;
 };
 
-};
+}
 
 #endif // __USB_COMMUNICATOR_H__
