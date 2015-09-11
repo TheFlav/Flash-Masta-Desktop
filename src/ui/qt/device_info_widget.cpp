@@ -65,6 +65,11 @@ void DeviceInfoWidget::set_device_id(unsigned int device_id)
 {
   m_device_id = device_id;
   
+  // display busy indicator
+  ui->deviceString->hide();
+  ui->gameString->hide();
+  ui->progressBar->show();
+  
   QThread* thread = new QThread();
   worker* w = new worker(device_id);
   w->moveToThread(thread);
@@ -85,6 +90,10 @@ void DeviceInfoWidget::refresh_ui(QString device_name, QString game_name)
   
   ui->deviceString->setText(m_device_name);
   ui->gameString->setText(m_game_name);
+  
+  ui->progressBar->hide();
+  ui->deviceString->show();
+  ui->gameString->show();
 }
 
 

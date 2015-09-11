@@ -174,15 +174,20 @@ void MainWindow::on_refreshDeviceList_timeout()
 
 void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
 {
+  ui->scrollAreaWidgetContents->hide();
+  ui->scrollAreaWidgetContents->deleteLater();
+  
   if (currentRow >= 0)
   {
-    DeviceInfoWidget* widget = new DeviceInfoWidget(ui->deviceInfoScrollArea);
+    DeviceInfoWidget* widget = new DeviceInfoWidget(ui->scrollAreaWidgetContents->parentWidget());
     widget->set_device_id(m_device_ids[currentRow]);
     
-    ui->scrollAreaWidgetContents->hide();
-    ui->scrollAreaWidgetContents->deleteLater();
     ui->scrollAreaWidgetContents = widget;
     widget->show();
+  }
+  else
+  {
+    ui->scrollAreaWidgetContents = new QWidget(ui->scrollAreaWidgetContents->parentWidget());    
   }
 }
 
