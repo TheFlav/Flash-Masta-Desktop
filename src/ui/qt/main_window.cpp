@@ -3,9 +3,11 @@
 
 #include <vector>
 #include <QString>
+#include <QLayout>
 #include <string>
 #include "flash_masta.h"
 #include "device_manager.h"
+#include "device_info_widget.h"
 #include "task/ngp_cartridge_backup_task.h"
 #include "task/ngp_cartridge_verify_task.h"
 #include "task/ngp_cartridge_flash_task.h"
@@ -168,6 +170,20 @@ void MainWindow::on_refreshDeviceList_timeout()
   }
   
   m_timer.start(10);
+}
+
+void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
+{
+  if (currentRow >= 0)
+  {
+    DeviceInfoWidget* widget = new DeviceInfoWidget(ui->deviceInfoScrollArea);
+    widget->set_device_id(m_device_ids[currentRow]);
+    
+    ui->scrollAreaWidgetContents->hide();
+    ui->scrollAreaWidgetContents->deleteLater();
+    ui->scrollAreaWidgetContents = widget;
+    widget->show();
+  }
 }
 
 

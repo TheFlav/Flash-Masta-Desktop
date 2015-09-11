@@ -25,6 +25,8 @@ private slots:
   void on_actionRestoreSave_triggered();
   void on_refreshDeviceList_timeout();
   
+  void on_deviceListWidget_currentRowChanged(int currentRow);
+  
 private:
   Ui::MainWindow *ui;
   system_type m_target_system;
