@@ -26,16 +26,21 @@ void worker::process()
   case 0x4256:       // NGP (new flashmasta)
     if (ngp_cartridge::test_for_cartridge(linkmasta))
     {
-      game_str = "Game detected";
+      cart = new ngp_cartridge(linkmasta);
+      cart->init();
+      game_str = cart->fetch_game_name(0);
     }
     else
     {
+      cart = nullptr;
       game_str = "No cartridge detected";
     }
     break;
     
   case 0x4252:       // WS
-    game_str = "Game detected";
+    cart = new ws_cartridge(linkmasta);
+    cart->init();
+    game_str = cart->fetch_game_name(0);
     break;
   }
   
@@ -43,6 +48,8 @@ void worker::process()
   
   s1 = QString(product_str.c_str());
   s2 = QString(game_str.c_str());
+  
+  if (cart != nullptr) delete cart;
   
   emit finished(s1, s2);
 }
