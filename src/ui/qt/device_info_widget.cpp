@@ -15,42 +15,49 @@ worker::worker(unsigned int id) : QObject(), m_id(id) {}
 worker::~worker() {}
 void worker::process()
 {
-  std::string product_str = FlashMasta::get_instance()->get_device_manager()->get_product_string(m_id);
-  std::string game_str;
-  linkmasta_device* linkmasta = FlashMasta::get_instance()->get_device_manager()->get_linkmasta_device(m_id);
-  cartridge* cart;
+  std::string product_str = "";
+  std::string game_str = "";
   
-  switch (FlashMasta::get_instance()->get_device_manager()->get_product_id(m_id))
+  try
   {
-  case 0x4178:       // NGP (linkmasta)
-  case 0x4256:       // NGP (new flashmasta)
-    if (ngp_cartridge::test_for_cartridge(linkmasta))
+    product_str = FlashMasta::get_instance()->get_device_manager()->get_product_string(m_id);
+    linkmasta_device* linkmasta = FlashMasta::get_instance()->get_device_manager()->get_linkmasta_device(m_id);
+    cartridge* cart;
+    
+    switch (FlashMasta::get_instance()->get_device_manager()->get_product_id(m_id))
     {
-      cart = new ngp_cartridge(linkmasta);
+    case 0x4178:       // NGP (linkmasta)
+    case 0x4256:       // NGP (new flashmasta)
+      if (ngp_cartridge::test_for_cartridge(linkmasta))
+      {
+        cart = new ngp_cartridge(linkmasta);
+        cart->init();
+        game_str = cart->fetch_game_name(0);
+      }
+      else
+      {
+        cart = nullptr;
+        game_str = "No cartridge detected";
+      }
+      break;
+      
+    case 0x4252:       // WS
+      cart = new ws_cartridge(linkmasta);
       cart->init();
       game_str = cart->fetch_game_name(0);
+      break;
     }
-    else
-    {
-      cart = nullptr;
-      game_str = "No cartridge detected";
-    }
-    break;
     
-  case 0x4252:       // WS
-    cart = new ws_cartridge(linkmasta);
-    cart->init();
-    game_str = cart->fetch_game_name(0);
-    break;
+    if (cart != nullptr) delete cart;
+  }
+  catch (std::exception& ex)
+  {
+    product_str = "An error occured";
   }
   
   QString s1, s2;
-  
   s1 = QString(product_str.c_str());
   s2 = QString(game_str.c_str());
-  
-  if (cart != nullptr) delete cart;
-  
   emit finished(s1, s2);
 }
 
