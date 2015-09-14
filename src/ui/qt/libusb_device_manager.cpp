@@ -256,7 +256,12 @@ void LibusbDeviceManager::refresh_device_list()
   {
     if (!entry.second)
     {
-      delete m_connected_devices[entry.first].linkmasta;
+      try {
+        delete m_connected_devices[entry.first].linkmasta;
+      } catch (std::exception &ex) {
+        // do nothing, fail silently
+      }
+
       libusb_unref_device(m_connected_devices[entry.first].device);
       m_connected_devices.erase(entry.first);
     }

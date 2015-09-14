@@ -8,6 +8,7 @@
 namespace Ui {
 class MainWindow;
 }
+class DeviceInfoWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -33,6 +34,8 @@ private:
   QTimer m_timer;
   
   std::vector<unsigned int> m_device_ids;
+  std::map<unsigned int, DeviceInfoWidget*> m_device_info_widgets;
+  QWidget* m_default_widget;
 };
 
 #endif // __MAINWINDOW_H__

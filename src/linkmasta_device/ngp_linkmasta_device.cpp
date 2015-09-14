@@ -54,7 +54,14 @@ ngp_linkmasta_device::~ngp_linkmasta_device()
 {
   if (m_is_open)
   {
-    close();
+    try
+    {
+      close();
+    }
+    catch (std::exception& ex)
+    {
+      // Do nothing, fail silently
+    }
   }
   
   if (m_was_init)

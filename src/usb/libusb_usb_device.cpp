@@ -73,7 +73,14 @@ libusb_usb_device::~libusb_usb_device()
   // Close connection if opened
   if (m_is_open)
   {
-    close();
+    try
+    {
+      close();
+    }
+    catch (std::exception& ex)
+    {
+      // Do nothing, fail silently
+    }
   }
   
   // Decrement the reference counter for the device

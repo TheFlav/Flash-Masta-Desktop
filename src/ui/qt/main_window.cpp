@@ -25,7 +25,8 @@ using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) 
   : QMainWindow(parent), ui(new Ui::MainWindow),
-    m_target_system(system_type::UNKNOWN), m_timer(this), m_device_ids()
+    m_target_system(system_type::UNKNOWN), m_timer(this), m_device_ids(),
+    m_device_info_widgets(), m_default_widget(nullptr)
 {
   ui->setupUi(this);
   
@@ -138,6 +139,11 @@ void MainWindow::on_refreshDeviceList_timeout()
           ui->deviceListWidget->insertItem(i, item);
           m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
           
+          auto widget = new DeviceInfoWidget(ui->scrollAreaWidgetContents->parentWidget());
+          m_device_info_widgets[devices[j]] = widget;
+          widget->set_device_id(devices[j]);
+          widget->hide();
+          
           ++i;
           ++j;
         }
@@ -151,6 +157,12 @@ void MainWindow::on_refreshDeviceList_timeout()
       {
         // Device was disconnected
         delete ui->deviceListWidget->takeItem(i);
+        auto it = m_device_info_widgets.find(m_device_ids[i]);
+        if (it != m_device_info_widgets.end())
+        {
+          delete it->second;
+          m_device_info_widgets.erase(it);
+        }
         m_device_ids.erase(m_device_ids.begin() + i);
       }
       else if (j < devices.size())
@@ -163,6 +175,11 @@ void MainWindow::on_refreshDeviceList_timeout()
         ui->deviceListWidget->insertItem(i, item);
         m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
         
+        auto widget = new DeviceInfoWidget(ui->scrollAreaWidgetContents->parentWidget());
+        m_device_info_widgets[devices[j]] = widget;
+        widget->set_device_id(devices[j]);
+        widget->hide();
+        
         ++i;
         ++j;
       }
@@ -174,20 +191,20 @@ void MainWindow::on_refreshDeviceList_timeout()
 
 void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
 {
-  ui->scrollAreaWidgetContents->hide();
-  ui->scrollAreaWidgetContents->deleteLater();
+  if (m_default_widget == nullptr)
+  {
+    m_default_widget = ui->scrollAreaWidgetContents;
+  }
   
   if (currentRow >= 0)
   {
-    DeviceInfoWidget* widget = new DeviceInfoWidget(ui->scrollAreaWidgetContents->parentWidget());
-    widget->set_device_id(m_device_ids[currentRow]);
-    
-    ui->scrollAreaWidgetContents = widget;
-    widget->show();
+    ui->scrollAreaWidgetContents->hide();
+    ui->scrollAreaWidgetContents = m_device_info_widgets[m_device_ids[currentRow]];
+    ui->scrollAreaWidgetContents->show();
   }
   else
   {
-    ui->scrollAreaWidgetContents = new QWidget(ui->scrollAreaWidgetContents->parentWidget());    
+    ui->scrollAreaWidgetContents = m_default_widget;
   }
 }
 
