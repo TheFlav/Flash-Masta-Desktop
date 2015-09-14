@@ -995,6 +995,12 @@ unsigned int ws_cartridge::slot_size(int slot) const
   }
 }
 
+std::string ws_cartridge::fetch_game_name(int slot)
+{
+  // TODO
+  return std::string();
+}
+
 
 
 void ws_cartridge::build_cartridge_destriptor()

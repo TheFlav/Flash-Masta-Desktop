@@ -35,7 +35,8 @@ linkmasta_device* DeviceManager::build_linkmasta_device(usb::usb_device* device)
   int vendor_id = device->get_device_description()->vendor_id;
   int product_id = device->get_device_description()->product_id;
   
-  if (vendor_id == 0x20A0 && product_id == 0x4178)
+  if (vendor_id == 0x20A0 && product_id == 0x4178
+      || vendor_id == 0x20A0 && product_id == 0x4256)
   {
     auto r = new ngp_linkmasta_device(device);
     r->init();

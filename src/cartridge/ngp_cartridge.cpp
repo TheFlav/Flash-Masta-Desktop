@@ -1382,6 +1382,42 @@ unsigned int ngp_cartridge::slot_size(int slot) const
   }
 }
 
+std::string ngp_cartridge::fetch_game_name(int slot)
+{
+  // Make sure cartridge has been initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("Cartridge not initialized");
+  }
+  
+  // Verify parameters
+  if (slot >= num_slots() || slot < 0)
+  {
+    throw std::invalid_argument("Invalid slot number");
+  }
+  
+  char name[13] = "";
+  
+  try
+  {
+    m_linkmasta->open();
+    m_chips[slot]->read_bytes(0x24, (unsigned char*) name, 12);
+    m_linkmasta->close();
+  }
+  catch (std::exception& ex)
+  {
+    try {
+      m_linkmasta->close();
+    } catch(std::exception ex2) {
+      // Well... this is awkward
+    }
+    
+    throw;
+  }
+  
+  return std::string(name);
+}
+
 
 
 void ngp_cartridge::build_cartridge_destriptor()
