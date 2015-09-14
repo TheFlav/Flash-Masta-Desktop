@@ -128,6 +128,11 @@ public:
    */
   unsigned int          slot_size(int slot) const;
   
+  /*!
+   *  \see cartridge::fetch_game_name(int slot)
+   */
+  std::string           fetch_game_name(int slot);
+  
   
   
   /*! \brief Tests the provided \ref linkmasta_device for whether or not a
