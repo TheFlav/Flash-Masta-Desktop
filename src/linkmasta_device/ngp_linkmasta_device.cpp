@@ -264,7 +264,7 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
   }
   
   // Get as many bytes of data as possible in packets of 64
-  while ((offset - num_bytes) / NGP_LINKMASTA_USB_RXTX_SIZE >= 1
+  while ((num_bytes - offset) / NGP_LINKMASTA_USB_RXTX_SIZE >= 1
          && (controller == nullptr || !controller->is_task_cancelled()))
   {
     // Calculate number of packets. Don't go over packet limit
@@ -300,12 +300,11 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
   {
     build_read_command(_buffer, start_address + offset, chip);
     m_usb_device->write(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
-    
     m_usb_device->read(_buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
     
     uint32_t address;
     uint8_t  data;
-    if (get_read_reply(_buffer, &address, &data) == MSG_RESULT_SUCCESS)
+    if (get_read_reply(_buffer, &address, &data))
     {
       buffer[offset] = data;
     }

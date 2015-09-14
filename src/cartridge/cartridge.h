@@ -329,6 +329,25 @@ public:
    *  file will fit in a single slot size on a cartridge.
    */
   virtual unsigned int slot_size(int slot) const = 0;
+  
+  /*! \brief Fetches the name of a game located in a given slot.
+   *  
+   *  Gets the name of the game on the cartridge in the given slot. If no game
+   *  exists at the given slot, this function may return garbage.
+   *  
+   *  This function is a blocking function that can take several seconds to
+   *  complete.
+   *  
+   *  If a call to this funtion is made before a call to \ref init() is made,
+   *  this function will throw an exception and no other action will be taken.
+   *  
+   *  \param [in] slot The game slot on the cartridge to fetch the game name
+   *         from.
+   *  
+   *  \returns A string of 12 or fewer characters that represent the name of the
+   *           gone on the cartridge.
+   */
+  virtual std::string  fetch_game_name(int slot) = 0;
 };
 
 #endif // __CARTRIDGE_H__

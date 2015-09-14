@@ -33,6 +33,8 @@ public:
   bool                  compare_cartridge_save_data(std::istream& fin, int slot = SLOT_ALL, task_controller* controller = nullptr);
   unsigned int          num_slots() const;
   unsigned int          slot_size(int slot) const;
+  std::string           fetch_game_name(int slot);
+  
 
 protected:
   void                  build_cartridge_destriptor();
