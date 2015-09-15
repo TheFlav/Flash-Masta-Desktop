@@ -4,7 +4,7 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-NgpCartridgeVerifyTask::NgpCartridgeVerifyTask(QWidget *parent) : NgpCartridgeTask(parent)
+NgpCartridgeVerifyTask::NgpCartridgeVerifyTask(QWidget *parent, cartridge* cart) : NgpCartridgeTask(parent, cart)
 {
   // Nothing else to do
 }

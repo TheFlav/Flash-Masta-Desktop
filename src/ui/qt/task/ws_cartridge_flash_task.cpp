@@ -4,7 +4,7 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-WsCartridgeFlashTask::WsCartridgeFlashTask(QWidget* parent): WsCartridgeTask(parent)
+WsCartridgeFlashTask::WsCartridgeFlashTask(QWidget* parent, cartridge* cart): WsCartridgeTask(parent, cart)
 {
   // Nothing else to do
 }

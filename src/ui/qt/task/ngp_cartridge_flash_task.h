@@ -7,7 +7,7 @@
 class NgpCartridgeFlashTask: public NgpCartridgeTask
 {
 public:
-  explicit NgpCartridgeFlashTask(QWidget* parent = 0);
+  explicit NgpCartridgeFlashTask(QWidget* parent, cartridge* cart);
   ~NgpCartridgeFlashTask();
   
 protected:

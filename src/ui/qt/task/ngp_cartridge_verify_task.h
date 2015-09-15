@@ -7,7 +7,7 @@
 class NgpCartridgeVerifyTask : public NgpCartridgeTask
 {
 public:
-  explicit NgpCartridgeVerifyTask(QWidget *parent = 0);
+  explicit NgpCartridgeVerifyTask(QWidget *parent, cartridge* cart);
   ~NgpCartridgeVerifyTask();
   
 protected:

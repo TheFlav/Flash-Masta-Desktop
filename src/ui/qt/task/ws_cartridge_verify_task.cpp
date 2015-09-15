@@ -4,7 +4,7 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-WsCartridgeVerifyTask::WsCartridgeVerifyTask(QWidget *parent) : WsCartridgeTask(parent)
+WsCartridgeVerifyTask::WsCartridgeVerifyTask(QWidget *parent, cartridge* cart) : WsCartridgeTask(parent, cart)
 {
   // Nothing else to do
 }

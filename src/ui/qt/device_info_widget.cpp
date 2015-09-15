@@ -20,7 +20,6 @@ void worker::process()
     if (m_full)
     {
       product_str = FlashMasta::get_instance()->get_device_manager()->get_product_string(m_id);
-      m_full = false;
     }
     linkmasta_device* linkmasta = FlashMasta::get_instance()->get_device_manager()->get_linkmasta_device(m_id);
     cartridge* cart;
@@ -60,6 +59,8 @@ void worker::process()
     product_str = "An error occured";
     m_full = true;
   }
+  
+  m_full = false;
   
   QString s1, s2;
   s1 = QString(product_str.c_str());
