@@ -766,7 +766,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, tas
         block_header.num_bytes = block->num_bytes;
         
         // Adjust for NGP virtual address offset
-        block_header.address += 0x200000 + 0x600000 * (curr_block - chip_lower_bound);
+        block_header.address += 0x200000 + 0x600000 * (curr_chip - chip_lower_bound);
         
         // Write block header to file
         fout.write((char*) &block_header, sizeof(block_header));

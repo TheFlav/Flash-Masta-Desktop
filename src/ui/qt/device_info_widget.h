@@ -45,7 +45,6 @@ public:
   
   void set_device_id(unsigned int device_id);
   
-  
 private slots:
   void refresh_ui(QString device_name, QString game_name);
   

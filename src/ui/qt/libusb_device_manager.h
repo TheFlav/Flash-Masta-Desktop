@@ -26,6 +26,9 @@ public:
   std::string               get_product_string(unsigned int id);
   std::string               get_serial_number(unsigned int id);
   linkmasta_device*         get_linkmasta_device(unsigned int id);
+  bool                      is_device_claimed(unsigned int id);
+  bool                      claim_device(unsigned int id);
+  void                      release_device(unsigned int id);
   
 protected:
   void refresh_device_list();
@@ -47,9 +50,11 @@ private:
     std::string  serial_number;
     libusb_device* device;
     linkmasta_device* linkmasta;
+    bool claimed;
   };
   std::map<unsigned int, connected_device> m_connected_devices;
   std::mutex m_connected_devices_mutex;
+  std::vector<connected_device> m_disconnected_devices;
 };
 
 #endif // __LIBUSB_DEVICE_MANAGER_H__
