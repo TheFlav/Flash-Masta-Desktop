@@ -306,6 +306,12 @@ void MainWindow::on_refreshDeviceList_timeout()
         {
           // Device has been disconnected
           delete ui->deviceListWidget->takeItem(i);
+          auto it = m_device_info_widgets.find(m_device_ids[i]);
+          if (it != m_device_info_widgets.end())
+          {
+            delete it->second;
+            m_device_info_widgets.erase(it);
+          }
           m_device_ids.erase(m_device_ids.begin() + i);
         }
         else if (m_device_ids[i] > devices[j])
