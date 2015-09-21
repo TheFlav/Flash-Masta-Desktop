@@ -454,6 +454,44 @@ public:
    *  \see chip_mode
    */
   unsigned int            read_bytes(address_t address, data_t* data, unsigned int num_bytes, task_controller* controller = nullptr);
+  
+  /*! \brief Programs a series of bytes of data sequentially to the chip.
+   *  
+   *  Programs the flash data on the chip given a sequence of bytes, starting at
+   *  the given address. This modifies the chips contents. Will program the
+   *  specified number of bytes to the chip starting at the given address and
+   *  will return the number of bytes successfully written.
+   *  
+   *  The exact result of this function is dependent on the behavior of flash
+   *  memory. Flash chips can only program 0's, meaning that 1's can only be
+   *  flipped to 0's, and 0's cannot be changed. The only way to "reset" these
+   *  0's to 1's is to erase the entire sector in which the desired address
+   *  resides. Before calling this function, be sure to call \ref erase_chip()
+   *  or \ref erase_block(address_t block_address) first to guarantee expected
+   *  behavior.
+   *  
+   *  This function is a blocking function that can take several seconds to
+   *  complete. A \ref task_controller object may be optionally provided to
+   *  allow for mid-process communication and progress updates. If no controller
+   *  is supplied or **nullptr** is given, then this feature will be ignored.
+   *  
+   *  Causes the device to enter \ref chip_mode::BYPASS mode if supported by the
+   *  chip, and \ref chip_mode::READ mode otherwise.
+   *  
+   *  \param [in] address The address on the chipo to begin programming bytes.
+   *  \param [in] data A buffer containing the data to program to the chip.
+   *  \param [in] num_bytes The size in bytes of the \ref data buffer.
+   *  \param [in,out] controller The \ref task_controller to report progress to.
+   *         This value must be a valid pointer a \ref task_controller object or
+   *         **nullptr**.
+   *  
+   *  \returns The number of bytes successfully programmed to the chip.
+   *  
+   *  \see address_t
+   *  \see data_t
+   *  \see task_controller
+   *  \see chip_mode
+   */
   unsigned int            program_bytes(address_t address, const data_t* data, unsigned int num_bytes, task_controller* controller = nullptr);
   
 private:
