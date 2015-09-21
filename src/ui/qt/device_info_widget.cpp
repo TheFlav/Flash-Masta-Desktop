@@ -15,50 +15,58 @@ worker::worker(unsigned int id) : QObject(), m_id(id), product_str(), game_str()
 worker::~worker() {}
 void worker::process()
 {
-  try
+  if (FlashMasta::get_instance()->get_device_manager()->claim_device(m_id))
   {
-    if (m_full)
+  
+    try
     {
-      product_str = FlashMasta::get_instance()->get_device_manager()->get_product_string(m_id);
-      m_full = false;
-    }
-    linkmasta_device* linkmasta = FlashMasta::get_instance()->get_device_manager()->get_linkmasta_device(m_id);
-    cartridge* cart;
-    
-    switch (FlashMasta::get_instance()->get_device_manager()->get_product_id(m_id))
-    {
-    case 0x4256:       // NGP (new flashmasta)
-      if (!m_full) break;
-      
-    case 0x4178:       // NGP (linkmasta)
-      if (ngp_cartridge::test_for_cartridge(linkmasta))
+      if (m_full)
       {
-        cart = new ngp_cartridge(linkmasta);
+        product_str = FlashMasta::get_instance()->get_device_manager()->get_product_string(m_id);
+      }
+      linkmasta_device* linkmasta = FlashMasta::get_instance()->get_device_manager()->get_linkmasta_device(m_id);
+      cartridge* cart = nullptr;
+      
+      switch (FlashMasta::get_instance()->get_device_manager()->get_product_id(m_id))
+      {
+      case 0x4256:       // NGP (new flashmasta)
+        if (!m_full) break;
+        
+      case 0x4178:       // NGP (linkmasta)
+        if (ngp_cartridge::test_for_cartridge(linkmasta))
+        {
+          cart = new ngp_cartridge(linkmasta);
+          cart->init();
+          game_str = cart->fetch_game_name(0);
+        }
+        else
+        {
+          cart = nullptr;
+          game_str = "No cartridge detected";
+        }
+        break;
+        
+      case 0x4252:       // WS
+        if (!m_full) break;
+        
+        cart = new ws_cartridge(linkmasta);
         cart->init();
         game_str = cart->fetch_game_name(0);
+        break;
       }
-      else
-      {
-        cart = nullptr;
-        game_str = "No cartridge detected";
-      }
-      break;
       
-    case 0x4252:       // WS
-      if (!m_full) break;
+      if (cart != nullptr) delete cart;
       
-      cart = new ws_cartridge(linkmasta);
-      cart->init();
-      game_str = cart->fetch_game_name(0);
-      break;
+    }
+    catch (std::exception& ex)
+    {
+      product_str = "An error occured";
+      m_full = true;
     }
     
-    if (cart != nullptr) delete cart;
-  }
-  catch (std::exception& ex)
-  {
-    product_str = "An error occured";
-    m_full = true;
+    m_full = false;
+    
+    FlashMasta::get_instance()->get_device_manager()->release_device(m_id);    
   }
   
   QString s1, s2;

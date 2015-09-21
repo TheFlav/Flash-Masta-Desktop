@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 #include <stdlib.h>
+#include <stdint.h>
 
 unsigned char getBootBlockStart();
 

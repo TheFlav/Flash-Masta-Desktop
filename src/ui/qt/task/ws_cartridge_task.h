@@ -17,7 +17,7 @@ class WsCartridgeTask : public QObject, public task_controller
 {
   Q_OBJECT
 public:
-  explicit              WsCartridgeTask(QWidget *parent = 0);
+  explicit              WsCartridgeTask(QWidget *parent, cartridge* cart);
   virtual               ~WsCartridgeTask();
   
   virtual void          go();
@@ -33,20 +33,10 @@ protected:
   virtual void          set_progress_label(QString label);
   cartridge*            m_cartridge;
   
-  static const unsigned short target_vendor_id = 0x20A0;
-  static const unsigned short target_device_id = 0x4252;
-  
 private:
   std::mutex*           m_mutex;
   QProgressDialog*      m_progress;
   QString               m_progress_label;
-  
-  usb::usb_device*      m_usb;
-  linkmasta_device*     m_linkmasta;
-  
-  libusb_context*       m_libusb;
-  libusb_device*        m_device;
-  libusb_device_handle* m_handle;
 };
 
 #endif // __WS_CARTRIDGE_TASK_H__

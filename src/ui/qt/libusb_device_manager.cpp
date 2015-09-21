@@ -189,6 +189,62 @@ linkmasta_device* LibusbDeviceManager::get_linkmasta_device(unsigned int id)
   return r;
 }
 
+bool LibusbDeviceManager::is_device_claimed(unsigned int id)
+{
+  m_connected_devices_mutex.lock();
+  
+  auto it = m_connected_devices.find(id);
+  
+  if (it == m_connected_devices.end())
+  {
+    m_connected_devices_mutex.unlock();
+    throw std::invalid_argument("Unknown connected device ID " + std::to_string(id));
+  }
+  
+  auto r = it->second.claimed;
+  
+  m_connected_devices_mutex.unlock();
+  
+  return r;
+}
+
+bool LibusbDeviceManager::claim_device(unsigned int id)
+{
+  m_connected_devices_mutex.lock();
+  
+  auto it = m_connected_devices.find(id);
+  
+  if (it == m_connected_devices.end())
+  {
+    m_connected_devices_mutex.unlock();
+    throw std::invalid_argument("Unknown connected device ID " + std::to_string(id));
+  }
+  
+  auto r = it->second.claimed;
+  it->second.claimed = true;
+  
+  m_connected_devices_mutex.unlock();
+  
+  return !r;
+}
+
+void LibusbDeviceManager::release_device(unsigned int id)
+{
+  m_connected_devices_mutex.lock();
+  
+  auto it = m_connected_devices.find(id);
+  
+  if (it == m_connected_devices.end())
+  {
+    m_connected_devices_mutex.unlock();
+    throw std::invalid_argument("Unknown connected device ID " + std::to_string(id));
+  }
+  
+  it->second.claimed = false;
+  
+  m_connected_devices_mutex.unlock();
+}
+
 
 
 void LibusbDeviceManager::refresh_device_list()
@@ -236,6 +292,7 @@ void LibusbDeviceManager::refresh_device_list()
       new_device.vendor_id = desc.idVendor;
       new_device.product_id = desc.idProduct;
       new_device.device = device_list[i];
+      new_device.claimed = false;
       
       usb::libusb_usb_device* usb_device = new usb::libusb_usb_device(new_device.device);
       usb_device->init();
@@ -251,10 +308,10 @@ void LibusbDeviceManager::refresh_device_list()
     }
   }
   
-  // Remove devices that were not found
+  // Remove devices that were not found, but only if they are not claimed
   for (auto entry : device_status)
   {
-    if (!entry.second)
+    if (!entry.second && !m_connected_devices[entry.first].claimed)
     {
       try {
         delete m_connected_devices[entry.first].linkmasta;

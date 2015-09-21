@@ -4,7 +4,7 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-WsCartridgeBackupSaveTask::WsCartridgeBackupSaveTask(QWidget *parent) : WsCartridgeTask(parent)
+WsCartridgeBackupSaveTask::WsCartridgeBackupSaveTask(QWidget *parent, cartridge* cart) : WsCartridgeTask(parent, cart)
 {
   // Nothing else to do
 }

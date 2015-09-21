@@ -13,6 +13,8 @@
 #include "tasks/task_controller.h"
 #include "tasks/forwarding_task_controller.h"
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 
 #ifdef VERBOSE
 #include <iostream>
@@ -997,8 +999,35 @@ unsigned int ws_cartridge::slot_size(int slot) const
 
 std::string ws_cartridge::fetch_game_name(int slot)
 {
-  // TODO
-  return std::string();
+  // Get developer ID from chip
+  // Get game ID from chip
+  // Check developer ID and game ID against database and get game name
+  
+  static const unsigned int high_addr = 0x00FFFFFF;
+  static const unsigned int foot_addr = high_addr - 0x0000000A;
+  
+  m_linkmasta->open();
+  
+  // Get developer ID
+  ws_rom_chip::word_t w = m_rom_chip->read(foot_addr);
+  w >>= 8;
+  unsigned char developer_id = (unsigned char) w;
+  
+  // Get game ID
+  w = m_rom_chip->read(foot_addr + 0x00000002);
+  w >>= 8;
+  unsigned char game_id = (unsigned char) w;
+  
+  m_linkmasta->close();
+  
+  std::stringstream r;
+  
+  r << std::setfill('0') << std::hex;
+  
+  r << "Developer: " << std::setw(2) << (int) developer_id;
+  r << "  Game: " << std::setw(2) << (int) game_id;
+  
+  return std::string(r.str());
 }
 
 

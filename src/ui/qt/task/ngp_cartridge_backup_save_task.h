@@ -7,7 +7,7 @@
 class NgpCartridgeBackupSaveTask : public NgpCartridgeTask
 {
 public:
-  explicit NgpCartridgeBackupSaveTask(QWidget *parent = 0);
+  explicit NgpCartridgeBackupSaveTask(QWidget *parent, cartridge* cart);
   ~NgpCartridgeBackupSaveTask();
   
 protected:

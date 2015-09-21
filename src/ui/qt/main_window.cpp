@@ -5,9 +5,14 @@
 #include <QString>
 #include <QLayout>
 #include <string>
+#include <QMessageBox>
 #include "flash_masta.h"
 #include "device_manager.h"
 #include "device_info_widget.h"
+#include "cartridge/cartridge.h"
+#include "cartridge/ngp_cartridge.h"
+#include "cartridge/ws_cartridge.h"
+#include "linkmasta_device/linkmasta_device.h"
 #include "task/ngp_cartridge_backup_task.h"
 #include "task/ngp_cartridge_verify_task.h"
 #include "task/ngp_cartridge_flash_task.h"
@@ -42,74 +47,248 @@ MainWindow::~MainWindow()
 
 
 
-void MainWindow::on_actionBackupROM_triggered()
+cartridge* build_cartridge_for_device(int id)
 {
-  switch (ui->deviceListWidget->currentRow())
+  linkmasta_device* linkmasta;
+  cartridge* cart;
+  
+  linkmasta = FlashMasta::get_instance()->get_device_manager()->get_linkmasta_device(id);
+  if (linkmasta == nullptr)
   {
-  case 0:
-    NgpCartridgeBackupTask(this).go();
+    return nullptr;
+  }
+  
+  switch (FlashMasta::get_instance()->get_device_manager()->get_product_id(id))
+  {
+  case 0x4256:       // NGP (new flashmasta)
+  case 0x4178:       // NGP (linkmasta)
+    cart = new ngp_cartridge(linkmasta);
     break;
     
-  case 1:
-    WsCartridgeBackupTask(this).go();
+  case 0x4252:       // WS
+    cart = new ws_cartridge(linkmasta);
     break;
   }
+  
+  cart->init();
+  return cart;
+}
+
+
+
+void MainWindow::on_actionBackupROM_triggered()
+{
+  int index = ui->deviceListWidget->currentRow();
+  
+  if (index >= 0)
+  {
+    index = m_device_ids[index];
+  }
+  else
+  {
+    return;
+  }
+  
+  // Mark device as in-use, wait until available
+  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
+  
+  cartridge* cart = build_cartridge_for_device(index);
+  cart->init();
+  
+  try
+  {
+    switch (cart->system())
+    {
+    case system_type::NEO_GEO_POCKET:
+      NgpCartridgeBackupTask(this, cart).go();
+      break;
+      
+    case system_type::WONDERSWAN:
+      WsCartridgeBackupTask(this, cart).go();
+      break;
+    }
+  }
+  catch (std::runtime_error& ex)
+  {
+    QMessageBox msgBox(this);
+    msgBox.setText(ex.what());
+    msgBox.exec();    
+  }
+  
+  delete cart;
+  FlashMasta::get_instance()->get_device_manager()->release_device(index);
 }
 
 void MainWindow::on_actionRestoreROM_triggered()
 {
-  switch (ui->deviceListWidget->currentRow())
+  int index = ui->deviceListWidget->currentRow();
+  
+  if (index >= 0)
   {
-  case 0:
-    NgpCartridgeFlashTask(this).go();
-    break;
-    
-  case 1:
-    WsCartridgeFlashTask(this).go();
-    break;
+    index = m_device_ids[index];
   }
+  else
+  {
+    return;
+  }
+  
+  // Mark device as in-use, wait until available
+  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
+  
+  cartridge* cart = build_cartridge_for_device(index);
+  cart->init();
+  
+  try
+  {
+    switch (cart->system())
+    {
+    case system_type::NEO_GEO_POCKET:
+      NgpCartridgeFlashTask(this, cart).go();
+      break;
+      
+    case system_type::WONDERSWAN:
+      WsCartridgeFlashTask(this, cart).go();
+      break;
+    }
+  }
+  catch (std::runtime_error& ex)
+  {
+    QMessageBox msgBox(this);
+    msgBox.setText(ex.what());
+    msgBox.exec();    
+  }
+  
+  delete cart;
+  FlashMasta::get_instance()->get_device_manager()->release_device(index);
 }
 
 void MainWindow::on_actionVerifyROM_triggered()
 {
-  switch (ui->deviceListWidget->currentRow())
+  int index = ui->deviceListWidget->currentRow();
+  
+  if (index >= 0)
   {
-  case 0:
-    NgpCartridgeVerifyTask(this).go();
-    break;
-    
-  case 1:
-    WsCartridgeVerifyTask(this).go();
-    break;
+    index = m_device_ids[index];
   }
+  else
+  {
+    return;
+  }
+  
+  // Mark device as in-use, wait until available
+  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
+  
+  cartridge* cart = build_cartridge_for_device(index);
+  cart->init();
+  
+  try
+  {
+    switch (cart->system())
+    {
+    case system_type::NEO_GEO_POCKET:
+      NgpCartridgeVerifyTask(this, cart).go();
+      break;
+      
+    case system_type::WONDERSWAN:
+      WsCartridgeVerifyTask(this, cart).go();
+      break;
+    }
+  }
+  catch (std::runtime_error& ex)
+  {
+    QMessageBox msgBox(this);
+    msgBox.setText(ex.what());
+    msgBox.exec();    
+  }
+  
+  delete cart;
+  FlashMasta::get_instance()->get_device_manager()->release_device(index);
 }
 
 void MainWindow::on_actionBackupSave_triggered()
 {
-  switch (ui->deviceListWidget->currentRow())
+  int index = ui->deviceListWidget->currentRow();
+  
+  if (index >= 0)
   {
-  case 0:
-    NgpCartridgeBackupSaveTask(this).go();
-    break;
-    
-  case 1:
-    WsCartridgeBackupSaveTask(this).go();
-    break;
+    index = m_device_ids[index];
   }
+  else
+  {
+    return;
+  }
+  
+  // Mark device as in-use, wait until available
+  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
+  
+  cartridge* cart = build_cartridge_for_device(index);
+  cart->init();
+  
+  try
+  {
+    switch (cart->system())
+    {
+    case system_type::NEO_GEO_POCKET:
+      NgpCartridgeBackupSaveTask(this, cart).go();
+      break;
+      
+    case system_type::WONDERSWAN:
+      WsCartridgeBackupSaveTask(this, cart).go();
+      break;
+    }
+  }
+  catch (std::runtime_error& ex)
+  {
+    QMessageBox msgBox(this);
+    msgBox.setText(ex.what());
+    msgBox.exec();    
+  }
+  
+  delete cart;
+  FlashMasta::get_instance()->get_device_manager()->release_device(index);
 }
 
 void MainWindow::on_actionRestoreSave_triggered()
 {
-  switch (ui->deviceListWidget->currentRow())
+  int index = ui->deviceListWidget->currentRow();
+  
+  if (index >= 0)
   {
-  case 0:
-    NgpCartridgeRestoreSaveTask(this).go();
-    break;
-    
-  case 1:
-    WsCartridgeRestoreSaveTask(this).go();
-    break;
+    index = m_device_ids[index];
   }
+  else
+  {
+    return;
+  }
+  
+  // Mark device as in-use, wait until available
+  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
+  
+  cartridge* cart = build_cartridge_for_device(index);
+  cart->init();
+  
+  try
+  {
+    switch (cart->system())
+    {
+    case system_type::NEO_GEO_POCKET:
+      NgpCartridgeRestoreSaveTask(this, cart).go();
+      break;
+      
+    case system_type::WONDERSWAN:
+      WsCartridgeRestoreSaveTask(this, cart).go();
+      break;
+    }
+  }
+  catch (std::runtime_error& ex)
+  {
+    QMessageBox msgBox(this);
+    msgBox.setText(ex.what());
+    msgBox.exec();    
+  }
+  
+  delete cart;
+  FlashMasta::get_instance()->get_device_manager()->release_device(index);
 }
 
 void MainWindow::on_refreshDeviceList_timeout()
@@ -127,6 +306,12 @@ void MainWindow::on_refreshDeviceList_timeout()
         {
           // Device has been disconnected
           delete ui->deviceListWidget->takeItem(i);
+          auto it = m_device_info_widgets.find(m_device_ids[i]);
+          if (it != m_device_info_widgets.end())
+          {
+            delete it->second;
+            m_device_info_widgets.erase(it);
+          }
           m_device_ids.erase(m_device_ids.begin() + i);
         }
         else if (m_device_ids[i] > devices[j])

@@ -4,7 +4,7 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-NgpCartridgeFlashTask::NgpCartridgeFlashTask(QWidget* parent): NgpCartridgeTask(parent)
+NgpCartridgeFlashTask::NgpCartridgeFlashTask(QWidget* parent, cartridge* cart): NgpCartridgeTask(parent, cart)
 {
   // Nothing else to do
 }

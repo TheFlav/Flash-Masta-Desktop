@@ -11,9 +11,9 @@
 
 using namespace usb;
 
-WsCartridgeTask::WsCartridgeTask(QWidget *parent) 
-  : QObject(parent), task_controller(), m_mutex(new std::mutex()),
-    m_progress(nullptr), m_progress_label()
+WsCartridgeTask::WsCartridgeTask(QWidget *parent, cartridge* cart) 
+  : QObject(parent), task_controller(), m_cartridge(cart),
+    m_mutex(new std::mutex()), m_progress(nullptr), m_progress_label()
 {
   // Nothing else to do
 }
@@ -25,110 +25,6 @@ WsCartridgeTask::~WsCartridgeTask()
 
 void WsCartridgeTask::go()
 {
-  // Initialize libusb
-  if (libusb_init(&m_libusb) != 0)
-  {
-    QMessageBox msgBox;
-    msgBox.setText("Unable to initialize usb library.");
-    msgBox.exec();
-    return;
-  }
-  
-  // Get handle to USB device
-  m_handle = libusb_open_device_with_vid_pid(m_libusb, WsCartridgeTask::target_vendor_id, WsCartridgeTask::target_device_id);
-  if (m_handle == nullptr)
-  {
-    libusb_exit(m_libusb);
-    QMessageBox msgBox;
-    msgBox.setText("Unable to find device. Make sure it's connected.");
-    msgBox.exec();
-    return;
-  }
-  else
-  {
-    m_device = libusb_get_device(m_handle);
-    libusb_ref_device(m_device);
-    libusb_close(m_handle);
-  }
-  
-  // Initialize usb device
-  try
-  {
-    m_usb = new libusb_usb_device(m_device);
-    m_usb->init();
-  }
-  catch (std::exception& ex)
-  {
-    libusb_unref_device(m_device);
-    libusb_exit(m_libusb);
-    QMessageBox msgBox;
-    msgBox.setText(QString("An error occured while initializing usb device.\n\n") + ex.what());
-    msgBox.exec();
-    return;
-  }
-  
-  // Initialize linkmasta device
-  try
-  {
-    m_linkmasta = new ws_linkmasta_device(m_usb);
-    m_linkmasta->init();
-  }
-  catch (std::exception& ex)
-  {
-    delete m_linkmasta;
-    libusb_unref_device(m_device);
-    libusb_exit(m_libusb);
-    QMessageBox msgBox;
-    msgBox.setText(QString("An error occured while initalizing linkmasta device.\n\n") + ex.what());
-    msgBox.exec();
-    return;
-  }
-  
-  // Test for cartridge
-  /*
-  try
-  {
-    if (!ws_cartridge::test_for_cartridge(m_linkmasta))
-    {
-      delete m_linkmasta;
-      libusb_unref_device(m_device);
-      libusb_exit(m_libusb);
-      QMessageBox msgBox;
-      msgBox.setText(QString("No cartridge detected.\n\n"));
-      msgBox.exec();
-      return;
-    }
-  }
-  catch (std::exception& ex)
-  {
-    delete m_linkmasta;
-    libusb_unref_device(m_device);
-    libusb_exit(m_libusb);
-    QMessageBox msgBox;
-    msgBox.setText(QString("An error occured while testing for cartridge.\n\n") + ex.what());
-    msgBox.exec();
-    return;
-  }
-  */
-  
-  // Initialize cartridge
-  try
-  {
-    m_cartridge = new ws_cartridge(m_linkmasta);
-    m_cartridge->init();
-  }
-  catch (std::exception& ex)
-  {
-    delete m_cartridge;
-    delete m_linkmasta;
-    libusb_unref_device(m_device);
-    libusb_exit(m_libusb);
-    QMessageBox msgBox;
-    msgBox.setText(QString("An error occured while initializing cartridge.\n\n") + ex.what());
-    msgBox.exec();
-    return;
-  }
-  
   // Begin task
   try
   {
@@ -148,10 +44,6 @@ void WsCartridgeTask::go()
   }
   
   // Cleanup
-  delete m_cartridge;
-  delete m_linkmasta;
-  libusb_unref_device(m_device);
-  libusb_exit(m_libusb);
   if (m_progress != nullptr)
   {
     m_progress->close();

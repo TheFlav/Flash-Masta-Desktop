@@ -7,7 +7,7 @@
 class WsCartridgeBackupSaveTask: public WsCartridgeTask
 {
 public:
-  explicit WsCartridgeBackupSaveTask(QWidget* parent = 0);
+  explicit WsCartridgeBackupSaveTask(QWidget* parent, cartridge* cart);
   ~WsCartridgeBackupSaveTask();
   
 protected:

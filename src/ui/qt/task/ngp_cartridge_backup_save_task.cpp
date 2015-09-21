@@ -4,7 +4,7 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-NgpCartridgeBackupSaveTask::NgpCartridgeBackupSaveTask(QWidget *parent) : NgpCartridgeTask(parent)
+NgpCartridgeBackupSaveTask::NgpCartridgeBackupSaveTask(QWidget *parent, cartridge* cart) : NgpCartridgeTask(parent, cart)
 {
   // Nothing else to do
 }

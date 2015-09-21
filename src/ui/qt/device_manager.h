@@ -28,7 +28,9 @@ public:
   virtual std::string               get_product_string(unsigned int id) = 0;
   virtual std::string               get_serial_number(unsigned int id) = 0;
   virtual linkmasta_device*         get_linkmasta_device(unsigned int id) = 0;
-  
+  virtual bool                      is_device_claimed(unsigned int id) = 0;
+  virtual bool                      claim_device(unsigned int id) = 0;
+  virtual void                      release_device(unsigned int id) = 0;
   
 protected:
   unsigned int                      generate_id();
