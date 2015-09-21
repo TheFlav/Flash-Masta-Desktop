@@ -122,10 +122,12 @@ INCLUDEPATH +=\
 
 macx {
     INCLUDEPATH +=\
-        include/osx
-
+        includes/osx
+    
+    QMAKE_MAC_SDK = macosx10.11
+    
     QMAKE_LFLAGS +=\
-        -Llib/osx
+        -L"$$PWD/libs/osx"
 
     LIBS     +=\
         -framework IOKit\
