@@ -7,6 +7,7 @@
 //
 
 #include "linkmasta_device.h"
+#include <stdexcept>
 
 bool linkmasta_device::supports_read_bytes() const
 {

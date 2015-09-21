@@ -25,7 +25,7 @@ void worker::process()
         product_str = FlashMasta::get_instance()->get_device_manager()->get_product_string(m_id);
       }
       linkmasta_device* linkmasta = FlashMasta::get_instance()->get_device_manager()->get_linkmasta_device(m_id);
-      cartridge* cart;
+      cartridge* cart = nullptr;
       
       switch (FlashMasta::get_instance()->get_device_manager()->get_product_id(m_id))
       {
