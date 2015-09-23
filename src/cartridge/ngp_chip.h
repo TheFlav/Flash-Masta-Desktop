@@ -454,17 +454,118 @@ public:
    *  \see chip_mode
    */
   unsigned int            read_bytes(address_t address, data_t* data, unsigned int num_bytes, task_controller* controller = nullptr);
+  
+  /*! \brief Programs a series of bytes of data sequentially to the chip.
+   *  
+   *  Programs the flash data on the chip given a sequence of bytes, starting at
+   *  the given address. This modifies the chips contents. Will program the
+   *  specified number of bytes to the chip starting at the given address and
+   *  will return the number of bytes successfully written.
+   *  
+   *  The exact result of this function is dependent on the behavior of flash
+   *  memory. Flash chips can only program 0's, meaning that 1's can only be
+   *  flipped to 0's, and 0's cannot be changed. The only way to "reset" these
+   *  0's to 1's is to erase the entire sector in which the desired address
+   *  resides. Before calling this function, be sure to call \ref erase_chip()
+   *  or \ref erase_block(address_t block_address) first to guarantee expected
+   *  behavior.
+   *  
+   *  This function is a blocking function that can take several seconds to
+   *  complete. A \ref task_controller object may be optionally provided to
+   *  allow for mid-process communication and progress updates. If no controller
+   *  is supplied or **nullptr** is given, then this feature will be ignored.
+   *  
+   *  Causes the device to enter \ref chip_mode::BYPASS mode if supported by the
+   *  chip, and \ref chip_mode::READ mode otherwise.
+   *  
+   *  \param [in] address The address on the chipo to begin programming bytes.
+   *  \param [in] data A buffer containing the data to program to the chip.
+   *  \param [in] num_bytes The size in bytes of the \ref data buffer.
+   *  \param [in,out] controller The \ref task_controller to report progress to.
+   *         This value must be a valid pointer a \ref task_controller object or
+   *         **nullptr**.
+   *  
+   *  \returns The number of bytes successfully programmed to the chip.
+   *  
+   *  \see address_t
+   *  \see data_t
+   *  \see task_controller
+   *  \see chip_mode
+   */
   unsigned int            program_bytes(address_t address, const data_t* data, unsigned int num_bytes, task_controller* controller = nullptr);
   
+  
+  
 private:
+  
+  /*! \brief Send the command sequence to enter \ref chip_mode::AUTOSELECT mode
+   *         to the chip.
+   *  
+   *  Sends the \ref chip_mode::AUTOSELECT mode command sequence to the chip.
+   *  This will send reset the device if necessary.
+   *  
+   *  This function is a blocking function that can take several seconds to
+   *  complete.
+   *  
+   *  Causes the device to enter \ref chip_mode::AUTOSELECT mode.
+   *  
+   *  \see chip_mode
+   */
   void                    enter_autoselect();
   
+  /*! \brief The currently predicted mode of the chip.
+   *  
+   *  The currently predicted mode the hardware device is in. This value is
+   *  to track the state of the chip and must be actively maintained when
+   *  passing commands that could alter the state of the device. This value is
+   *  initialized to \ref chip_mode::READ.
+   *  
+   *  \see chip_mode
+   */
   chip_mode               m_mode;
+  
+  /*! \brief The address of the last block erased.
+   *  
+   *  The last address passed to the \ref erase_block(address_t block_address)
+   *  function. This value is used for testing whether the chip has finished
+   *  erasing or not.
+   *  
+   *  \ref address_t
+   *  \ref erase_block(address_t block_address)
+   */
   address_t               m_last_erased_addr;
   
+  /*! \brief Boolean value indicating whether or not the device supports bypass
+   *         mode.
+   *  
+   *  Boolean value indicating whether or not the device supports bypass mode.
+   *  This value is set in the \ref init() and automatically detected based on
+   *  the device's manufacturer and product IDs.
+   *  
+   *  \ref init()
+   */
   bool                    m_supports_bypass;
   
+  /*! \brief A pointer to the \ref linkmasta_device used for communicating with
+   *         the chip.
+   *  
+   *  A constant pointer to the \ref linkmasta_device used for communicating
+   *  with the chip. The pointer to this device is const but the device itself
+   *  is not protected from modification. When this object is deallocated, this
+   *  pointer's target will not be deleted.
+   *  
+   *  \see linkmasta_device
+   */
   linkmasta_device* const m_linkmasta;
+  
+  /*! \brief The index number of the chip on the cartridge.
+   *  
+   *  The index number of this device on the cartridge. Used for specifying the
+   *  hardware device to communicated with through the assigned \ref m_linkmasta
+   *  device.
+   *  
+   *  \see chip_index_t
+   */
   chip_index_t const      m_chip_num;
 };
 
