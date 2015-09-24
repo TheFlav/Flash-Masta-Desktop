@@ -58,7 +58,9 @@ SOURCES +=\
     src/ui/qt/device_manager.cpp \
     src/ui/qt/libusb_device_manager.cpp \
     src/ui/qt/device_info_widget.cpp \
-    src/ui/qt/ngp_linkmasta_detail_widget.cpp
+    src/ui/qt/detail/ngp_linkmasta_detail_widget.cpp \
+    src/ui/qt/detail/ngp_official_cartridge_widget.cpp \
+    src/ui/qt/worker/ngp_lm_cartridge_worker.cpp
 
 HEADERS  +=\
     src/hardware/AVR/ids.h \
@@ -109,12 +111,15 @@ HEADERS  +=\
     src/ui/qt/device_manager.h \
     src/ui/qt/libusb_device_manager.h \
     src/ui/qt/device_info_widget.h \
-    src/ui/qt/ngp_linkmasta_detail_widget.h
+    src/ui/qt/detail/ngp_linkmasta_detail_widget.h \
+    src/ui/qt/detail/ngp_official_cartridge_widget.h \
+    src/ui/qt/worker/ngp_lm_cartridge_worker.h
 
 FORMS    +=\
     src/ui/qt/device_info_widget.ui \
-    src/ui/qt/ngp_linkmasta_detail_widget.ui \
-    src/ui/qt/main_window.ui
+    src/ui/qt/main_window.ui \
+    src/ui/qt/detail/ngp_linkmasta_detail_widget.ui \
+    src/ui/qt/detail/ngp_official_cartridge_widget.ui
 
 DISTFILES += \
     README.md
