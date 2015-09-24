@@ -1,6 +1,6 @@
 #include "ngp_linkmasta_detail_widget.h"
 #include "ui_ngp_linkmasta_detail_widget.h"
-#include "worker/ngp_lm_cartridge_worker.h"
+#include "../worker/ngp_lm_cartridge_polling_worker.h"
 
 NgpLinkmastaDetailWidget::NgpLinkmastaDetailWidget(unsigned int device_id, QWidget *parent) :
   QWidget(parent),
@@ -12,19 +12,19 @@ NgpLinkmastaDetailWidget::NgpLinkmastaDetailWidget(unsigned int device_id, QWidg
 
 NgpLinkmastaDetailWidget::~NgpLinkmastaDetailWidget()
 {
-  stop_pooling();
+  stop_polling();
   delete ui;
 }
 
 
 
-void NgpLinkmastaDetailWidget::start_pooling()
+void NgpLinkmastaDetailWidget::start_polling()
 {
   if (m_pooling_thread != nullptr) return;
   
   // Spin up a new thread with a worker to periodically pool linkmasta for cartridge
   m_pooling_thread = new QThread();
-  auto worker = new NgpLmCartridgeWorker(m_device_id);
+  auto worker = new NgpLmCartridgePollingWorker(m_device_id);
   
   worker->moveToThread(m_pooling_thread);
   connect(worker, SIGNAL(cartridge_removed()), this, SLOT(on_cartridge_removed()));
@@ -36,7 +36,7 @@ void NgpLinkmastaDetailWidget::start_pooling()
   m_pooling_thread->start();
 }
 
-void NgpLinkmastaDetailWidget::stop_pooling()
+void NgpLinkmastaDetailWidget::stop_polling()
 {
   if (m_pooling_thread == nullptr) return;
   

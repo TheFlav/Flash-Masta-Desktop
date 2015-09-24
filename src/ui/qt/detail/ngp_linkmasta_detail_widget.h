@@ -16,8 +16,8 @@ public:
   explicit NgpLinkmastaDetailWidget(unsigned int device_id, QWidget *parent = 0);
   ~NgpLinkmastaDetailWidget();
   
-  void start_pooling();
-  void stop_pooling();
+  void start_polling();
+  void stop_polling();
   
 public slots:
   void on_cartridge_removed();

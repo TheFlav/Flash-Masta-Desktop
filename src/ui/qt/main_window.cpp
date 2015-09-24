@@ -9,7 +9,7 @@
 #include "flash_masta.h"
 #include "device_manager.h"
 #include "device_info_widget.h"
-#include "ngp_linkmasta_detail_widget.h"
+#include "detail/ngp_linkmasta_detail_widget.h"
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
 #include "cartridge/ws_cartridge.h"
@@ -327,7 +327,7 @@ void MainWindow::on_refreshDeviceList_timeout()
           
           //auto widget = new DeviceInfoWidget(ui->scrollAreaWidgetContents->parentWidget());
           auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents->parentWidget());
-          widget->start_pooling();
+          widget->start_polling();
           
           m_device_info_widgets[devices[j]] = widget;
           //widget->set_device_id(devices[j]);
@@ -366,7 +366,7 @@ void MainWindow::on_refreshDeviceList_timeout()
         
         //auto widget = new DeviceInfoWidget(ui->scrollAreaWidgetContents->parentWidget());
         auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents->parentWidget());
-        widget->start_pooling();
+        widget->start_polling();
         
         m_device_info_widgets[devices[j]] = widget;
         //widget->set_device_id(devices[j]);
