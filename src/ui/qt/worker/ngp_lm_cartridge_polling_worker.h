@@ -1,14 +1,14 @@
-#ifndef NGP_LM_CARTRIDGE_WORKER_H
-#define NGP_LM_CARTRIDGE_WORKER_H
+#ifndef NGP_LM_CARTRIDGE_POLLING_WORKER_H
+#define NGP_LM_CARTRIDGE_POLLING_WORKER_H
 
 #include <QObject>
 #include <QTimer>
 
-class NgpLmCartridgeWorker : public QObject
+class NgpLmCartridgePollingWorker : public QObject
 {
   Q_OBJECT
 public:
-  explicit NgpLmCartridgeWorker(unsigned int id, QObject *parent = 0);
+  explicit NgpLmCartridgePollingWorker(unsigned int id, QObject *parent = 0);
   
 signals:
   void cartridge_inserted();

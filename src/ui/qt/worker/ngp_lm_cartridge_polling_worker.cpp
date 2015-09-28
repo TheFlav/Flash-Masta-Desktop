@@ -1,12 +1,12 @@
-#include "ngp_lm_cartridge_worker.h"
+#include "ngp_lm_cartridge_polling_worker.h"
 
 #include "../flash_masta.h"
 #include "../device_manager.h"
 #include "cartridge/ngp_cartridge.h"
 
-const int NgpLmCartridgeWorker::INTERVAL = 2000; // 1k milliseconds = 1 second
+const int NgpLmCartridgePollingWorker::INTERVAL = 2000; // 1k milliseconds = 1 second
 
-NgpLmCartridgeWorker::NgpLmCartridgeWorker(unsigned int id, QObject *parent) :
+NgpLmCartridgePollingWorker::NgpLmCartridgePollingWorker(unsigned int id, QObject *parent) :
   QObject(parent),
   m_id(id), m_device_connected(false), m_running(false), m_timer(this)
 {
@@ -15,7 +15,7 @@ NgpLmCartridgeWorker::NgpLmCartridgeWorker(unsigned int id, QObject *parent) :
 
 
 
-void NgpLmCartridgeWorker::start()
+void NgpLmCartridgePollingWorker::start()
 {
   // Configure the timer to trigger periodically
   m_timer.setInterval(INTERVAL);
@@ -28,12 +28,12 @@ void NgpLmCartridgeWorker::start()
   m_timer.start();
 }
 
-void NgpLmCartridgeWorker::stop()
+void NgpLmCartridgePollingWorker::stop()
 {
   m_timer.stop();
 }
 
-void NgpLmCartridgeWorker::run()
+void NgpLmCartridgePollingWorker::run()
 {
   if (!FlashMasta::get_instance()->get_device_manager()->claim_device(m_id))
   {
