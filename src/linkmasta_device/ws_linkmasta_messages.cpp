@@ -26,6 +26,8 @@
 #define MSG_WRITE16_CMD             0x0E
 #define MSG_READ16_CMD              0x0F
 #define MSG_SRAMWRITE64xN_CMD       0x10
+#define MSG_GET_CARTINFO_CMD        0x11
+#define MSG_SET_CARTSLOT_CMD        0x12
 
 #define MSG_EEPROMWRITE_N_CMD       0x80
 #define MSG_EEPROMREAD_N_CMD        0x81
@@ -37,6 +39,11 @@
 
 #define MSG_MAJORVER_OFFSET         1
 #define MSG_MINORVER_OFFSET         2
+
+#define MSG_SLOTS_FIXEDNUM_OFFSET   1
+#define MSG_SLOTS_FIXEDSIZE_OFFSET  2
+#define MSG_CARTSLOTS_OFFSET        3
+#define MSG_SLOTADDRLINES_OFFSET    4
 
 #define MSG_SETBITS_OFFSET          1
 #define MSG_UNSETBITS_OFFSET        2
@@ -82,6 +89,11 @@ void build_getversion_command(uint8_t *buf)
   buf[MSG_TYPE_OFFSET] = MSG_GETVERSION;
 }
 
+void build_getcartinfo_command(uint8_t *buf)
+{
+  buf[MSG_TYPE_OFFSET] = MSG_GET_CARTINFO_CMD;
+}
+
 void build_set_unset_lines_command(uint8_t *buf, uint8_t setBits, uint8_t unsetBits)
 {
   buf[MSG_TYPE_OFFSET] = MSG_SET_UNSET_LINES_CMD;
@@ -91,7 +103,6 @@ void build_set_unset_lines_command(uint8_t *buf, uint8_t setBits, uint8_t unsetB
 
 void get_set_unset_lines_command(uint8_t *buf, uint8_t *setBits, uint8_t *unsetBits)
 {
-  //    buf[MSG_TYPE_OFFSET] = MSG_SET_UNSET_LINES_CMD;
   *setBits = buf[MSG_SETBITS_OFFSET];
   *unsetBits = buf[MSG_UNSETBITS_OFFSET];
 }
@@ -119,6 +130,42 @@ void get_getversion_reply(uint8_t *buf, uint8_t *majVer, uint8_t *minVer)
   return;
 }
 
+void build_getcartinfo_reply(uint8_t *buf, uint8_t isSlotNumFixed, uint8_t isSlotSizeFixed, uint8_t numSlotsPerCart, uint8_t numAddrLinesPerSlot)
+{
+  buf[MSG_TYPE_OFFSET] = MSG_GET_CARTINFO_CMD;
+  buf[MSG_SLOTS_FIXEDNUM_OFFSET] = isSlotNumFixed;                            //fixed=1 variable=0
+  buf[MSG_SLOTS_FIXEDSIZE_OFFSET] = isSlotSizeFixed;                          //fixed=1 variable=0
+  buf[MSG_CARTSLOTS_OFFSET] = numSlotsPerCart;
+  buf[MSG_SLOTADDRLINES_OFFSET] = numAddrLinesPerSlot;
+}
+
+void get_getcartinfo_reply(uint8_t *buf, uint8_t *isSlotNumFixed, uint8_t *isSlotSizeFixed, uint8_t *numSlotsPerCart, uint8_t *numAddrLinesPerSlot)
+{
+  if(buf[MSG_TYPE_OFFSET] == MSG_GET_CARTINFO_CMD)
+  {
+    *isSlotNumFixed = buf[MSG_SLOTS_FIXEDNUM_OFFSET];
+    *isSlotSizeFixed = buf[MSG_SLOTS_FIXEDSIZE_OFFSET];
+    *numSlotsPerCart = buf[MSG_CARTSLOTS_OFFSET];
+    *numAddrLinesPerSlot = buf[MSG_SLOTADDRLINES_OFFSET];
+  }
+  else
+  {
+    *isSlotNumFixed = 0xFF;
+    *isSlotSizeFixed = 0xFF;
+    *numSlotsPerCart = 0xFF;
+    *numAddrLinesPerSlot = 0xFF;
+  }
+  
+  return;
+}
+
+void build_set_cartslot_command(uint8_t *buf, uint8_t slot_num)
+{
+  buf[MSG_TYPE_OFFSET] = MSG_SET_CARTSLOT_CMD;
+  buf[MSG_DATA8_OFFSET] = slot_num;
+}
+
+
 //message structure
 //byte  value
 //0     msgType
@@ -143,7 +190,7 @@ void build_write8_command(uint8_t *buf, uint32_t addr_host, uint8_t data, uint8_
   buf[MSG_TARGET_OFFSET] = target;//SRAM, PORT_IO, etc.
   
 #if (defined(OS_WINDOWS) || defined(OS_MACOSX)) && defined(DEBUG)
-  printf("write 0x%02X to addr %02X %02X %02X %s\n", buf[MSG_DATA8_OFFSET], buf[MSG_ADDRHB_OFFSET], buf[MSG_ADDRMB_OFFSET], buf[MSG_ADDRLB_OFFSET], buf[MSG_ADDRNEGATIVEONE_OFFSET] ? "1" : "0");
+  printf("write 0x%02X to addr %02X %02X %02X %s (target %d)\n", buf[MSG_DATA8_OFFSET], buf[MSG_ADDRHB_OFFSET], buf[MSG_ADDRMB_OFFSET], buf[MSG_ADDRLB_OFFSET], buf[MSG_ADDRNEGATIVEONE_OFFSET] ? "1" : "0", target);
 #endif
 }
 
@@ -397,30 +444,33 @@ void build_reply_fail(uint8_t *buf)
   buf[MSG_TYPE_OFFSET] = MSG_RESULT_FAIL;
 }
 
-uint8_t *get_flash_write_32_command(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB)
+uint8_t *get_flash_write_32_command(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *addrNO)
 {
   *addrHB = buf[MSG_ADDRHB_OFFSET];
   *addrMB = buf[MSG_ADDRMB_OFFSET];
   *addrLB = buf[MSG_ADDRLB_OFFSET];
+  *addrNO = buf[MSG_ADDRNEGATIVEONE_OFFSET];
   
   return &buf[MSG_FWRITE_PAYLOAD_OFFSET];
 }
 
-uint8_t *get_flash_write_N_command(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *n)
+uint8_t *get_flash_write_N_command(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *addrNO, uint8_t *n)
 {
   *addrHB = buf[MSG_ADDRHB_OFFSET];
   *addrMB = buf[MSG_ADDRMB_OFFSET];
   *addrLB = buf[MSG_ADDRLB_OFFSET];
+  *addrNO = buf[MSG_ADDRNEGATIVEONE_OFFSET];
   *n = buf[MSG_FWRITE_BYTE_COUNT];
   
   return &buf[MSG_FWRITE_PAYLOAD_OFFSET];
 }
 
-void get_flash_write64xN_message(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *n)
+void get_flash_write64xN_message(uint8_t *buf, uint8_t *addrHB, uint8_t *addrMB, uint8_t *addrLB, uint8_t *addrNO, uint8_t *n)
 {
   *addrHB = buf[MSG_ADDRHB_OFFSET];
   *addrMB = buf[MSG_ADDRMB_OFFSET];
   *addrLB = buf[MSG_ADDRLB_OFFSET];
+  *addrNO = buf[MSG_ADDRNEGATIVEONE_OFFSET];
   *n = buf[MSG_64B_PACKET_COUNT];
 }
 
@@ -601,4 +651,8 @@ void get_blink_led_message(uint8_t *buf, uint8_t *blinkCount)
   *blinkCount = buf[MSG_DATA8_OFFSET];
 }
 
+void get_set_cartslot_command(uint8_t *buf, uint8_t *slot_num)
+{
+  *slot_num = buf[MSG_DATA8_OFFSET];
+}
 };

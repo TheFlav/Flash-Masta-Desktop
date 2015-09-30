@@ -36,12 +36,19 @@ public:
   
   bool             supports_read_bytes() const;
   bool             supports_program_bytes() const;
+  bool             supports_read_num_slots() const;
+  bool             supports_read_slot_size() const;
+  bool             supports_switch_slot() const;
   
   unsigned int     read_bytes(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes, task_controller* controller = nullptr);
   unsigned int     program_bytes(chip_index chip, address_t start_address, const data_t* buffer, unsigned int num_bytes, bool bypass_mode, task_controller* controller = nullptr);
+  unsigned int     read_num_slots();
+  unsigned int     read_slot_size(unsigned int slot_num);
+  bool             switch_slot(unsigned int slot_num);
   
 private:
   void             fetch_firmware_version();
+  void             fetch_slot_info();
   
   // Resources
   usb::usb_device* const m_usb_device;
@@ -54,6 +61,10 @@ private:
   // Cached values
   unsigned int     m_firmware_major_version;
   unsigned int     m_firmware_minor_version;
+  bool             m_static_num_slots;
+  bool             m_static_slot_sizes;
+  unsigned int     m_num_slots;
+  unsigned int     m_slot_size;
 };
 
 #endif /* defined(__WS_LINKMASTA_DEVICE_H__) */

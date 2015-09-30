@@ -76,6 +76,7 @@ void ws_cartridge::init()
   m_linkmasta->init();
   m_linkmasta->open();
   build_cartridge_destriptor();
+  build_slots_layout();
   m_linkmasta->close();
   
   m_was_init = true;
@@ -966,30 +967,26 @@ bool ws_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, task
 
 unsigned int ws_cartridge::num_slots() const
 {
-  // This functionality is not implemented for this cartridge yet.
-  
   // Ensure class was initialized
   if (!m_was_init)
   {
     throw std::runtime_error("ERROR"); // TODO
   }
   
-  return 1;
+  return (unsigned int) m_slots.size();
 }
 
 unsigned int ws_cartridge::slot_size(int slot) const
 {
-  // This functionality is not implemented for this cartridge yet.
-  
   // Ensure class was initialized
   if (!m_was_init)
   {
     throw std::runtime_error("ERROR"); // TODO
   }
   
-  if (slot == SLOT_ALL || slot == 0)
+  if (slot >= 0 && slot < num_slots())
   {
-    return descriptor()->num_bytes;
+    return m_slots[slot];
   }
   else
   {
@@ -1145,6 +1142,11 @@ void ws_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int bloc
   
   // Query chip for protection status of block
   block->is_protected = (chip->get_block_protection(block->base_address) == 0 ? false : true);
+}
+
+void ws_cartridge::build_slots_layout()
+{
+  
 }
 
 

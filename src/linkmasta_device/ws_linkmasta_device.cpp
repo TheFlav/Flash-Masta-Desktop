@@ -37,7 +37,8 @@ using namespace wsmsg;
 ws_linkmasta_device::ws_linkmasta_device(usb::usb_device* usb_device)
   : m_usb_device(usb_device),
     m_was_init(false), m_is_open(false), m_firmware_version_set(false),
-    m_firmware_major_version(0), m_firmware_minor_version(0)
+    m_firmware_major_version(0), m_firmware_minor_version(0),
+    m_static_num_slots(false), m_static_slot_sizes(false)
 {
   // Nothing else to do
 }
@@ -231,6 +232,21 @@ bool ws_linkmasta_device::supports_read_bytes() const
 }
 
 bool ws_linkmasta_device::supports_program_bytes() const
+{
+  return true;
+}
+
+bool ws_linkmasta_device::supports_read_num_slots() const
+{
+  return true;
+}
+
+bool ws_linkmasta_device::supports_read_slot_size() const
+{
+  return true;
+}
+
+bool ws_linkmasta_device::supports_switch_slot() const
 {
   return true;
 }
@@ -555,6 +571,64 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
   return offset;
 }
 
+unsigned int ws_linkmasta_device::read_num_slots()
+{
+  // Make sure object has been initialized at least
+  if (!m_was_init || !m_is_open)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
+  if (m_static_num_slots)
+  {
+    return m_num_slots;
+  }
+  else
+  {
+    // TODO
+    return 1;
+  }
+}
+
+unsigned int ws_linkmasta_device::read_slot_size(unsigned int slot_num)
+{
+  // Make sure object has been initialized at least
+  if (!m_was_init || !m_is_open)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
+  if (m_static_slot_sizes)
+  {
+    return m_slot_size;
+  }
+  else
+  {
+    // TODO
+    return 0;
+  }
+}
+
+bool ws_linkmasta_device::switch_slot(unsigned int slot_num)
+{
+  // Make sure object has been initialized at least
+  if (!m_was_init || !m_is_open)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
+  data_t buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
+  
+  build_set_cartslot_command(buffer, (unsigned char) slot_num);
+  m_usb_device->write(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+  m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+  
+  uint8_t result;
+  get_result_reply(buffer, &result);
+  
+  return (result == MSG_RESULT_SUCCESS);
+}
+
 
 
 void ws_linkmasta_device::fetch_firmware_version()
@@ -580,6 +654,32 @@ void ws_linkmasta_device::fetch_firmware_version()
   m_firmware_major_version = (unsigned int) majVer;
   m_firmware_minor_version = (unsigned int) minVer;
   m_firmware_version_set = true;
+}
+
+void ws_linkmasta_device::fetch_slot_info()
+{
+  data_t buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
+  build_getcartinfo_command(buffer);
+  
+  unsigned int num_bytes;
+  
+  // Send command
+  num_bytes = m_usb_device->write(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+  
+  // Fetch reply
+  num_bytes = m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+  if (num_bytes != WS_LINKMASTA_USB_RXTX_SIZE)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  uint8_t isSlotNumFixed, isSlotSizeFixed, numSlotsPerCart, numAddrLinesPerSlot;
+  get_getcartinfo_reply(buffer, &isSlotNumFixed, &isSlotSizeFixed, &numSlotsPerCart, &numAddrLinesPerSlot);
+  
+  m_static_num_slots = (isSlotNumFixed == 1);
+  m_static_slot_sizes = (isSlotSizeFixed == 1);
+  m_num_slots = (unsigned int) numSlotsPerCart;
+  m_slot_size = 1 << numAddrLinesPerSlot;
 }
 
 

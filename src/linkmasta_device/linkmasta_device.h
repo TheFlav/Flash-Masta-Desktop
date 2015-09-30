@@ -45,6 +45,9 @@ public:
   virtual bool             supports_read_manufacturer_id() const;
   virtual bool             supports_read_device_id() const;
   virtual bool             supports_read_block_protection() const;
+  virtual bool             supports_read_num_slots() const;
+  virtual bool             supports_read_slot_size() const;
+  virtual bool             supports_switch_slot() const;
   
   virtual unsigned int     read_bytes(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes, task_controller* controller = nullptr);
   virtual unsigned int     program_bytes(chip_index chip, address_t start_address, const data_t* buffer, unsigned int num_bytes, bool bypass_mode, task_controller* controller = nullptr);
@@ -53,6 +56,9 @@ public:
   virtual unsigned int     read_manufacturer_id(chip_index chip);
   virtual unsigned int     read_device_id(chip_index chip);
   virtual bool             read_block_protection(chip_index chip, address_t block_address);
+  virtual unsigned int     read_num_slots();
+  virtual unsigned int     read_slot_size(unsigned int slot_num);
+  virtual bool             switch_slot(unsigned int slot_num);
 };
 
 #endif /* defined(__LINKMASTSA_DEVICE_H__) */
