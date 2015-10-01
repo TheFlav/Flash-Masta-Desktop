@@ -37,8 +37,9 @@ using namespace wsmsg;
 ws_linkmasta_device::ws_linkmasta_device(usb::usb_device* usb_device)
   : m_usb_device(usb_device),
     m_was_init(false), m_is_open(false), m_firmware_version_set(false),
-    m_firmware_major_version(0), m_firmware_minor_version(0),
-    m_static_num_slots(false), m_static_slot_sizes(false)
+    m_slot_info_set(false), m_firmware_major_version(0),
+    m_firmware_minor_version(0), m_static_num_slots(false),
+    m_static_slot_sizes(false)
 {
   // Nothing else to do
 }
@@ -381,6 +382,8 @@ unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_ad
 
 unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes, bool bypass_mode, task_controller* controller)
 {
+  (void) bypass_mode;
+  
   if (!m_was_init || !m_is_open)
   {
     throw std::runtime_error("ERROR");
@@ -579,6 +582,11 @@ unsigned int ws_linkmasta_device::read_num_slots()
     throw std::runtime_error("ERROR");
   }
   
+  if (!m_slot_info_set)
+  {
+    fetch_slot_info();
+  }
+  
   if (m_static_num_slots)
   {
     return m_num_slots;
@@ -592,10 +600,17 @@ unsigned int ws_linkmasta_device::read_num_slots()
 
 unsigned int ws_linkmasta_device::read_slot_size(unsigned int slot_num)
 {
+  (void) slot_num;
+  
   // Make sure object has been initialized at least
   if (!m_was_init || !m_is_open)
   {
     throw std::runtime_error("ERROR");
+  }
+  
+  if (!m_slot_info_set)
+  {
+    fetch_slot_info();
   }
   
   if (m_static_slot_sizes)

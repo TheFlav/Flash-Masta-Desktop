@@ -57,6 +57,7 @@ private:
   bool             m_was_init;
   bool             m_is_open;
   bool             m_firmware_version_set;
+  bool             m_slot_info_set;
   
   // Cached values
   unsigned int     m_firmware_major_version;
