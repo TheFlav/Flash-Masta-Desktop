@@ -16,7 +16,7 @@ class ws_rom_chip
 {
 public:
   typedef unsigned char   data_t;
-  typedef unsigned short  word_t;
+  typedef unsigned char   word_t;
   typedef unsigned int    chip_index_t;
   typedef unsigned int    manufact_id_t;
   typedef unsigned int    device_id_t;
