@@ -1,10 +1,14 @@
-//
-//  ws_cartridge.h
-//  FlashMasta
-//
-//  Created by Dan on 8/17/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing the declaration of the \ref ws_cartridge class.
+ *  
+ *  File containing the header information and declaration of the
+ *  \ref ws_cartridge class. This file includes the minimal number of files
+ *  necessary to use any instance of the \ref ws_cartridge class.
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-07-28
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #ifndef __WS_CARTRIDGE_H__
 #define __WS_CARTRIDGE_H__
@@ -16,11 +20,24 @@ class linkmasta_device;
 class ws_rom_chip;
 class ws_sram_chip;
 
+/*! \class ws_cartridge
+ *  \brief Class representing a WonderSwan game cartridge.
+ *  
+ *  Class representing a WonderSwan game cartridge. Stores information relevant
+ *  to cartridge storage and hardware information, such as the number of onboard
+ *  chips and exactly how the chips are divided into blocks. Implements
+ *  functions for performing high-level operations on a cartridge.
+ *  
+ *  This class does not support copying or the copy assignment operator (=).
+ *  
+ *  This class is *not* thread-safe. Use caution when working in a multithreaded
+ *  environment.
+ */
 class ws_cartridge: public cartridge
 {
 public:
-  /* constructor */     ws_cartridge(linkmasta_device* linkmasta);
-  /* destructor  */     ~ws_cartridge();
+                        ws_cartridge(linkmasta_device* linkmasta);
+                        ~ws_cartridge();
   
   system_type           system() const;
   const cartridge_descriptor* descriptor() const;
