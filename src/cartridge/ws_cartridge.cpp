@@ -1180,12 +1180,10 @@ std::string ws_cartridge::fetch_game_name(int slot)
   
   // Get developer ID
   ws_rom_chip::word_t w = m_rom_chip->read(foot_addr);
-  w >>= 8;
   unsigned char developer_id = (unsigned char) w;
   
   // Get game ID
   w = m_rom_chip->read(foot_addr + 0x00000002);
-  w >>= 8;
   unsigned char game_id = (unsigned char) w;
   
   m_linkmasta->close();
