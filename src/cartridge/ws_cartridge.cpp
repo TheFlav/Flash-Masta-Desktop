@@ -1241,7 +1241,6 @@ void ws_cartridge::build_chip_descriptor(unsigned int chip_i)
   
   ws_rom_chip::manufact_id_t manufacturer = chip->get_manufacturer_id();
   ws_rom_chip::device_id_t   device_id    = chip->get_device_id();
-  ws_rom_chip::device_id_t   size_id      = chip->get_size_id();
   
   // Confirm that chip exists
   if (manufacturer == 0x90 && device_id == 0x90)
@@ -1250,29 +1249,9 @@ void ws_cartridge::build_chip_descriptor(unsigned int chip_i)
     return;
   }
   
-  // Determine size of chip based on some size number
-  switch (size_id)
-  {
-    case 0x2228:  // 1 Gib (2^30 bits) = 128 MiB (2^27 bytes)
-      num_bytes = 0x8000000;
-      break;
-      
-    case 0x2223:  // 512 Mib (2^29 bits) = 64 MiB (2^26 bytes)
-      num_bytes = 0x4000000;
-      break;
-      
-    case 0x2222:  // 256 Mib (2^28 bits) = 32 MiB (2^25 bytes)
-      num_bytes = 0x2000000;
-      break;
-      
-    case 0x2221:  // 128 MiB (2^27 bits) = 16 MiB (2^24 bytes)
-      num_bytes = 0x1000000;
-      break;
-      
-    default:    // Unknown chip? Too bad. No bytes 4 u
-      num_bytes = 0x00;
-      break;
-  }
+  // At the time of this code writing, cartridges contain a single chip
+  // with a constant size and block size.
+  num_bytes = 0x10000000;
   
   // Calculate number of blocks. (1 block per 64 Kib (8 KiB))
   num_blocks = num_bytes / DEFAULT_BLOCK_SIZE;

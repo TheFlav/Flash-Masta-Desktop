@@ -131,34 +131,6 @@ device_id_t ws_rom_chip::get_device_id()
   }
 }
 
-device_id_t ws_rom_chip::get_size_id()
-{
-  if (is_erasing())
-  {
-    // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  
-  if (m_linkmasta->supports_read_device_id())
-  {
-    if (current_mode() != READ)
-    {
-      reset();
-    }
-    
-    return m_linkmasta->read_device_id(m_chip_num);
-  }
-  else
-  {
-    if (current_mode() != AUTOSELECT)
-    {
-      enter_autoselect();
-    }
-    
-    return read(0x001C);
-  }
-}
-
 protect_t ws_rom_chip::get_block_protection(address_t sector_address)
 {
   (void) sector_address;
