@@ -44,6 +44,21 @@ bool linkmasta_device::supports_read_block_protection() const
   return false;
 }
 
+bool linkmasta_device::supports_read_num_slots() const
+{
+  return false;
+}
+
+bool linkmasta_device::supports_read_slot_size() const
+{
+  return false;
+}
+
+bool linkmasta_device::supports_switch_slot() const
+{
+  return false;
+}
+
 
 
 unsigned int linkmasta_device::read_bytes(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes, task_controller* controller)
@@ -96,6 +111,23 @@ bool linkmasta_device::read_block_protection(chip_index chip, address_t block_ad
 {
   (void) chip;
   (void) block_address;
+  throw std::runtime_error("ERROR: NOT SUPPORTED"); // TODO
+}
+
+unsigned int linkmasta_device::read_num_slots()
+{
+  throw std::runtime_error("ERROR: NOT SUPPORTED"); // TODO
+}
+
+unsigned int linkmasta_device::read_slot_size(unsigned int slot_num)
+{
+  (void) slot_num;
+  throw std::runtime_error("ERROR: NOT SUPPORTED"); // TODO
+}
+
+bool linkmasta_device::switch_slot(unsigned int slot_num)
+{
+  (void) slot_num;
   throw std::runtime_error("ERROR: NOT SUPPORTED"); // TODO
 }
 

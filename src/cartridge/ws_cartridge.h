@@ -10,6 +10,7 @@
 #define __WS_CARTRIDGE_H__
 
 #include "cartridge.h"
+#include <vector>
 
 class linkmasta_device;
 class ws_rom_chip;
@@ -40,6 +41,7 @@ protected:
   void                  build_cartridge_destriptor();
   void                  build_chip_descriptor(unsigned int chip_i);
   void                  build_block_descriptor(unsigned int chip_i, unsigned int block_i);
+  void                  build_slots_layout();
   
 private:  
   bool                  m_was_init;
@@ -48,6 +50,8 @@ private:
   cartridge_descriptor* m_descriptor;
   ws_rom_chip*          m_rom_chip;
   ws_sram_chip*         m_sram_chip;
+  
+  std::vector<unsigned int> m_slots;
 };
 
 #endif /* defined(__WS_CARTRIDGE_H__) */

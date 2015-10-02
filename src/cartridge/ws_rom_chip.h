@@ -16,7 +16,7 @@ class ws_rom_chip
 {
 public:
   typedef unsigned char   data_t;
-  typedef unsigned short  word_t;
+  typedef unsigned char   word_t;
   typedef unsigned int    chip_index_t;
   typedef unsigned int    manufact_id_t;
   typedef unsigned int    device_id_t;
@@ -39,7 +39,6 @@ public:
   void                    reset();
   manufact_id_t           get_manufacturer_id();
   device_id_t             get_device_id();
-  device_id_t             get_size_id();
   protect_t               get_block_protection(address_t sector_address);
   void                    program_word(address_t address, word_t data);
   void                    unlock_bypass();

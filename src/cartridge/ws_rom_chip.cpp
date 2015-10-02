@@ -16,9 +16,9 @@
 #define CHIP_INDEX    0
 
 #define ADDR_DONTCARE 0x00000000
-#define ADDR_COMMAND1 0x00002AAA
-#define ADDR_COMMAND2 0x00005555
-#define ADDR_COMMAND3 0x00002AAA
+#define ADDR_COMMAND1 0x00000AAA
+#define ADDR_COMMAND2 0x00000555
+#define ADDR_COMMAND3 0x00000AAA
 
 #define MASK_SECTOR   0xFFFE0000
 
@@ -48,7 +48,7 @@ ws_rom_chip::~ws_rom_chip()
 
 word_t ws_rom_chip::read(address_t address)
 {
-  return m_linkmasta->read_word(m_chip_num, address);
+  return (word_t) m_linkmasta->read_word(m_chip_num, address);
 }
 
 void ws_rom_chip::write(address_t address, word_t data)
@@ -131,34 +131,6 @@ device_id_t ws_rom_chip::get_device_id()
   }
 }
 
-device_id_t ws_rom_chip::get_size_id()
-{
-  if (is_erasing())
-  {
-    // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  
-  if (m_linkmasta->supports_read_device_id())
-  {
-    if (current_mode() != READ)
-    {
-      reset();
-    }
-    
-    return m_linkmasta->read_device_id(m_chip_num);
-  }
-  else
-  {
-    if (current_mode() != AUTOSELECT)
-    {
-      enter_autoselect();
-    }
-    
-    return read(0x001C);
-  }
-}
-
 protect_t ws_rom_chip::get_block_protection(address_t sector_address)
 {
   (void) sector_address;
@@ -233,6 +205,7 @@ void ws_rom_chip::erase_block(address_t block_address)
     reset();
   }
   
+  block_address &= MASK_SECTOR;
   m_last_erased_addr = block_address;
   
   if (m_linkmasta->supports_erase_chip())
@@ -247,7 +220,7 @@ void ws_rom_chip::erase_block(address_t block_address)
     write(ADDR_COMMAND3, 0x80);
     write(ADDR_COMMAND1, 0xAA);
     write(ADDR_COMMAND2, 0x55);
-    write((block_address & MASK_SECTOR), 0x30);
+    write(m_last_erased_addr, 0x30);
   }
   
   m_mode = ERASE;
@@ -272,9 +245,18 @@ bool ws_rom_chip::test_erasing()
     return false;
   }
   
+  // Send BLANK CHECK SETUP command sequence
+  write(ADDR_COMMAND1, 0xAA);
+  write(ADDR_COMMAND2, 0x55);
+  write(m_last_erased_addr, 0xEB);
+  write(m_last_erased_addr, 0x76);
+  write(m_last_erased_addr, 0x00);
+  write(m_last_erased_addr, 0x00);
+  write(m_last_erased_addr, 0x29);
+  
   unsigned char result = read(m_last_erased_addr);
   
-  m_mode = (result == 0xFF ? READ : ERASE);
+  m_mode = (result == 0 ? ERASE : READ);
   
   return is_erasing();
 }
