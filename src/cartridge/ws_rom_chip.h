@@ -27,6 +27,7 @@ public:
   {
     READ,
     AUTOSELECT,
+    BYPASS,
     ERASE
   };
   
@@ -58,6 +59,7 @@ private:
   
   chip_mode               m_mode;
   address_t               m_last_erased_addr;
+  bool                    m_supports_bypass;
   
   linkmasta_device* const m_linkmasta;
   chip_index_t const      m_chip_num;
