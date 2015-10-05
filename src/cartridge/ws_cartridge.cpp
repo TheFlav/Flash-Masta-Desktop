@@ -82,6 +82,439 @@ void ws_cartridge::init()
   m_was_init = true;
 }
 
+void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task_controller* controller)
+{
+  // Wonderswan games are stored in the upper addresses of a chip. That means
+  // game metadata is stored at the very top (highest addresses) and the rest
+  // of the game is just below that. Games may not necessarily occupy the whole
+  // chip, just the upper addresses.
+  // 
+  // This procedure reads the size of the ROM from the top of the slot and only
+  // backs up only the relevant data.
+  
+  // Ensure class was intiialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  m_linkmasta->open();
+  
+  // Validate arguments
+  if ((slot < 0 || slot >= m_slots.size()) && slot != SLOT_ALL)
+  {
+    throw std::invalid_argument("invalid slot number: " + std::to_string(slot));
+  }
+  else if (slot != SLOT_ALL)
+  {
+    if (!m_linkmasta->switch_slot((unsigned int) slot))
+    {
+      throw std::runtime_error("ERROR"); // TODO
+    }
+  }
+  unsigned int slot_size = (slot == SLOT_ALL ? descriptor()->num_bytes : m_linkmasta->read_slot_size(slot));
+  
+  // Determine the total number of bytes to write
+  unsigned int bytes_written = 0;
+  unsigned int bytes_total = 0;
+  switch (m_linkmasta->read_word(0, slot_size - 0x0004))
+  {
+    case 0x0002:
+      bytes_total = 0x80000; // 4Mbit (512KB)
+      break;
+      
+    case 0x0003:
+      bytes_total = 0x100000; // 8Mbit (1MB)
+      break;
+      
+    case 0x0004:
+      bytes_total = 0x200000; // 16Mbit (2MB)
+      break;
+      
+    case 0x0006:
+      bytes_total = 0x400000; // 32Mbit (4MB)
+      break;
+      
+    case 0x0008:
+      bytes_total = 0x800000; // 64Mbit (8MB)
+      break;
+      
+    case 0x0009:
+      bytes_total = 0x1000000; // 128Mbit (16MB)
+      break;
+      
+    default:
+      bytes_total = slot_size;
+      break;
+  }
+  
+  // Initialize markers
+  unsigned int curr_chip = 0;
+  unsigned int curr_offset = slot_size - bytes_total;
+  unsigned int curr_block = 0;
+  
+  unsigned int slot_offset = 0;
+  for (unsigned int i = 0; i < slot; ++i)
+  {
+    slot_offset += m_linkmasta->read_slot_size(i);
+  }
+  for (unsigned int i = 0; i < descriptor()->chips[0]->num_blocks; ++i)
+  {
+    if (descriptor()->chips[0]->blocks[i]->base_address <= slot_offset
+        && descriptor()->chips[0]->blocks[i]->base_address
+        + descriptor()->chips[0]->blocks[i]->num_bytes > slot_offset)
+    {
+      curr_block = i;
+      break;
+    }
+  }
+  
+  m_linkmasta->close();
+  
+  // Allocate a buffer with max size of a block
+  const unsigned int BUFFER_MAX_SIZE = DEFAULT_BLOCK_SIZE;
+  unsigned int       buffer_size = 0;
+  unsigned char*     buffer = new unsigned char[BUFFER_MAX_SIZE];
+  
+  // Inform controller that task is starting
+  if (controller != nullptr)
+  {
+    controller->on_task_start(bytes_total);
+  }
+  
+  // Begin writing data block-by-block
+  try
+  {
+    // Open connection to NGP chip
+    m_linkmasta->open();
+    
+    while (bytes_written < bytes_total && curr_chip < descriptor()->num_chips && (controller == nullptr || !controller->is_task_cancelled()))
+    {
+#ifdef VERBOSE
+      std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
+#endif
+      
+      // Convenience variables
+      cartridge_descriptor::chip_descriptor* chip;
+      cartridge_descriptor::chip_descriptor::block_descriptor* block;
+      chip = descriptor()->chips[curr_chip];
+      block = chip->blocks[curr_block];
+      
+      // Calcualte number of expected bytes
+      unsigned int bytes_expected = block->num_bytes - (slot_offset + curr_offset - block->base_address);
+      if (bytes_expected > bytes_total - bytes_written)
+      {
+        bytes_expected = bytes_total - bytes_written;
+      }
+      
+      // Attempt to read bytes from cartridge
+      if (controller == nullptr)
+      {
+        buffer_size = m_rom_chip->read_bytes(curr_offset, buffer, bytes_expected);
+      }
+      else
+      {
+        // Create a forwarding controller to pass progress updates to
+        forwarding_task_controller fwd_controller(controller);
+        fwd_controller.scale_work_to(bytes_expected);
+        try
+        {
+          buffer_size = m_rom_chip->read_bytes(curr_offset, buffer, bytes_expected, &fwd_controller);
+        }
+        catch (std::exception& ex)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+          throw;
+        }
+      }
+      
+      // Check for errors
+      if (buffer_size != bytes_expected)
+      {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
+        throw std::runtime_error("ERROR");
+      }
+      if (!fout.good())
+      {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
+        throw std::runtime_error("ERROR");
+      }
+      
+      // Write buffer to file
+      fout.write((char*) buffer, buffer_size);
+      
+      // Update markers
+      bytes_written += buffer_size;
+      curr_offset += buffer_size;
+      curr_block++;
+      if (curr_block >= chip->num_blocks)
+      {
+        curr_block = 0;
+        curr_chip++;
+      }
+    }
+    
+    // Clean up before returning
+    m_linkmasta->close();
+  }
+  catch (std::exception& ex)
+  {
+    // Error occured! Clean up and pass error on to caller
+    try {
+      // Spinlock while the chip finishes erasing (if it was erasing)
+      while (m_rom_chip->is_erasing());
+    } catch (std::exception& ex2) {
+      // Well... this is awkward
+    }
+    
+    try {
+      // Attempt to reset the chip
+      m_rom_chip->reset();
+    } catch (std::exception& ex2) {
+      // Well... this is awkward
+    }
+    
+    try {
+      m_linkmasta->close();
+    } catch (std::exception& ex2) {
+      // Well... this is awkward
+    }
+    
+    // Inform controller of task end
+    if (controller != nullptr)
+    {
+      controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+    }
+    delete [] buffer;
+    throw;
+  }
+  
+  // Inform controller of task end
+  if (controller != nullptr)
+  {
+    controller->on_task_end(controller->is_task_cancelled() && bytes_written < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_written);
+  }
+  delete [] buffer;
+}
+
+void ws_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task_controller* controller)
+{
+  // Due to how WonderSwan games are read and stored on a cart, the game's meta
+  // data is stored in the upper addresses. Because of how cartridges are made,
+  // a WonderSwan can read from 0xFFFFFFFF and never be wrong because if the
+  // chip is too small, the upper lines will simply not be connected, meaning
+  // the device can consistently access the upper addresses of the cartridge.
+  //
+  // This procedure will write to the upper addresses only and ignore any
+  // lower addresses. This will work as long as the game uses only relative
+  // addressing and never absolute addressing. Or, if it does use absolute
+  // addressing, will always have the higher bits set to 1.
+  
+  // Ensure class was intiialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  m_linkmasta->open();
+  
+  // Validate arguments
+  if ((slot < 0 || slot >= m_slots.size()) && slot != SLOT_ALL)
+  {
+    throw std::invalid_argument("invalid slot number: " + std::to_string(slot));
+  }
+  else if (slot != SLOT_ALL)
+  {
+    m_linkmasta->switch_slot((unsigned int) slot);
+  }
+  
+  // Determine the total number of bytes to write
+  fin.seekg(0, fin.end);
+  unsigned int bytes_written = 0;
+  unsigned int bytes_total = (unsigned int) fin.tellg();
+  fin.seekg(0, fin.beg);
+  
+  // Ensure file will fit
+  unsigned int slot_size = (slot == SLOT_ALL ? descriptor()->num_bytes : m_linkmasta->read_slot_size(slot));
+  if (bytes_total > slot_size)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  // Initialize markers
+  unsigned int curr_chip = 0;
+  unsigned int curr_offset = slot_size - bytes_total;
+  unsigned int curr_block = 0;
+  
+  // Search for starting block, since it's not clear exactly where it will be
+  unsigned int slot_offset = 0;
+  for (unsigned int i = 0; i < slot; ++i)
+  {
+    slot_offset += m_linkmasta->read_slot_size(i);
+  }
+  for (unsigned int i = 0; i < descriptor()->chips[0]->num_blocks; ++i)
+  {
+    if (descriptor()->chips[0]->blocks[i]->base_address <= slot_offset
+        && descriptor()->chips[0]->blocks[i]->base_address
+        + descriptor()->chips[0]->blocks[i]->num_bytes > slot_offset)
+    {
+      curr_block = i;
+      break;
+    }
+  }
+  
+  m_linkmasta->close();
+  
+  // Allocate a buffer with max size of a block
+  const unsigned int BUFFER_MAX_SIZE = DEFAULT_BLOCK_SIZE;
+  unsigned int       buffer_size = 0;
+  unsigned char*     buffer = new unsigned char[BUFFER_MAX_SIZE];
+  
+  // Inform controller that task is starting
+  if (controller != nullptr)
+  {
+    controller->on_task_start(bytes_total);
+  }
+  
+  // Begin writing data block-by-block
+  try
+  {
+    // Open connection to NGP chip
+    m_linkmasta->open();
+    
+    while (bytes_written < bytes_total && (controller == nullptr || !controller->is_task_cancelled()))
+    {
+#ifdef VERBOSE
+      std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
+#endif
+      
+      // Convenience variables
+      cartridge_descriptor::chip_descriptor* chip;
+      cartridge_descriptor::chip_descriptor::block_descriptor* block;
+      chip = descriptor()->chips[curr_chip];
+      block = chip->blocks[curr_block];
+      
+      // Calcualte number of expected bytes
+      unsigned bytes_expected = block->num_bytes - (curr_offset + slot_offset - block->base_address);
+      if (bytes_expected > bytes_total - bytes_written)
+      {
+        bytes_expected = bytes_total - bytes_written;
+      }
+      
+      // Attempt to read bytes from file
+      fin.read((char*) buffer, bytes_expected);
+      buffer_size = ((unsigned int) fin.tellg()) - bytes_written;
+      
+      // Check for errors
+      if (buffer_size != bytes_expected)
+      {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
+        throw std::runtime_error("ERROR");
+      }
+      if (!fin.good() && (buffer_size + bytes_written) < bytes_total)
+      {
+        if (controller != nullptr)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+        }
+        throw std::runtime_error("ERROR");
+      }
+      
+      // Erase block from cartridge
+      m_rom_chip->erase_block(block->base_address);
+      
+      // Wait for erasure to complete
+      while (m_rom_chip->test_erasing())
+      {
+        // Give UI an opportunity to update
+        if (controller != nullptr)
+        {
+          controller->on_task_update(task_status::RUNNING, 0);
+        }
+      }
+      
+      // Write buffer to cartridge
+      if (controller == nullptr)
+      {
+        m_rom_chip->program_bytes(curr_offset, buffer, buffer_size);
+      }
+      else
+      {
+        forwarding_task_controller fwd_controller(controller);
+        fwd_controller.scale_work_to(buffer_size);
+        try
+        {
+          m_rom_chip->program_bytes(curr_offset, buffer, buffer_size, &fwd_controller);
+        }
+        catch (std::exception& ex)
+        {
+          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+          throw;
+        }
+      }
+      
+      // Update markers
+      bytes_written += buffer_size;
+      curr_offset += buffer_size;
+      curr_block++;
+      if (curr_block >= chip->num_blocks)
+      {
+        curr_block = 0;
+        curr_chip++;
+      }
+    }
+    
+    // Clean up before returning
+    m_linkmasta->close();
+  }
+  catch (std::exception& ex)
+  {
+    // Error occured! Clean up and pass error on to caller
+    try {
+      // Spinlock while the chip finishes erasing (if it was erasing)
+      while (m_rom_chip->is_erasing());
+    } catch (exception ex2) {
+      // Well... this is awkward
+    }
+    
+    try {
+      // Attempt to reset the chip
+      m_rom_chip->reset();
+    } catch (exception ex2) {
+      // Well... this is awkward
+    }
+    
+    try {
+      m_linkmasta->close();
+    } catch (exception ex2) {
+      // Well... this is awkward
+    }
+    
+    if (controller != nullptr)
+    {
+      controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
+    }
+    delete [] buffer;
+    throw;
+  }
+  
+  // Inform controller that task has ended
+  if (controller != nullptr)
+  {
+    controller->on_task_end(controller->is_task_cancelled() && bytes_written < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_written);
+  }
+  delete [] buffer;
+}
+
 bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, task_controller* controller)
 {
   // WonderSwan games store their metadata at the top of the chip on which they
@@ -303,439 +736,6 @@ bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, task
   delete [] f_buffer;
   delete [] c_buffer;
   return matched;
-}
-
-void ws_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task_controller* controller)
-{
-  // Due to how WonderSwan games are read and stored on a cart, the game's meta
-  // data is stored in the upper addresses. Because of how cartridges are made,
-  // a WonderSwan can read from 0xFFFFFFFF and never be wrong because if the
-  // chip is too small, the upper lines will simply not be connected, meaning
-  // the device can consistently access the upper addresses of the cartridge.
-  //
-  // This procedure will write to the upper addresses only and ignore any
-  // lower addresses. This will work as long as the game uses only relative
-  // addressing and never absolute addressing. Or, if it does use absolute
-  // addressing, will always have the higher bits set to 1.
-  
-  // Ensure class was intiialized
-  if (!m_was_init)
-  {
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  
-  m_linkmasta->open();
-  
-  // Validate arguments
-  if ((slot < 0 || slot >= m_slots.size()) && slot != SLOT_ALL)
-  {
-    throw std::invalid_argument("invalid slot number: " + std::to_string(slot));
-  }
-  else if (slot != SLOT_ALL)
-  {
-    m_linkmasta->switch_slot((unsigned int) slot);
-  }
-  
-  // Determine the total number of bytes to write
-  fin.seekg(0, fin.end);
-  unsigned int bytes_written = 0;
-  unsigned int bytes_total = (unsigned int) fin.tellg();
-  fin.seekg(0, fin.beg);
-  
-  // Ensure file will fit
-  unsigned int slot_size = (slot == SLOT_ALL ? descriptor()->num_bytes : m_linkmasta->read_slot_size(slot));
-  if (bytes_total > slot_size)
-  {
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  
-  // Initialize markers
-  unsigned int curr_chip = 0;
-  unsigned int curr_offset = slot_size - bytes_total;
-  unsigned int curr_block = 0;
-  
-  // Search for starting block, since it's not clear exactly where it will be
-  unsigned int slot_offset = 0;
-  for (unsigned int i = 0; i < slot; ++i)
-  {
-    slot_offset += m_linkmasta->read_slot_size(i);
-  }
-  for (unsigned int i = 0; i < descriptor()->chips[0]->num_blocks; ++i)
-  {
-    if (descriptor()->chips[0]->blocks[i]->base_address <= slot_offset
-        && descriptor()->chips[0]->blocks[i]->base_address
-        + descriptor()->chips[0]->blocks[i]->num_bytes > slot_offset)
-    {
-      curr_block = i;
-      break;
-    }
-  }
-  
-  m_linkmasta->close();
-  
-  // Allocate a buffer with max size of a block
-  const unsigned int BUFFER_MAX_SIZE = DEFAULT_BLOCK_SIZE;
-  unsigned int       buffer_size = 0;
-  unsigned char*     buffer = new unsigned char[BUFFER_MAX_SIZE];
-  
-  // Inform controller that task is starting
-  if (controller != nullptr)
-  {
-    controller->on_task_start(bytes_total);
-  }
-  
-  // Begin writing data block-by-block
-  try
-  {
-    // Open connection to NGP chip
-    m_linkmasta->open();
-    
-    while (bytes_written < bytes_total && (controller == nullptr || !controller->is_task_cancelled()))
-    {
-#ifdef VERBOSE
-      std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
-#endif
-      
-      // Convenience variables
-      cartridge_descriptor::chip_descriptor* chip;
-      cartridge_descriptor::chip_descriptor::block_descriptor* block;
-      chip = descriptor()->chips[curr_chip];
-      block = chip->blocks[curr_block];
-      
-      // Calcualte number of expected bytes
-      unsigned bytes_expected = block->num_bytes - (curr_offset + slot_offset - block->base_address);
-      if (bytes_expected > bytes_total - bytes_written)
-      {
-        bytes_expected = bytes_total - bytes_written;
-      }
-      
-      // Attempt to read bytes from file
-      fin.read((char*) buffer, bytes_expected);
-      buffer_size = ((unsigned int) fin.tellg()) - bytes_written;
-      
-      // Check for errors
-      if (buffer_size != bytes_expected)
-      {
-        if (controller != nullptr)
-        {
-          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-        }
-        throw std::runtime_error("ERROR");
-      }
-      if (!fin.good() && (buffer_size + bytes_written) < bytes_total)
-      {
-        if (controller != nullptr)
-        {
-          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-        }
-        throw std::runtime_error("ERROR");
-      }
-      
-      // Erase block from cartridge
-      m_rom_chip->erase_block(block->base_address);
-      
-      // Wait for erasure to complete
-      while (m_rom_chip->test_erasing())
-      {
-        // Give UI an opportunity to update
-        if (controller != nullptr)
-        {
-          controller->on_task_update(task_status::RUNNING, 0);
-        }
-      }
-      
-      // Write buffer to cartridge
-      if (controller == nullptr)
-      {
-        m_rom_chip->program_bytes(curr_offset, buffer, buffer_size);
-      }
-      else
-      {
-        forwarding_task_controller fwd_controller(controller);
-        fwd_controller.scale_work_to(buffer_size);
-        try
-        {
-          m_rom_chip->program_bytes(curr_offset, buffer, buffer_size, &fwd_controller);
-        }
-        catch (std::exception& ex)
-        {
-          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-          throw;
-        }
-      }
-      
-      // Update markers
-      bytes_written += buffer_size;
-      curr_offset += buffer_size;
-      curr_block++;
-      if (curr_block >= chip->num_blocks)
-      {
-        curr_block = 0;
-        curr_chip++;
-      }
-    }
-    
-    // Clean up before returning
-    m_linkmasta->close();
-  }
-  catch (std::exception& ex)
-  {
-    // Error occured! Clean up and pass error on to caller
-    try {
-      // Spinlock while the chip finishes erasing (if it was erasing)
-      while (m_rom_chip->is_erasing());
-    } catch (exception ex2) {
-      // Well... this is awkward
-    }
-    
-    try {
-      // Attempt to reset the chip
-      m_rom_chip->reset();
-    } catch (exception ex2) {
-      // Well... this is awkward
-    }
-    
-    try {
-      m_linkmasta->close();
-    } catch (exception ex2) {
-      // Well... this is awkward
-    }
-    
-    if (controller != nullptr)
-    {
-      controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-    }
-    delete [] buffer;
-    throw;
-  }
-  
-  // Inform controller that task has ended
-  if (controller != nullptr)
-  {
-    controller->on_task_end(controller->is_task_cancelled() && bytes_written < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_written);
-  }
-  delete [] buffer;
-}
-
-void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task_controller* controller)
-{
-  // Wonderswan games are stored in the upper addresses of a chip. That means
-  // game metadata is stored at the very top (highest addresses) and the rest
-  // of the game is just below that. Games may not necessarily occupy the whole
-  // chip, just the upper addresses.
-  // 
-  // This procedure reads the size of the ROM from the top of the slot and only
-  // backs up only the relevant data.
-  
-  // Ensure class was intiialized
-  if (!m_was_init)
-  {
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  
-  m_linkmasta->open();
-  
-  // Validate arguments
-  if ((slot < 0 || slot >= m_slots.size()) && slot != SLOT_ALL)
-  {
-    throw std::invalid_argument("invalid slot number: " + std::to_string(slot));
-  }
-  else if (slot != SLOT_ALL)
-  {
-    if (!m_linkmasta->switch_slot((unsigned int) slot))
-    {
-      throw std::runtime_error("ERROR"); // TODO
-    }
-  }
-  unsigned int slot_size = (slot == SLOT_ALL ? descriptor()->num_bytes : m_linkmasta->read_slot_size(slot));
-  
-  // Determine the total number of bytes to write
-  unsigned int bytes_written = 0;
-  unsigned int bytes_total = 0;
-  switch (m_linkmasta->read_word(0, slot_size - 0x0004))
-  {
-  case 0x0002:
-    bytes_total = 0x80000; // 4Mbit (512KB)
-    break;
-    
-  case 0x0003:
-    bytes_total = 0x100000; // 8Mbit (1MB)
-    break;
-    
-  case 0x0004:
-    bytes_total = 0x200000; // 16Mbit (2MB)
-    break;
-    
-  case 0x0006:
-    bytes_total = 0x400000; // 32Mbit (4MB)
-    break;
-    
-  case 0x0008:
-    bytes_total = 0x800000; // 64Mbit (8MB)
-    break;
-    
-  case 0x0009:
-    bytes_total = 0x1000000; // 128Mbit (16MB)
-    break;
-    
-  default:
-    bytes_total = slot_size;
-    break;
-  }
-  
-  // Initialize markers
-  unsigned int curr_chip = 0;
-  unsigned int curr_offset = slot_size - bytes_total;
-  unsigned int curr_block = 0;
-  
-  unsigned int slot_offset = 0;
-  for (unsigned int i = 0; i < slot; ++i)
-  {
-    slot_offset += m_linkmasta->read_slot_size(i);
-  }
-  for (unsigned int i = 0; i < descriptor()->chips[0]->num_blocks; ++i)
-  {
-    if (descriptor()->chips[0]->blocks[i]->base_address <= slot_offset
-        && descriptor()->chips[0]->blocks[i]->base_address
-          + descriptor()->chips[0]->blocks[i]->num_bytes > slot_offset)
-    {
-      curr_block = i;
-      break;
-    }
-  }
-  
-  m_linkmasta->close();
-  
-  // Allocate a buffer with max size of a block
-  const unsigned int BUFFER_MAX_SIZE = DEFAULT_BLOCK_SIZE;
-  unsigned int       buffer_size = 0;
-  unsigned char*     buffer = new unsigned char[BUFFER_MAX_SIZE];
-  
-  // Inform controller that task is starting
-  if (controller != nullptr)
-  {
-    controller->on_task_start(bytes_total);
-  }
-  
-  // Begin writing data block-by-block
-  try
-  {
-    // Open connection to NGP chip
-    m_linkmasta->open();
-    
-    while (bytes_written < bytes_total && curr_chip < descriptor()->num_chips && (controller == nullptr || !controller->is_task_cancelled()))
-    {
-#ifdef VERBOSE
-      std::cout << "(chip " << curr_chip << ", block " << curr_block << ") " << bytes_written << " B / " << bytes_total << " B (" << (bytes_written * 100 / bytes_total) << "%)" << endl;
-#endif
-      
-      // Convenience variables
-      cartridge_descriptor::chip_descriptor* chip;
-      cartridge_descriptor::chip_descriptor::block_descriptor* block;
-      chip = descriptor()->chips[curr_chip];
-      block = chip->blocks[curr_block];
-      
-      // Calcualte number of expected bytes
-      unsigned int bytes_expected = block->num_bytes - (slot_offset + curr_offset - block->base_address);
-      if (bytes_expected > bytes_total - bytes_written)
-      {
-        bytes_expected = bytes_total - bytes_written;
-      }
-      
-      // Attempt to read bytes from cartridge
-      if (controller == nullptr)
-      {
-        buffer_size = m_rom_chip->read_bytes(curr_offset, buffer, bytes_expected);
-      }
-      else
-      {
-        // Create a forwarding controller to pass progress updates to
-        forwarding_task_controller fwd_controller(controller);
-        fwd_controller.scale_work_to(bytes_expected);
-        try
-        {
-          buffer_size = m_rom_chip->read_bytes(curr_offset, buffer, bytes_expected, &fwd_controller);
-        }
-        catch (std::exception& ex)
-        {
-          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-          throw;
-        }
-      }
-      
-      // Check for errors
-      if (buffer_size != bytes_expected)
-      {
-        if (controller != nullptr)
-        {
-          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-        }
-        throw std::runtime_error("ERROR");
-      }
-      if (!fout.good())
-      {
-        if (controller != nullptr)
-        {
-          controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-        }
-        throw std::runtime_error("ERROR");
-      }
-      
-      // Write buffer to file
-      fout.write((char*) buffer, buffer_size);
-      
-      // Update markers
-      bytes_written += buffer_size;
-      curr_offset += buffer_size;
-      curr_block++;
-      if (curr_block >= chip->num_blocks)
-      {
-        curr_block = 0;
-        curr_chip++;
-      }
-    }
-    
-    // Clean up before returning
-    m_linkmasta->close();
-  }
-  catch (std::exception& ex)
-  {
-    // Error occured! Clean up and pass error on to caller
-    try {
-      // Spinlock while the chip finishes erasing (if it was erasing)
-      while (m_rom_chip->is_erasing());
-    } catch (std::exception& ex2) {
-      // Well... this is awkward
-    }
-    
-    try {
-      // Attempt to reset the chip
-      m_rom_chip->reset();
-    } catch (std::exception& ex2) {
-      // Well... this is awkward
-    }
-    
-    try {
-      m_linkmasta->close();
-    } catch (std::exception& ex2) {
-      // Well... this is awkward
-    }
-    
-    // Inform controller of task end
-    if (controller != nullptr)
-    {
-      controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
-    }
-    delete [] buffer;
-    throw;
-  }
-  
-  // Inform controller of task end
-  if (controller != nullptr)
-  {
-    controller->on_task_end(controller->is_task_cancelled() && bytes_written < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_written);
-  }
-  delete [] buffer;
 }
 
 void ws_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, task_controller* controller)

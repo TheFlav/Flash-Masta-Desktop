@@ -78,9 +78,9 @@ public:
   void                  init();
   
   /*!
-   *  \see cartridge::compare_cartridge_game_data(std::istream& fin, task_controller* controller = nullptr)
+   *  \see cartridge::backup_cartridge_game_data(std::ostream& fout, task_controller* controller = nullptr)
    */
-  bool                  compare_cartridge_game_data(std::istream& fin, int slot = SLOT_ALL, task_controller* controller = nullptr);
+  void                  backup_cartridge_game_data(std::ostream& fout, int slot = SLOT_ALL, task_controller* controller = nullptr);
   
   /*!
    *  \see cartridge::restore_cartridge_game_data(std::istream& fin, task_controller* controller = nullptr)
@@ -88,9 +88,9 @@ public:
   void                  restore_cartridge_game_data(std::istream& fin, int slot = SLOT_ALL, task_controller* controller = nullptr);
   
   /*!
-   *  \see cartridge::backup_cartridge_game_data(std::ostream& fout, task_controller* controller = nullptr)
+   *  \see cartridge::compare_cartridge_game_data(std::istream& fin, task_controller* controller = nullptr)
    */
-  void                  backup_cartridge_game_data(std::ostream& fout, int slot = SLOT_ALL, task_controller* controller = nullptr);
+  bool                  compare_cartridge_game_data(std::istream& fin, int slot = SLOT_ALL, task_controller* controller = nullptr);
   
   /*!
    *  \see cartridge::backup_cartridge_save_data(std::ostream& fout, task_controller* controller = nullptr)
