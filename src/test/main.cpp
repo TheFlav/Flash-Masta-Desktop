@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <iomanip>
 using namespace std;
 
 
@@ -54,6 +55,12 @@ bool run_tests(vector<tester*>& tests)
   
   for (tester* test : tests)
   {
+    string s = "running " + test->name() + " tests";
+    cout << endl;
+    cout << setw((int) s.size()) << setfill('-') << " " << setfill(' ') << "\n";
+    cout << s << endl;
+    cout << endl;
+    
     if (!test->prepare())
     {
       success = false;
@@ -62,14 +69,14 @@ bool run_tests(vector<tester*>& tests)
     
     test->pretests();
     
-    if (!test->run_tests())
+    if (!test->run_tests(cout, cin, cerr))
     {
       success = false;
     }
     
     test->posttests();
     
-    test->results();
+    test->results(cout);
   }
   
   return success;
@@ -83,3 +90,5 @@ void delete_tests(vector<tester*>& tests)
     delete test;
   }
 }
+
+

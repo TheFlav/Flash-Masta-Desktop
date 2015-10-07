@@ -27,10 +27,8 @@ public:
   
   bool prepare();
   void pretests();
-  bool run_tests();
   void posttests();
   void cleanup();
-  void results();
 
 private:
   std::istream& in;
@@ -45,9 +43,6 @@ private:
   libusb_context*       m_libusb;
   libusb_device*        m_device;
   libusb_device_handle* m_handle;
-  
-  int                   m_test_count[2] = {0};
-
 };
 
 #endif /* defined(__NGP_CARTRIDGE_TESTER_H__) */

@@ -351,9 +351,4 @@ void ngp_cartridge_tester::cleanup()
   libusb_exit(m_libusb);
 }
 
-void ngp_cartridge_tester::results()
-{
-  out << "Passed " << m_test_count[0] << " of " << (m_test_count[0] + m_test_count[1]) << endl << endl;
-}
-
 

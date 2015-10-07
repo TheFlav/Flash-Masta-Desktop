@@ -27,10 +27,8 @@ public:
   
   bool prepare();
   void pretests();
-  bool run_tests();
   void posttests();
   void cleanup();
-  void results();
 
 private:
   std::istream& in;
