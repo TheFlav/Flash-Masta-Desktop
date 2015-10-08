@@ -154,7 +154,7 @@ ws_linkmasta_tester::~ws_linkmasta_tester()
 
 bool ws_linkmasta_tester::prepare()
 {
-  out << "Beginning ws_linkmasta_tester test preparations" << endl;
+  out << "Beginning " << name() << " test preparations" << endl;
   
   // Initialize libusb
   out << "Initializing libusb..."; out.flush();
@@ -193,12 +193,12 @@ bool ws_linkmasta_tester::prepare()
 
 void ws_linkmasta_tester::pretests()
 {
-  out << "Beginning ws_linkmasta_tester tests" << endl;
+  out << "Beginning " << name() << " tests" << endl;
 }
 
 void ws_linkmasta_tester::posttests()
 {
-  out << "Concluded ws_linkmasta_tester tests" << endl;
+  out << "Concluded " << name() << " tests" << endl;
 }
 
 void ws_linkmasta_tester::cleanup()
