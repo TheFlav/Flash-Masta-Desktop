@@ -16,9 +16,9 @@
 #define CHIP_INDEX    0
 
 #define ADDR_DONTCARE 0x00000000
-#define ADDR_COMMAND1 0x00002AAA
-#define ADDR_COMMAND2 0x00005555
-#define ADDR_COMMAND3 0x00002AAA
+#define ADDR_COMMAND1 0x00000AAA
+#define ADDR_COMMAND2 0x00000555
+#define ADDR_COMMAND3 0x00000AAA
 
 #define MASK_SECTOR   0xFFFE0000
 
@@ -48,7 +48,7 @@ ws_rom_chip::~ws_rom_chip()
 
 word_t ws_rom_chip::read(address_t address)
 {
-  return m_linkmasta->read_word(m_chip_num, address);
+  return (word_t) m_linkmasta->read_word(m_chip_num, address);
 }
 
 void ws_rom_chip::write(address_t address, word_t data)
@@ -131,34 +131,6 @@ device_id_t ws_rom_chip::get_device_id()
   }
 }
 
-device_id_t ws_rom_chip::get_size_id()
-{
-  if (is_erasing())
-  {
-    // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
-  }
-  
-  if (m_linkmasta->supports_read_device_id())
-  {
-    if (current_mode() != READ)
-    {
-      reset();
-    }
-    
-    return m_linkmasta->read_device_id(m_chip_num);
-  }
-  else
-  {
-    if (current_mode() != AUTOSELECT)
-    {
-      enter_autoselect();
-    }
-    
-    return read(0x001C);
-  }
-}
-
 protect_t ws_rom_chip::get_block_protection(address_t sector_address)
 {
   (void) sector_address;
@@ -174,15 +146,54 @@ void ws_rom_chip::program_word(address_t address, word_t data)
   }
   
   // Reset if in autoselect mode
+  if (current_mode() != BYPASS && current_mode() != READ)
+  {
+    reset();
+  }
+  
+  if (current_mode() == BYPASS)
+  {
+    write(ADDR_DONTCARE, 0xA0);
+  }
+  else
+  {
+    write(ADDR_COMMAND1, 0xAA);
+    write(ADDR_COMMAND2, 0x55);
+    write(ADDR_COMMAND3, 0xA0);
+  }
+  
+  write(address, data);
+}
+
+void ws_rom_chip::unlock_bypass()
+{
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  // Ensure that we actually support bypass mode before doing anything
+  if (!supports_bypass())
+  {
+    return;
+  }
+  
+  // Reset the chip if necessary
   if (current_mode() != READ)
   {
     reset();
   }
   
-  write(ADDR_COMMAND1, 0xAA);
-  write(ADDR_COMMAND2, 0x55);
-  write(ADDR_COMMAND3, 0xA0);
-  write(address, data);
+  // Unlock bypass mode and update flags
+  if (current_mode() != BYPASS)
+  {
+    write(ADDR_COMMAND1, 0xAA);
+    write(ADDR_COMMAND2, 0x55);
+    write(ADDR_COMMAND3, 0x20);
+    
+    m_mode = BYPASS;
+  }
 }
 
 void ws_rom_chip::erase_chip()
@@ -233,6 +244,7 @@ void ws_rom_chip::erase_block(address_t block_address)
     reset();
   }
   
+  block_address &= MASK_SECTOR;
   m_last_erased_addr = block_address;
   
   if (m_linkmasta->supports_erase_chip())
@@ -247,7 +259,7 @@ void ws_rom_chip::erase_block(address_t block_address)
     write(ADDR_COMMAND3, 0x80);
     write(ADDR_COMMAND1, 0xAA);
     write(ADDR_COMMAND2, 0x55);
-    write((block_address & MASK_SECTOR), 0x30);
+    write(m_last_erased_addr, 0x30);
   }
   
   m_mode = ERASE;
@@ -258,6 +270,25 @@ void ws_rom_chip::erase_block(address_t block_address)
 ws_rom_chip::chip_mode ws_rom_chip::current_mode() const
 {
   return m_mode;
+}
+
+bool ws_rom_chip::supports_bypass() const
+{
+  return m_supports_bypass;
+}
+
+bool ws_rom_chip::test_bypass_support()
+{
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  // Assume yes for this particular chip
+  m_supports_bypass = true;
+  
+  return supports_bypass();
 }
 
 bool ws_rom_chip::is_erasing() const
@@ -272,9 +303,18 @@ bool ws_rom_chip::test_erasing()
     return false;
   }
   
+  // Send BLANK CHECK SETUP command sequence
+  write(ADDR_COMMAND1, 0xAA);
+  write(ADDR_COMMAND2, 0x55);
+  write(m_last_erased_addr, 0xEB);
+  write(m_last_erased_addr, 0x76);
+  write(m_last_erased_addr, 0x00);
+  write(m_last_erased_addr, 0x00);
+  write(m_last_erased_addr, 0x29);
+  
   unsigned char result = read(m_last_erased_addr);
   
-  m_mode = (result == 0xFF ? READ : ERASE);
+  m_mode = (result == 0 ? ERASE : READ);
   
   return is_erasing();
 }
@@ -389,7 +429,7 @@ unsigned int ws_rom_chip::program_bytes(address_t address, const data_t* data, u
     // Use Linkmasta's built-in support for batch programming
     if (controller == nullptr)
     {
-      return m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, false);
+      return m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, supports_bypass());
     }
     else
     {
@@ -405,7 +445,7 @@ unsigned int ws_rom_chip::program_bytes(address_t address, const data_t* data, u
       {
         try
         {
-          result = m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, false,  &fwd_controller);
+          result = m_linkmasta->program_bytes(m_chip_num, address, data, num_bytes, supports_bypass(),  &fwd_controller);
         }
         catch (std::exception& ex)
         {
@@ -426,6 +466,10 @@ unsigned int ws_rom_chip::program_bytes(address_t address, const data_t* data, u
     // TODO: Make use of chip's buffer commands
     
     // First, ensure we're in the correct mode
+    if (supports_bypass() && current_mode() != BYPASS)
+    {
+      unlock_bypass();
+    }
     if (current_mode() != READ)
     {
       reset();
@@ -439,17 +483,11 @@ unsigned int ws_rom_chip::program_bytes(address_t address, const data_t* data, u
     
     // Program word of data one at a time
     unsigned int i;
-    for (i = 0; i < num_bytes && (controller == nullptr || !controller->is_task_cancelled()); i+=2, address+=2)
+    for (i = 0; i < num_bytes && (controller == nullptr || !controller->is_task_cancelled()); i++, address++)
     {
-      // Combine 2 bytes into 1 word
-      word_t d = 0;
-      d |= data[i];
-      d <<= (sizeof(data[i]) * 8);
-      d |= data[i+1];
-      
       try
       {
-        program_word(address, d);
+        program_word(address, data[i]);
       }
       catch (std::exception& ex)
       {

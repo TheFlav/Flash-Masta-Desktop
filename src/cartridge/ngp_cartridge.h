@@ -46,7 +46,7 @@ public:
   
   /*! \brief Class constructor.
    *  
-   *  Main constructor for the class. Iniitalizes members with default values
+   *  Main constructor for the class. Inititalizes members with default values
    *  and supplied parameters.
    *  
    *  \param linkmasta Pointer to a valid instance of \ref linkmasta_device to
@@ -236,7 +236,7 @@ protected:
    *  configured with the supplied \ref linkmasta_device beforehand.
    *  
    *  \param [in] chip_i The index of the chip to build the struct from. Index
-             0 will refer to the first chip on the cartridge.
+   *         0 will refer to the first chip on the cartridge.
    *  \param [in] block_i The index of the block on the chip to build the
    *         descriptor from. Index 0 will refer to the first sector on the
    *         chip.

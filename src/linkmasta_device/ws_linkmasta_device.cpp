@@ -37,7 +37,9 @@ using namespace wsmsg;
 ws_linkmasta_device::ws_linkmasta_device(usb::usb_device* usb_device)
   : m_usb_device(usb_device),
     m_was_init(false), m_is_open(false), m_firmware_version_set(false),
-    m_firmware_major_version(0), m_firmware_minor_version(0)
+    m_slot_info_set(false), m_firmware_major_version(0),
+    m_firmware_minor_version(0), m_static_num_slots(false),
+    m_static_slot_sizes(false)
 {
   // Nothing else to do
 }
@@ -180,14 +182,14 @@ word_t ws_linkmasta_device::read_word(chip_index chip, address_t address)
     throw std::runtime_error("ERROR"); // TODO
   }
   
-  uint16_t data;
+  uint8_t data;
   data_t buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
   
-  build_read16_command(buffer, address, chip);
+  build_read8_command(buffer, address, chip);
   m_usb_device->write(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
   
   m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
-  if (get_read16_reply(buffer, &address, &data))
+  if (get_read8_reply(buffer, &address, &data))
   {
     return data;
   }
@@ -208,7 +210,7 @@ void ws_linkmasta_device::write_word(chip_index chip, address_t address, word_t 
   uint8_t result;
   data_t buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
   
-  build_write16_command(buffer, address, data, chip);
+  build_write8_command(buffer, address, data, chip);
   m_usb_device->write(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
   
   m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
@@ -235,6 +237,21 @@ bool ws_linkmasta_device::supports_program_bytes() const
   return true;
 }
 
+bool ws_linkmasta_device::supports_read_num_slots() const
+{
+  return true;
+}
+
+bool ws_linkmasta_device::supports_read_slot_size() const
+{
+  return true;
+}
+
+bool ws_linkmasta_device::supports_switch_slot() const
+{
+  return true;
+}
+
 
 
 unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes, task_controller* controller)
@@ -248,10 +265,6 @@ unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_ad
   // Some working variables
   data_t   _buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
   unsigned int offset = 0;
-  
-  // Because of WS's curious 2-byte words, always remove lower order bit
-  start_address = start_address & (address_t) ~1;
-  num_bytes = num_bytes & (unsigned int) ~1;
   
   // Inform the controller that the task has begun
   if (controller != nullptr)
@@ -291,68 +304,31 @@ unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_ad
   }
   
   // Get any remaining bytes of data individually
-  // Treat reads from flash and sram differently
-  switch (chip)
+  while (num_bytes - offset > 0
+         && (controller == nullptr || !controller->is_task_cancelled()))
   {
-  case target_enum::TARGET_ROM:
-    while (num_bytes - offset > 0
-           && (controller == nullptr || !controller->is_task_cancelled()))
-    {
-      build_read16_command(_buffer, start_address + offset, chip);
-      m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
-      
-      m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
-      
-      uint32_t address;
-      uint16_t data;
-      if (get_read16_reply(_buffer, &address, &data) == MSG_RESULT_SUCCESS)
-      {
-        buffer[offset] = (data_t) (data >> 8);
-        buffer[offset+1] = (data_t) (data);
-      }
-      else
-      {
-        throw std::runtime_error("ERROR");
-      }
-      
-      // Update offset and inform controller of progress
-      offset += 2;
-      if (controller != nullptr)
-      {
-        controller->on_task_update(task_status::RUNNING, 1);
-      }
-    }
-    break;
+    build_read8_command(_buffer, start_address + offset, chip);
+    m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
     
-  case target_enum::TARGET_SRAM:
-  default:
-    while (num_bytes - offset > 0
-           && (controller == nullptr || !controller->is_task_cancelled()))
+    m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+    
+    uint32_t address;
+    uint8_t data;
+    if (get_read8_reply(_buffer, &address, &data))
     {
-      build_read8_command(_buffer, start_address + offset, chip);
-      m_usb_device->write(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
-      
-      m_usb_device->read(_buffer, WS_LINKMASTA_USB_RXTX_SIZE);
-      
-      uint32_t address;
-      uint8_t data;
-      if (get_read8_reply(_buffer, &address, &data))
-      {
-        buffer[offset] = (data_t) (data);
-      }
-      else
-      {
-        throw std::runtime_error("ERROR");
-      }
-      
-      // Update offset and inform controller of progress
-      offset += 1;
-      if (controller != nullptr)
-      {
-        controller->on_task_update(task_status::RUNNING, 1);
-      }
+      buffer[offset] = (data_t) (data);
     }
-    break;
+    else
+    {
+      throw std::runtime_error("ERROR");
+    }
+    
+    // Update offset and inform controller of progress
+    offset += 1;
+    if (controller != nullptr)
+    {
+      controller->on_task_update(task_status::RUNNING, 1);
+    }
   }
   
   // Inform controller that task is complete
@@ -365,6 +341,8 @@ unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_ad
 
 unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes, bool bypass_mode, task_controller* controller)
 {
+  (void) bypass_mode;
+  
   if (!m_was_init || !m_is_open)
   {
     throw std::runtime_error("ERROR");
@@ -381,10 +359,6 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
   data_t   _buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
   unsigned int offset = 0;
   uint8_t  result;
-  
-  // Because of WS's curious 2-byte words, always remove lower order bit
-  start_address = start_address & (address_t) ~1;
-  num_bytes = num_bytes & (unsigned int) ~1;
   
   // Inform controller that task has started
   if (controller != nullptr)
@@ -490,9 +464,9 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
     case target_enum::TARGET_ROM:
       {
         unsigned int num_bytes_ = num_bytes;
-        if (num_bytes_ >= WS_LINKMASTA_USB_RXTX_SIZE / 2)
+        if (num_bytes_ > WS_LINKMASTA_USB_RXTX_SIZE / 2)
         {
-          num_bytes_ = (WS_LINKMASTA_USB_RXTX_SIZE / 2) - 1;
+          num_bytes_ = (WS_LINKMASTA_USB_RXTX_SIZE / 2);
         }
         
         build_flash_write_N_command(_buffer, start_address + offset, &buffer[offset], num_bytes_ - offset);
@@ -555,6 +529,76 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
   return offset;
 }
 
+unsigned int ws_linkmasta_device::read_num_slots()
+{
+  // Make sure object has been initialized at least
+  if (!m_was_init || !m_is_open)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
+  if (!m_slot_info_set)
+  {
+    fetch_slot_info();
+  }
+  
+  if (m_static_num_slots)
+  {
+    return m_num_slots;
+  }
+  else
+  {
+    // TODO
+    return 1;
+  }
+}
+
+unsigned int ws_linkmasta_device::read_slot_size(unsigned int slot_num)
+{
+  (void) slot_num;
+  
+  // Make sure object has been initialized at least
+  if (!m_was_init || !m_is_open)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
+  if (!m_slot_info_set)
+  {
+    fetch_slot_info();
+  }
+  
+  if (m_static_slot_sizes)
+  {
+    return m_slot_size;
+  }
+  else
+  {
+    // TODO
+    return 0;
+  }
+}
+
+bool ws_linkmasta_device::switch_slot(unsigned int slot_num)
+{
+  // Make sure object has been initialized at least
+  if (!m_was_init || !m_is_open)
+  {
+    throw std::runtime_error("ERROR");
+  }
+  
+  data_t buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
+  
+  build_set_cartslot_command(buffer, (unsigned char) slot_num);
+  m_usb_device->write(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+  m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+  
+  uint8_t result;
+  get_result_reply(buffer, &result);
+  
+  return (result == MSG_RESULT_SUCCESS);
+}
+
 
 
 void ws_linkmasta_device::fetch_firmware_version()
@@ -580,6 +624,32 @@ void ws_linkmasta_device::fetch_firmware_version()
   m_firmware_major_version = (unsigned int) majVer;
   m_firmware_minor_version = (unsigned int) minVer;
   m_firmware_version_set = true;
+}
+
+void ws_linkmasta_device::fetch_slot_info()
+{
+  data_t buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
+  build_getcartinfo_command(buffer);
+  
+  unsigned int num_bytes;
+  
+  // Send command
+  num_bytes = m_usb_device->write(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+  
+  // Fetch reply
+  num_bytes = m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
+  if (num_bytes != WS_LINKMASTA_USB_RXTX_SIZE)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  uint8_t isSlotNumFixed, isSlotSizeFixed, numSlotsPerCart, numAddrLinesPerSlot;
+  get_getcartinfo_reply(buffer, &isSlotNumFixed, &isSlotSizeFixed, &numSlotsPerCart, &numAddrLinesPerSlot);
+  
+  m_static_num_slots = (isSlotNumFixed == 1);
+  m_static_slot_sizes = (isSlotSizeFixed == 1);
+  m_num_slots = (unsigned int) numSlotsPerCart;
+  m_slot_size = 1 << numAddrLinesPerSlot;
 }
 
 

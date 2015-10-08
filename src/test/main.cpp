@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <iomanip>
 using namespace std;
 
 
@@ -7,6 +8,7 @@ using namespace std;
 #include "tester.h"
 #include "libusb_usb_device_tester.h"
 #include "ngp_cartridge_tester.h"
+#include "ws_linkmasta_tester.h"
 
 
 // Function forward declarations
@@ -23,8 +25,9 @@ int main()
   
   // Allocate tester objects and add to vector
   vector<tester*> tests;
-  tests.push_back(new libusb_usb_device_tester(in, out, err));
+//  tests.push_back(new libusb_usb_device_tester(in, out, err));
   tests.push_back(new ngp_cartridge_tester(in, out, err));
+  tests.push_back(new ws_linkmasta_tester(in, out, err));
   
   
   // Run the tests and print summary
@@ -52,6 +55,12 @@ bool run_tests(vector<tester*>& tests)
   
   for (tester* test : tests)
   {
+    string s = "running " + test->name() + " tests";
+    cout << endl;
+    cout << setw((int) s.size()) << setfill('-') << " " << setfill(' ') << "\n";
+    cout << s << endl;
+    cout << endl;
+    
     if (!test->prepare())
     {
       success = false;
@@ -60,14 +69,14 @@ bool run_tests(vector<tester*>& tests)
     
     test->pretests();
     
-    if (!test->run_tests())
+    if (!test->run_tests(cout, cin, cerr))
     {
       success = false;
     }
     
     test->posttests();
     
-    test->results();
+    test->results(cout);
   }
   
   return success;
@@ -81,3 +90,5 @@ void delete_tests(vector<tester*>& tests)
     delete test;
   }
 }
+
+

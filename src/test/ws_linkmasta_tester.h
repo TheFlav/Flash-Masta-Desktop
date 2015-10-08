@@ -1,13 +1,13 @@
 //
-//  ngp_cartridge_tester.h
+//  ws_linkmasta_tester.h
 //  FlashMasta
 //
 //  Created by Dan on 7/30/15.
 //  Copyright (c) 2015 7400 Circuits. All rights reserved.
 //
 
-#ifndef __NGP_CARTRIDGE_TESTER_H__
-#define __NGP_CARTRIDGE_TESTER_H__
+#ifndef __WS_LINKMASTA_TESTER_H__
+#define __WS_LINKMASTA_TESTER_H__
 
 #include "tester.h"
 #include <iosfwd>
@@ -19,11 +19,11 @@ struct libusb_context;
 struct libusb_device;
 struct libusb_device_handle;
 
-class ngp_cartridge_tester: public tester
+class ws_linkmasta_tester: public tester
 {
 public:
-  ngp_cartridge_tester(std::istream& in, std::ostream& out, std::ostream& err);
-  ~ngp_cartridge_tester();
+  ws_linkmasta_tester(std::istream& in, std::ostream& out, std::ostream& err);
+  ~ws_linkmasta_tester();
   
   bool prepare();
   void pretests();
@@ -38,11 +38,10 @@ private:
   std::ifstream*        m_fin;
   usb::usb_device*      m_usb;
   linkmasta_device*     m_linkmasta;
-  cartridge*            m_cartridge;
 
   libusb_context*       m_libusb;
   libusb_device*        m_device;
   libusb_device_handle* m_handle;
 };
 
-#endif /* defined(__NGP_CARTRIDGE_TESTER_H__) */
+#endif /* defined(__WS_LINKMASTA_TESTER_H__) */
