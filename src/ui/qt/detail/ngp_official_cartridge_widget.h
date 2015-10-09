@@ -8,6 +8,7 @@ namespace Ui {
 class NgpOfficalCartridgeWidget;
 }
 
+class cartridge;
 class ngp_cartridge;
 
 class NgpOfficalCartridgeWidget : public QWidget

@@ -10,15 +10,17 @@ using namespace usb;
 
 
 DeviceManager::DeviceManager()
-  : m_thread_kill_flag(false), curr_id(0)
+  : m_thread_kill_flag(false), m_thread_dead(true), curr_id(0)
 {
-  m_refresh_thread = thread(&DeviceManager::refresh_thread_function, this);
-  m_refresh_thread.detach();
+  // Nothing else to do
 }
 
 DeviceManager::~DeviceManager()
 {
   m_thread_kill_flag = true;
+  
+  // Spinlock until thread is dead. May take a moment
+  while (!m_thread_dead);
 }
 
 
@@ -26,6 +28,17 @@ DeviceManager::~DeviceManager()
 unsigned int DeviceManager::generate_id()
 {
   return curr_id++;
+}
+
+void DeviceManager::start_auto_refresh()
+{
+  if (m_thread_dead)
+  {
+    m_thread_dead = false;
+    m_thread_kill_flag = false;
+    m_refresh_thread = thread(&DeviceManager::refresh_thread_function, this);
+    m_refresh_thread.detach();
+  }
 }
 
 linkmasta_device* DeviceManager::build_linkmasta_device(usb::usb_device* device)
@@ -78,6 +91,8 @@ void DeviceManager::refresh_thread_function()
     target_time = target_time = chrono::steady_clock::now();
     target_time += chrono::seconds(1);
   }
+  
+  m_thread_dead = true;
 }
 
 

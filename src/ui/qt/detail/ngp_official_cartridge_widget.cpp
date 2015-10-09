@@ -13,10 +13,15 @@ NgpOfficalCartridgeWidget::NgpOfficalCartridgeWidget(QWidget *parent) :
   ui->setupUi(this);
   
   m_cart_thread = new QThread();
-  auto worker = new NgpLmOfficialCartridgeInfoWorker
 }
 
 NgpOfficalCartridgeWidget::~NgpOfficalCartridgeWidget()
 {
   delete ui;
 }
+
+void NgpOfficalCartridgeWidget::on_cartridge_loaded(cartridge* cart)
+{
+  (void) cart;
+}
+
