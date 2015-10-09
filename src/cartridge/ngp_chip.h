@@ -1,7 +1,7 @@
 /*! \file
  *  \brief File containing the declaration of the \ref ngp_chip class.
  *  
- *  file containing the header information and declaration of the
+ *  File containing the header information and declaration of the
  *  \ref ngp_chip class.
  *  
  *  \author Daniel Andrus
@@ -28,7 +28,7 @@ class task_controller;
  *  and stores very little information about the current state of the device
  *  that it represents.
  *  
- *  This class is *not* thread-safe. use caution when working in a multithreaded
+ *  This class is *not* thread-safe. Use caution when working in a multithreaded
  *  environment.
  */
 class ngp_chip
@@ -57,7 +57,7 @@ public:
    */
   typedef bool             protect_t;
   
-  /*! \brief Type used for specifying an address an on the device. */
+  /*! \brief Type used for specifying an address on the device. */
   typedef unsigned int     address_t;
   
   /*! \enum chip_mode
@@ -211,7 +211,7 @@ public:
    *  \param [in] sector_address The base address of the block (sector) to
    *         test for protection.
    *  
-   *  \returns If successful, returns **true** if the sector is proteccted and
+   *  \returns If successful, returns **true** if the sector is protected and
    *           **false** if it is unprotected.
    *  
    *  \see chip_mode::AUTOSELECT
@@ -497,7 +497,6 @@ public:
   
   
 private:
-  
   /*! \brief Send the command sequence to enter \ref chip_mode::AUTOSELECT mode
    *         to the chip.
    *  
@@ -512,6 +511,8 @@ private:
    *  \see chip_mode
    */
   void                    enter_autoselect();
+  
+  
   
   /*! \brief The currently predicted mode of the chip.
    *  
