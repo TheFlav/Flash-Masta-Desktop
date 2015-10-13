@@ -61,7 +61,9 @@ SOURCES +=\
     src/ui/qt/detail/ngp_linkmasta_detail_widget.cpp \
     src/ui/qt/detail/ngp_official_cartridge_widget.cpp \
     src/ui/qt/worker/ngp_lm_cartridge_polling_worker.cpp \
-    src/ui/qt/worker/ngp_lm_official_cartridge_info_worker.cpp
+    src/ui/qt/worker/ngp_lm_official_cartridge_info_worker.cpp \
+    src/ui/qt/detail/ngp_flashmasta_cartridge_widget.cpp \
+    src/ui/qt/detail/ngp_flashmasta_cartridge_slot_widget.cpp
 
 HEADERS  +=\
     src/hardware/AVR/ids.h \
@@ -115,13 +117,17 @@ HEADERS  +=\
     src/ui/qt/detail/ngp_linkmasta_detail_widget.h \
     src/ui/qt/detail/ngp_official_cartridge_widget.h \
     src/ui/qt/worker/ngp_lm_cartridge_polling_worker.h \
-    src/ui/qt/worker/ngp_lm_official_cartridge_info_worker.h
+    src/ui/qt/worker/ngp_lm_official_cartridge_info_worker.h \
+    src/ui/qt/detail/ngp_flashmasta_cartridge_widget.h \
+    src/ui/qt/detail/ngp_flashmasta_cartridge_slot_widget.h
 
 FORMS    +=\
     src/ui/qt/device_info_widget.ui \
     src/ui/qt/main_window.ui \
     src/ui/qt/detail/ngp_linkmasta_detail_widget.ui \
-    src/ui/qt/detail/ngp_official_cartridge_widget.ui
+    src/ui/qt/detail/ngp_official_cartridge_widget.ui \
+    src/ui/qt/detail/ngp_flashmasta_cartridge_widget.ui \
+    src/ui/qt/detail/ngp_flashmasta_cartridge_slot_widget.ui
 
 DISTFILES += \
     README.md

@@ -20,7 +20,7 @@ class task_controller;
  *         WonderSwan cartridge.
  *  
  *  Class for controlling and interacting with a flash storage chip on a
- *  WonderSwan cartridge. Contains logic for manipulating the device's current
+ *  WonderSwan cartridge. Contains logic for manipultaI ing the device's current
  *  mode, erasing sectors on the device, programming the device, and getting
  *  device information.
  *  

@@ -7,7 +7,7 @@ NgpLinkmastaDetailWidget::NgpLinkmastaDetailWidget(unsigned int device_id, QWidg
   ui(new Ui::NgpLinkmastaDetailWidget), m_device_id(device_id), m_pooling_thread(nullptr)
 {
   ui->setupUi(this);
-  m_default_widget = ui->verticalLayout->itemAt(1)->widget();
+  m_default_widget = ui->contentWidget;
 }
 
 NgpLinkmastaDetailWidget::~NgpLinkmastaDetailWidget()

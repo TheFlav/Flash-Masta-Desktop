@@ -2,6 +2,7 @@
 #define NGPLMOFFICIALCARTRIDGEINFOWORKER_H
 
 #include <QObject>
+
 class cartridge;
 
 class NgpLmOfficialCartridgeInfoWorker : public QObject
