@@ -1,5 +1,5 @@
 #include "main_window.h"
-#include "ui_mainwindow.h"
+#include "ui_main_window.h"
 
 #include <vector>
 #include <QString>

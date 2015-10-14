@@ -12,7 +12,9 @@ TARGET = FlashMasta
 TEMPLATE = app
 
 CONFIG +=\
-    c++11
+    c++11 \
+    static \
+    staticlib
 
 SOURCES +=\
     src/ui/qt/main.cpp \
@@ -143,12 +145,13 @@ macx {
     QMAKE_MAC_SDK = macosx10.11
     
     QMAKE_LFLAGS +=\
-        -L"$$PWD/libs/osx"
+        -L"$$PWD/libs/osx"\
+        -lobjc
 
     LIBS     +=\
-        -framework IOKit\
-        -framework CoreFoundation\
-        -lusb-1.0
+        -framework IOKit \
+        -framework CoreFoundation \
+        "$$PWD/libs/osx/libusb-1.0.a"
 
     DEFINES  +=\
         OS_MACOSX
@@ -158,7 +161,8 @@ win32 {
         includes\win32
 
     LIBS     +=\
-        -L"$$PWD/libs/win32" -l"usb-1.0"
+        #-L"$$PWD/libs/win32" -l"usb-1.0"
+        "libs/win32/libusb-1.0.a"
 
     DEFINES  +=\
         OS_WINDOWS
