@@ -16,6 +16,7 @@
 #include "../common/types.h"
 #include "cartridge_descriptor.h"
 #include <iosfwd>
+#include <string>
 
 class task_controller;
 
