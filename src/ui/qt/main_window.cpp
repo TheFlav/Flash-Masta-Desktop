@@ -35,6 +35,11 @@ MainWindow::MainWindow(QWidget *parent)
     m_device_info_widgets(), m_default_widget(nullptr)
 {
   ui->setupUi(this);
+
+  // Hide toolbar if on windows
+#ifdef OS_WINDOWS
+  ui->mainToolBar->hide();
+#endif
   
   // Start the automatic list refresh timer
   connect(&m_timer, SIGNAL(timeout()), this, SLOT(on_refreshDeviceList_timeout()));

@@ -18,7 +18,6 @@ CONFIG +=\
 
 SOURCES +=\
     src/ui/qt/main.cpp \
-    src/hardware/PC-App-CLI/NeoLinkmasta.c \
     src/cartridge/ngp_cartridge.cpp \
     src/cartridge/cartridge_descriptor.cpp \
     src/cartridge/ngp_chip.cpp \
@@ -68,9 +67,6 @@ SOURCES +=\
     src/ui/qt/detail/ngp_flashmasta_cartridge_slot_widget.cpp
 
 HEADERS  +=\
-    src/hardware/AVR/ids.h \
-    src/hardware/AVR/messages.h \
-    src/hardware/PC-App-CLI/NeoLinkmasta.h \
     src/cartridge/cartridge.h \
     src/cartridge/ngp_cartridge.h \
     src/common/types.h \
@@ -158,11 +154,13 @@ macx {
 }
 win32 {
     INCLUDEPATH +=\
-        includes\win32
+        includes/win32
 
     LIBS     +=\
-        #-L"$$PWD/libs/win32" -l"usb-1.0"
-        "libs/win32/libusb-1.0.a"
+        "$$PWD/libs/win32/libusb-1.0.a"
+		
+		#-L"$$PWD/libs/win32" -l"usb-1.0" \
+
 
     DEFINES  +=\
         OS_WINDOWS
