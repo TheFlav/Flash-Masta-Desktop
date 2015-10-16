@@ -201,64 +201,64 @@
     <ClCompile Include="src\cartridge\ws_sram_chip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ws_cartridge_task.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_device_info_widget.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ws_cartridge_task.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_device_info_widget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_official_cartridge_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_main_window.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_official_cartridge_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_main_window.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_lm_official_cartridge_info_worker.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_cartridge_task.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_lm_official_cartridge_info_worker.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_cartridge_task.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_lm_cartridge_polling_worker.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_flashmasta_cartridge_slot_widget.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_lm_cartridge_polling_worker.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_flashmasta_cartridge_slot_widget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_linkmasta_detail_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_flashmasta_cartridge_widget.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_linkmasta_detail_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_flashmasta_cartridge_widget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_flashmasta_cartridge_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_linkmasta_detail_widget.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_flashmasta_cartridge_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_linkmasta_detail_widget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_flashmasta_cartridge_slot_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_lm_cartridge_polling_worker.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_flashmasta_cartridge_slot_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_lm_cartridge_polling_worker.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_cartridge_task.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_lm_official_cartridge_info_worker.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_cartridge_task.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_lm_official_cartridge_info_worker.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_main_window.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_official_cartridge_widget.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_main_window.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_official_cartridge_widget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_device_info_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ws_cartridge_task.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_device_info_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ws_cartridge_task.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>

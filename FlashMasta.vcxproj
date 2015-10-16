@@ -56,7 +56,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;.\src;.\src\common;.\includes\win32;.\..\..\qt\5.5\msvc2013_64\include;.\..\..\qt\5.5\msvc2013_64\include\QtWidgets;.\..\..\qt\5.5\msvc2013_64\include\QtGui;.\..\..\qt\5.5\msvc2013_64\include\QtANGLE;.\..\..\qt\5.5\msvc2013_64\include\QtCore;.\release;.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013;.\build\$(ConfigurationName);.\build\GeneratedFiles;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;.\src;.\src\common;.\includes\win32;.\..\..\qt\5.5\msvc2013_64\include;.\..\..\qt\5.5\msvc2013_64\include\QtWidgets;.\..\..\qt\5.5\msvc2013_64\include\QtGui;.\..\..\qt\5.5\msvc2013_64\include\QtANGLE;.\..\..\qt\5.5\msvc2013_64\include\QtCore;.\release;.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013;.\build\GeneratedFiles;.\build\GeneratedFiles\$(ConfigurationName);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:strictStrings -w34100 -w34189 -w44996 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -94,10 +94,14 @@
     <ResourceCompile>
       <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;OS_WINDOWS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>$(QTDIR)\bin\windeployqt $(Outdir)\$(MSBuildProjectName).exe</Command>
+      <Message>Prepare executable for deployment</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;.\src;.\src\common;.\includes\win32;.\..\..\qt\5.5\msvc2013_64\include;.\..\..\qt\5.5\msvc2013_64\include\QtWidgets;.\..\..\qt\5.5\msvc2013_64\include\QtGui;.\..\..\qt\5.5\msvc2013_64\include\QtANGLE;.\..\..\qt\5.5\msvc2013_64\include\QtCore;.\debug;.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013;.\build\$(ConfigurationName);.\build\GeneratedFiles;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;.\src;.\src\common;.\includes\win32;.\..\..\qt\5.5\msvc2013_64\include;.\..\..\qt\5.5\msvc2013_64\include\QtWidgets;.\..\..\qt\5.5\msvc2013_64\include\QtGui;.\..\..\qt\5.5\msvc2013_64\include\QtANGLE;.\..\..\qt\5.5\msvc2013_64\include\QtCore;.\debug;.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013;.\build\GeneratedFiles;.\build\GeneratedFiles\$(ConfigurationName);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-w34100 -w34189 -w44996 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -136,64 +140,64 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="build\Debug\moc_device_info_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_device_info_widget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_main_window.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_main_window.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_cartridge_task.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_cartridge_task.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_flashmasta_cartridge_slot_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_flashmasta_cartridge_slot_widget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_flashmasta_cartridge_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_flashmasta_cartridge_widget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_linkmasta_detail_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_linkmasta_detail_widget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_lm_cartridge_polling_worker.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_lm_cartridge_polling_worker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_lm_official_cartridge_info_worker.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_lm_official_cartridge_info_worker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ngp_official_cartridge_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ngp_official_cartridge_widget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Debug\moc_ws_cartridge_task.cpp">
+    <ClCompile Include="build\GeneratedFiles\Debug\moc_ws_cartridge_task.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_device_info_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_device_info_widget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_main_window.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_main_window.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_cartridge_task.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_cartridge_task.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_flashmasta_cartridge_slot_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_flashmasta_cartridge_slot_widget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_flashmasta_cartridge_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_flashmasta_cartridge_widget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_linkmasta_detail_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_linkmasta_detail_widget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_lm_cartridge_polling_worker.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_lm_cartridge_polling_worker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_lm_official_cartridge_info_worker.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_lm_official_cartridge_info_worker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ngp_official_cartridge_widget.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ngp_official_cartridge_widget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="build\Release\moc_ws_cartridge_task.cpp">
+    <ClCompile Include="build\GeneratedFiles\Release\moc_ws_cartridge_task.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\usb\exception\busy_exception.cpp" />
@@ -261,17 +265,17 @@ if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing device_info_widget.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing device_info_widget.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
@@ -290,17 +294,17 @@ if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing main_window.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing main_window.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
@@ -315,17 +319,17 @@ if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing ngp_cartridge_task.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing ngp_cartridge_task.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
@@ -337,17 +341,17 @@ if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing ngp_flashmasta_cartridge_slot_widget.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing ngp_flashmasta_cartridge_slot_widget.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
@@ -357,17 +361,17 @@ if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing ngp_flashmasta_cartridge_widget.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing ngp_flashmasta_cartridge_widget.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
@@ -377,17 +381,17 @@ if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing ngp_linkmasta_detail_widget.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing ngp_linkmasta_detail_widget.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
@@ -399,17 +403,17 @@ if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing ngp_lm_cartridge_polling_worker.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing ngp_lm_cartridge_polling_worker.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
@@ -419,17 +423,17 @@ if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing ngp_lm_official_cartridge_info_worker.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing ngp_lm_official_cartridge_info_worker.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
@@ -439,17 +443,17 @@ if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing ngp_official_cartridge_widget.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing ngp_official_cartridge_widget.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
@@ -474,17 +478,17 @@ if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\release" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing ws_cartridge_task.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I.\build\$(ConfigurationName)\."</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DOS_WINDOWS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\src" "-I.\src\common" "-I.\includes\win32" "-I.\..\..\qt\5.5\msvc2013_64\include" "-I.\..\..\qt\5.5\msvc2013_64\include\QtWidgets" "-I.\..\..\qt\5.5\msvc2013_64\include\QtGui" "-I.\..\..\qt\5.5\msvc2013_64\include\QtANGLE" "-I.\..\..\qt\5.5\msvc2013_64\include\QtCore" "-I.\debug" "-I.\..\..\qt\5.5\msvc2013_64\mkspecs\win32-msvc2013" "-I.\build\GeneratedFiles" "-I.\build\GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing ws_cartridge_task.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\build\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
@@ -569,7 +573,7 @@ endlocal
   <ImportGroup Label="ExtensionTargets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties MocDir=".\build\$(ConfigurationName)" UicDir=".\build\GeneratedFiles" RccDir=".\build\GeneratedFiles" Qt5Version_x0020_x64="5.5" />
+      <UserProperties MocDir=".\build\GeneratedFiles\$(ConfigurationName)" UicDir=".\build\GeneratedFiles" RccDir=".\build\GeneratedFiles" Qt5Version_x0020_x64="5.5" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
