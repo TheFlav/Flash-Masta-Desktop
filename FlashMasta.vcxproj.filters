@@ -263,72 +263,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\usb\exception\busy_exception.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cartridge\cartridge.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cartridge\cartridge_descriptor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <CustomBuild Include="src\ui\qt\device_info_widget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <ClInclude Include="src\ui\qt\device_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\usb\exception\disconnected_exception.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\usb\exception\exception.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\qt\flash_masta.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\tasks\forwarding_task_controller.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\usb\exception\interrupted_exception.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\qt\libusb_device_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\usb\libusb_usb_device.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\linkmasta_device\linkmasta_device.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <CustomBuild Include="src\ui\qt\main_window.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <ClInclude Include="src\cartridge\ngp_cartridge.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\qt\task\ngp_cartridge_backup_save_task.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\qt\task\ngp_cartridge_backup_task.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\qt\task\ngp_cartridge_flash_task.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\qt\task\ngp_cartridge_restore_save_task.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <CustomBuild Include="src\ui\qt\task\ngp_cartridge_task.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <ClInclude Include="src\ui\qt\task\ngp_cartridge_verify_task.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cartridge\ngp_chip.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <CustomBuild Include="src\ui\qt\detail\ngp_flashmasta_cartridge_slot_widget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -338,12 +281,6 @@
     <CustomBuild Include="src\ui\qt\detail\ngp_linkmasta_detail_widget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <ClInclude Include="src\linkmasta_device\ngp_linkmasta_device.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\linkmasta_device\ngp_linkmasta_messages.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <CustomBuild Include="src\ui\qt\worker\ngp_lm_cartridge_polling_worker.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -353,87 +290,129 @@
     <CustomBuild Include="src\ui\qt\detail\ngp_official_cartridge_widget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <ClInclude Include="src\usb\exception\not_found_exception.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\tasks\task_controller.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\usb\exception\timeout_exception.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\common\types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\usb\exception\unconfigured_exception.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\usb\exception\uninitialized_exception.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\usb\exception\unopen_exception.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\usb\usb.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\usb\usb_device.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\usb\usbfwd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cartridge\ws_cartridge.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\qt\task\ws_cartridge_backup_save_task.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\qt\task\ws_cartridge_backup_task.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\qt\task\ws_cartridge_flash_task.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\qt\task\ws_cartridge_restore_save_task.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <CustomBuild Include="src\ui\qt\task\ws_cartridge_task.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <ClInclude Include="src\ui\qt\task\ws_cartridge_verify_task.h">
+    <CustomBuild Include="src\cartridge\cartridge_descriptor.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\linkmasta_device\ws_linkmasta_device.h">
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\device_manager.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\linkmasta_device\ws_linkmasta_messages.h">
+    </CustomBuild>
+    <CustomBuild Include="src\usb\exception\disconnected_exception.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cartridge\ws_rom_chip.h">
+    </CustomBuild>
+    <CustomBuild Include="src\usb\exception\exception.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cartridge\ws_sram_chip.h">
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\flash_masta.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="build\GeneratedFiles\ui_device_info_widget.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="build\GeneratedFiles\ui_main_window.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="build\GeneratedFiles\ui_ngp_flashmasta_cartridge_slot_widget.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="build\GeneratedFiles\ui_ngp_flashmasta_cartridge_widget.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="build\GeneratedFiles\ui_ngp_linkmasta_detail_widget.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="build\GeneratedFiles\ui_ngp_official_cartridge_widget.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
+    </CustomBuild>
+    <CustomBuild Include="src\tasks\forwarding_task_controller.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\usb\exception\interrupted_exception.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\libusb_device_manager.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\usb\libusb_usb_device.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\linkmasta_device\linkmasta_device.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\cartridge\ngp_cartridge.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\task\ngp_cartridge_backup_save_task.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\task\ngp_cartridge_backup_task.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\task\ngp_cartridge_flash_task.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\task\ngp_cartridge_restore_save_task.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\task\ngp_cartridge_verify_task.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\cartridge\ngp_chip.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\linkmasta_device\ngp_linkmasta_device.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\linkmasta_device\ngp_linkmasta_messages.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\usb\exception\not_found_exception.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\tasks\task_controller.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\usb\exception\timeout_exception.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\common\types.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\usb\exception\unconfigured_exception.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\usb\exception\uninitialized_exception.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\usb\exception\unopen_exception.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\usb\usb.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\usb\usb_device.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\usb\usbfwd.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\cartridge\ws_cartridge.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\task\ws_cartridge_backup_save_task.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\task\ws_cartridge_backup_task.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\task\ws_cartridge_flash_task.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\task\ws_cartridge_restore_save_task.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\ui\qt\task\ws_cartridge_verify_task.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\linkmasta_device\ws_linkmasta_device.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\linkmasta_device\ws_linkmasta_messages.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\cartridge\ws_rom_chip.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\cartridge\ws_sram_chip.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="README.md">
+      <Filter>Distribution Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="src\ui\qt\device_info_widget.ui">
@@ -454,10 +433,29 @@
     <CustomBuild Include="src\ui\qt\detail\ngp_official_cartridge_widget.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="README.md">
-      <Filter>Distribution Files</Filter>
-    </None>
+    <CustomBuild Include="build\GeneratedFiles\ui_device_info_widget.h">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="build\GeneratedFiles\ui_main_window.h">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="build\GeneratedFiles\ui_ngp_flashmasta_cartridge_slot_widget.h">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="build\GeneratedFiles\ui_ngp_flashmasta_cartridge_widget.h">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="build\GeneratedFiles\ui_ngp_linkmasta_detail_widget.h">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="build\GeneratedFiles\ui_ngp_official_cartridge_widget.h">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\usb\exception\busy_exception.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\cartridge\cartridge.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
