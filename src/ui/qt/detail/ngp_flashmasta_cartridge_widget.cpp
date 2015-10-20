@@ -45,7 +45,7 @@ void NgpFlashmastaCartridgeWidget::refresh_ui()
   
   ui->slotsComboBox->insertItem(0, "Cartridge Info");
   
-  for (int i = 0; i < m_cartridge->num_slots(); ++i)
+  for (unsigned int i = 0; i < m_cartridge->num_slots(); ++i)
   {
     ui->slotsComboBox->insertItem(i+1, "Slot " + QString::number(i+1));
   }

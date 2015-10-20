@@ -8,7 +8,6 @@
 #include <QMessageBox>
 #include "flash_masta.h"
 #include "device_manager.h"
-#include "device_info_widget.h"
 #include "detail/ngp_linkmasta_detail_widget.h"
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
@@ -32,7 +31,7 @@ using namespace std;
 MainWindow::MainWindow(QWidget *parent) 
   : QMainWindow(parent), ui(new Ui::MainWindow),
     m_target_system(system_type::UNKNOWN), m_timer(this), m_device_ids(),
-    m_device_info_widgets(), m_default_widget(nullptr)
+    m_device_detail_widgets(), m_default_widget(nullptr)
 {
   ui->setupUi(this);
 
@@ -112,6 +111,10 @@ void MainWindow::on_actionBackupROM_triggered()
     case system_type::WONDERSWAN:
       WsCartridgeBackupTask(this, cart).go();
       break;
+      
+    default:
+      // Too bad, so sad
+      break;
     }
   }
   catch (std::runtime_error& ex)
@@ -154,6 +157,10 @@ void MainWindow::on_actionRestoreROM_triggered()
       
     case system_type::WONDERSWAN:
       WsCartridgeFlashTask(this, cart).go();
+      break;
+      
+    default:
+      // Too bad, so sad
       break;
     }
   }
@@ -198,6 +205,9 @@ void MainWindow::on_actionVerifyROM_triggered()
     case system_type::WONDERSWAN:
       WsCartridgeVerifyTask(this, cart).go();
       break;
+      
+    default:
+      break;
     }
   }
   catch (std::runtime_error& ex)
@@ -240,6 +250,9 @@ void MainWindow::on_actionBackupSave_triggered()
       
     case system_type::WONDERSWAN:
       WsCartridgeBackupSaveTask(this, cart).go();
+      break;
+      
+    default:
       break;
     }
   }
@@ -284,6 +297,9 @@ void MainWindow::on_actionRestoreSave_triggered()
     case system_type::WONDERSWAN:
       WsCartridgeRestoreSaveTask(this, cart).go();
       break;
+      
+    default:
+      break;
     }
   }
   catch (std::runtime_error& ex)
@@ -304,7 +320,7 @@ void MainWindow::refreshDeviceList_timeout()
   if (FlashMasta::get_instance()->get_device_manager()->try_get_connected_devices(devices))
   {
     // Compare known devices with new devices and update list
-    for (int i = 0, j = 0; i < m_device_ids.size() || j < devices.size();)
+    for (unsigned int i = 0, j = 0; i < m_device_ids.size() || j < devices.size();)
     {
       if (i < m_device_ids.size() && j < devices.size())
       {
@@ -312,11 +328,11 @@ void MainWindow::refreshDeviceList_timeout()
         {
           // Device has been disconnected
           delete ui->deviceListWidget->takeItem(i);
-          auto it = m_device_info_widgets.find(m_device_ids[i]);
-          if (it != m_device_info_widgets.end())
+          auto it = m_device_detail_widgets.find(m_device_ids[i]);
+          if (it != m_device_detail_widgets.end())
           {
             delete it->second;
-            m_device_info_widgets.erase(it);
+            m_device_detail_widgets.erase(it);
           }
           m_device_ids.erase(m_device_ids.begin() + i);
         }
@@ -334,7 +350,7 @@ void MainWindow::refreshDeviceList_timeout()
           auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents->parentWidget());
           widget->start_polling();
           
-          m_device_info_widgets[devices[j]] = widget;
+          m_device_detail_widgets[devices[j]] = widget;
           //widget->set_device_id(devices[j]);
           widget->hide();
           
@@ -351,11 +367,11 @@ void MainWindow::refreshDeviceList_timeout()
       {
         // Device was disconnected
         delete ui->deviceListWidget->takeItem(i);
-        auto it = m_device_info_widgets.find(m_device_ids[i]);
-        if (it != m_device_info_widgets.end())
+        auto it = m_device_detail_widgets.find(m_device_ids[i]);
+        if (it != m_device_detail_widgets.end())
         {
           delete it->second;
-          m_device_info_widgets.erase(it);
+          m_device_detail_widgets.erase(it);
         }
         m_device_ids.erase(m_device_ids.begin() + i);
       }
@@ -373,7 +389,7 @@ void MainWindow::refreshDeviceList_timeout()
         auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents->parentWidget());
         widget->start_polling();
         
-        m_device_info_widgets[devices[j]] = widget;
+        m_device_detail_widgets[devices[j]] = widget;
         //widget->set_device_id(devices[j]);
         widget->hide();
         
@@ -396,7 +412,7 @@ void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
   if (currentRow >= 0)
   {
     ui->scrollAreaWidgetContents->hide();
-    ui->scrollAreaWidgetContents = m_device_info_widgets[m_device_ids[currentRow]];
+    ui->scrollAreaWidgetContents = m_device_detail_widgets[m_device_ids[currentRow]];
     ui->scrollAreaWidgetContents->show();
   }
   else

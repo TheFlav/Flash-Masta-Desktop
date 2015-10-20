@@ -95,7 +95,7 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, tas
     chip_lower_bound = 0;
     chip_upper_bound = descriptor()->num_chips;
   }
-  else if (slot < num_slots())
+  else if (slot < (int) num_slots())
   {
     // Adjust chip bounds to just the given slot
     chip_lower_bound = slot;
@@ -274,7 +274,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, tas
     chip_lower_bound = 0;
     chip_upper_bound = descriptor()->num_chips;
   }
-  else if (slot < num_slots())
+  else if (slot < (int) num_slots())
   {
     // Adjust chip bounds to just the given slot
     chip_lower_bound = slot;
@@ -473,7 +473,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, tas
     chip_lower_bound = 0;
     chip_upper_bound = descriptor()->num_chips;
   }
-  else if (slot < num_slots())
+  else if (slot < (int) num_slots())
   {
     // Adjust chip bounds to just the given slot
     chip_lower_bound = slot;
@@ -685,7 +685,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, tas
     chip_lower_bound = 0;
     chip_upper_bound = descriptor()->num_chips;
   }
-  else if (slot < num_slots())
+  else if (slot < (int) num_slots())
   {
     // Adjust chip bounds to just the given slot
     chip_lower_bound = slot;
@@ -899,7 +899,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
     chip_lower_bound = 0;
     chip_upper_bound = descriptor()->num_chips;
   }
-  else if (slot < num_slots())
+  else if (slot < (int) num_slots())
   {
     // Adjust chip bounds to just the given slot
     chip_lower_bound = slot;
@@ -1127,7 +1127,7 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, tas
     chip_lower_bound = 0;
     chip_upper_bound = descriptor()->num_chips;
   }
-  else if (slot < num_slots())
+  else if (slot < (int) num_slots())
   {
     // Adjust chip bounds to just the given slot
     chip_lower_bound = slot;
@@ -1372,7 +1372,7 @@ unsigned int ngp_cartridge::slot_size(int slot) const
   {
     return descriptor()->num_bytes;
   }
-  else if (slot < descriptor()->num_chips)
+  else if (slot < (int) descriptor()->num_chips)
   {
     return descriptor()->chips[slot]->num_bytes;
   }
@@ -1391,7 +1391,7 @@ std::string ngp_cartridge::fetch_game_name(int slot)
   }
   
   // Verify parameters
-  if (slot >= num_slots() || slot < 0)
+  if (slot >= (int) num_slots() || slot < 0)
   {
     throw std::invalid_argument("Invalid slot number");
   }
