@@ -1,10 +1,12 @@
 #include "ngp_linkmasta_detail_widget.h"
 #include "ui_ngp_linkmasta_detail_widget.h"
 #include "../worker/ngp_lm_cartridge_polling_worker.h"
+#include "ngp_flashmasta_cartridge_widget.h"
 
 NgpLinkmastaDetailWidget::NgpLinkmastaDetailWidget(unsigned int device_id, QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::NgpLinkmastaDetailWidget), m_device_id(device_id), m_pooling_thread(nullptr)
+  ui(new Ui::NgpLinkmastaDetailWidget), m_device_id(device_id), m_cartridge_widget(nullptr),
+  m_pooling_thread(nullptr)
 {
   ui->setupUi(this);
   m_default_widget = ui->contentWidget;
@@ -49,12 +51,28 @@ void NgpLinkmastaDetailWidget::stop_polling()
 
 void NgpLinkmastaDetailWidget::on_cartridge_removed()
 {
-  ui->noCartridgeLabel->setText("No cartridge detected");
+  m_default_widget->show();
+  
+  if (m_cartridge_widget != nullptr)
+  {
+    m_cartridge_widget->hide();
+    delete m_cartridge_widget;
+    m_cartridge_widget = nullptr;
+  }
 }
 
 void NgpLinkmastaDetailWidget::on_cartridge_inserted()
 {
-  ui->noCartridgeLabel->setText("Cartridge detected");
+  if (m_cartridge_widget != nullptr)
+  {
+    m_cartridge_widget->hide();
+    delete m_cartridge_widget;
+  }
+  
+  m_cartridge_widget = new NgpFlashmastaCartridgeWidget(m_device_id, ui->verticalLayout->widget());
+  ui->verticalLayout->addWidget(m_cartridge_widget, 1);
+  m_cartridge_widget->show();
+  m_default_widget->hide();
 }
 
 

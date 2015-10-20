@@ -28,6 +28,7 @@ private:
   const unsigned int m_device_id;
   
   QWidget* m_default_widget;
+  QWidget* m_cartridge_widget;
   QThread* m_pooling_thread;
 };
 
