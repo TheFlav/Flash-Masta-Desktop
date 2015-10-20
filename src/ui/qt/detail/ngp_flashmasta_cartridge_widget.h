@@ -11,6 +11,7 @@ class NgpFlashmastaCartridgeWidget;
 }
 
 class ngp_cartridge;
+class NgpLmOfficialCartridgeInfoWorker;
 
 class NgpFlashmastaCartridgeWidget : public QWidget
 {
@@ -22,11 +23,12 @@ public:
   void refresh_ui();
   
 public slots:
-  void on_cartridge_loaded(ngp_cartridge* cartridge);
+  void cartridge_loaded(ngp_cartridge* cartridge);
   
 private:
   Ui::NgpFlashmastaCartridgeWidget *ui;
   unsigned int m_device_id;
+  NgpLmOfficialCartridgeInfoWorker* m_worker;
   ngp_cartridge* m_cartridge;
   std::vector<QWidget*> m_slot_widgets;
 };

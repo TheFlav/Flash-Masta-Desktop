@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
 #endif
   
   // Start the automatic list refresh timer
-  connect(&m_timer, SIGNAL(timeout()), this, SLOT(on_refreshDeviceList_timeout()));
+  connect(&m_timer, SIGNAL(timeout()), this, SLOT(refreshDeviceList_timeout()));
   m_timer.start(10);
 }
 
@@ -297,7 +297,7 @@ void MainWindow::on_actionRestoreSave_triggered()
   FlashMasta::get_instance()->get_device_manager()->release_device(index);
 }
 
-void MainWindow::on_refreshDeviceList_timeout()
+void MainWindow::refreshDeviceList_timeout()
 {
   vector<unsigned int> devices;
   

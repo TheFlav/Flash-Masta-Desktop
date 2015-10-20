@@ -24,7 +24,7 @@ private slots:
   void on_actionVerifyROM_triggered();
   void on_actionBackupSave_triggered();
   void on_actionRestoreSave_triggered();
-  void on_refreshDeviceList_timeout();
+  void refreshDeviceList_timeout();
   
   void on_deviceListWidget_currentRowChanged(int currentRow);
   

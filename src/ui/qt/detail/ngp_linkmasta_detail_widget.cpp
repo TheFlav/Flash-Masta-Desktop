@@ -29,8 +29,8 @@ void NgpLinkmastaDetailWidget::start_polling()
   auto worker = new NgpLmCartridgePollingWorker(m_device_id);
   
   worker->moveToThread(m_pooling_thread);
-  connect(worker, SIGNAL(cartridge_removed()), this, SLOT(on_cartridge_removed()));
-  connect(worker, SIGNAL(cartridge_inserted()), this, SLOT(on_cartridge_inserted()));
+  connect(worker, SIGNAL(cartridge_removed()), this, SLOT(cartridge_removed()));
+  connect(worker, SIGNAL(cartridge_inserted()), this, SLOT(cartridge_inserted()));
   connect(m_pooling_thread, SIGNAL(started()), worker, SLOT(start()));
   connect(m_pooling_thread, SIGNAL(finished()), worker, SLOT(stop()));
   connect(m_pooling_thread, SIGNAL(finished()), worker, SLOT(deleteLater()));
@@ -49,7 +49,7 @@ void NgpLinkmastaDetailWidget::stop_polling()
 
 
 
-void NgpLinkmastaDetailWidget::on_cartridge_removed()
+void NgpLinkmastaDetailWidget::cartridge_removed()
 {
   m_default_widget->show();
   
@@ -61,7 +61,7 @@ void NgpLinkmastaDetailWidget::on_cartridge_removed()
   }
 }
 
-void NgpLinkmastaDetailWidget::on_cartridge_inserted()
+void NgpLinkmastaDetailWidget::cartridge_inserted()
 {
   if (m_cartridge_widget != nullptr)
   {

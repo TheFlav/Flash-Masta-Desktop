@@ -20,8 +20,8 @@ public:
   void stop_polling();
   
 public slots:
-  void on_cartridge_removed();
-  void on_cartridge_inserted();
+  void cartridge_removed();
+  void cartridge_inserted();
   
 private:
   Ui::NgpLinkmastaDetailWidget *ui;
