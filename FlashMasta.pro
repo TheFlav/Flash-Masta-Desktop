@@ -58,7 +58,6 @@ SOURCES +=\
     src/ui/qt/task/ws_cartridge_verify_task.cpp \
     src/ui/qt/device_manager.cpp \
     src/ui/qt/libusb_device_manager.cpp \
-    src/ui/qt/device_info_widget.cpp \
     src/ui/qt/detail/ngp_linkmasta_detail_widget.cpp \
     src/ui/qt/detail/ngp_official_cartridge_widget.cpp \
     src/ui/qt/worker/ngp_lm_cartridge_polling_worker.cpp \
@@ -111,7 +110,6 @@ HEADERS  +=\
     src/ui/qt/task/ws_cartridge_verify_task.h \
     src/ui/qt/device_manager.h \
     src/ui/qt/libusb_device_manager.h \
-    src/ui/qt/device_info_widget.h \
     src/ui/qt/detail/ngp_linkmasta_detail_widget.h \
     src/ui/qt/detail/ngp_official_cartridge_widget.h \
     src/ui/qt/worker/ngp_lm_cartridge_polling_worker.h \
@@ -120,7 +118,6 @@ HEADERS  +=\
     src/ui/qt/detail/ngp_flashmasta_cartridge_slot_widget.h
 
 FORMS    +=\
-    src/ui/qt/device_info_widget.ui \
     src/ui/qt/main_window.ui \
     src/ui/qt/detail/ngp_linkmasta_detail_widget.ui \
     src/ui/qt/detail/ngp_official_cartridge_widget.ui \
