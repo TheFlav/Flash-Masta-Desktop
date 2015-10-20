@@ -2,7 +2,7 @@
 #include "ui_ngp_flashmasta_cartridge_widget.h"
 #include "cartridge/ngp_cartridge.h"
 #include "ngp_flashmasta_cartridge_slot_widget.h"
-#include "../worker/ngp_lm_official_cartridge_info_worker.h"
+#include "../worker/ngp_lm_cartridge_fetching_worker.h"
 
 #include <QString>
 #include <string>
@@ -15,7 +15,7 @@ NgpFlashmastaCartridgeWidget::NgpFlashmastaCartridgeWidget(unsigned int device_i
   ui->setupUi(this);
   
   QThread* thread = new QThread();
-  m_worker = new NgpLmOfficialCartridgeInfoWorker(m_device_id);
+  m_worker = new NgpLmCartridgeFetchingWorker(m_device_id);
   m_worker->moveToThread(thread);
   connect(thread, SIGNAL(started()), m_worker, SLOT(run()));
   connect(m_worker, SIGNAL(finished(ngp_cartridge*)), this, SLOT(cartridge_loaded(ngp_cartridge*)));

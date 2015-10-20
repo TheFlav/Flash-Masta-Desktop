@@ -2,7 +2,7 @@
 #include "ui_ngp_official_cartridge_widget.h"
 
 #include <QThread>
-#include "../worker/ngp_lm_official_cartridge_info_worker.h"
+#include "../worker/ngp_lm_cartridge_fetching_worker.h"
 #include "cartridge/ngp_cartridge.h"
 
 NgpOfficalCartridgeWidget::NgpOfficalCartridgeWidget(QWidget *parent) :

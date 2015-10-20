@@ -1,11 +1,11 @@
-#include "ngp_lm_official_cartridge_info_worker.h"
+#include "ngp_lm_cartridge_fetching_worker.h"
 
 #include "../flash_masta.h"
 #include "../device_manager.h"
 #include "cartridge/ngp_cartridge.h"
 #include "linkmasta_device/linkmasta_device.h"
 
-NgpLmOfficialCartridgeInfoWorker::NgpLmOfficialCartridgeInfoWorker(unsigned int device_id, QObject *parent) :
+NgpLmCartridgeFetchingWorker::NgpLmCartridgeFetchingWorker(unsigned int device_id, QObject *parent) :
   QObject(parent), m_device_id(device_id), m_cancelled(false)
 {
   
@@ -13,7 +13,7 @@ NgpLmOfficialCartridgeInfoWorker::NgpLmOfficialCartridgeInfoWorker(unsigned int 
 
 
 
-void NgpLmOfficialCartridgeInfoWorker::run()
+void NgpLmCartridgeFetchingWorker::run()
 {
   bool cancel = false;
   ngp_cartridge* cart = nullptr;
@@ -63,7 +63,7 @@ void NgpLmOfficialCartridgeInfoWorker::run()
   emit finished(cart);
 }
 
-void NgpLmOfficialCartridgeInfoWorker::cancel()
+void NgpLmCartridgeFetchingWorker::cancel()
 {
   m_mutex.lock();
   m_cancelled = true;

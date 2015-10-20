@@ -6,11 +6,11 @@
 
 class ngp_cartridge;
 
-class NgpLmOfficialCartridgeInfoWorker : public QObject
+class NgpLmCartridgeFetchingWorker : public QObject
 {
   Q_OBJECT
 public:
-  explicit NgpLmOfficialCartridgeInfoWorker(unsigned int device_id, QObject *parent = 0);
+  explicit NgpLmCartridgeFetchingWorker(unsigned int device_id, QObject *parent = 0);
   
 signals:
   void finished(ngp_cartridge* cart);
