@@ -128,27 +128,16 @@ void NgpFmCartridgeInfoWidget::setCartridgeNumChips(unsigned int num_chips)
     for (unsigned int widget_i = 0; widget_i <= 2 + 1; widget_i++)
     {
       m_cart_chip_widgets[chip_i][widget_i] = nullptr;
-      if (widget_i >= 2 + 1) continue;
-      
-      QWidget* widget = nullptr;
-      switch (widget_i)
-      {
-      case 0:
-        widget = new QLabel(QString("Chip ") + QString::number(chip_i) + QString(" size:"), ui->cartridgeSpecsFormLayout->widget());
-        break;
-      case 1:
-        widget = new QLabel(QString(""), ui->cartridgeSpecsFormLayout->widget());
-        break;
-      default:
-        break;
-      }
-      
-      if (widget == nullptr) break;
-      
-      m_cart_chip_widgets[chip_i][widget_i] = widget;
-      ui->cartridgeSpecsFormLayout->addWidget(widget);
-      widget->show();
     }
+    
+    // Create widgets for chip
+    QWidget* chip_size_label = new QLabel(QString("Chip ") + QString::number(chip_i) + QString(" size:"), ui->cartridgeSpecsFormLayout->widget());
+    QWidget* chip_size_field = new QLabel(QString(""), ui->cartridgeSpecsFormLayout->widget());
+      
+    m_cart_chip_widgets[chip_i][0] = chip_size_label;
+    m_cart_chip_widgets[chip_i][1] = chip_size_field;
+    
+    ui->cartridgeSpecsFormLayout->addRow(chip_size_label, chip_size_field);
   }
   
   // Rebuild chip size array
