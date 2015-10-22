@@ -157,6 +157,8 @@ void NgpFmCartridgeInfoWidget::setCartridgeNumChips(unsigned int num_chips)
   {
     setCartridgeChipSize(chip_i, 0);
   }
+  
+  ui->cartridgeSpecNumChipsOutputLabel->setText(QString::number(m_cart_num_chips));
 }
 
 void NgpFmCartridgeInfoWidget::setCartridgeChipSize(unsigned int chip_index, unsigned int num_bytes)
