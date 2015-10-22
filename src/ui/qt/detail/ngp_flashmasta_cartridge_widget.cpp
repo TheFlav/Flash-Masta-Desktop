@@ -3,6 +3,7 @@
 #include "cartridge/ngp_cartridge.h"
 #include "ngp_flashmasta_cartridge_slot_widget.h"
 #include "../worker/ngp_lm_cartridge_fetching_worker.h"
+#include "ngp_fm_cartridge_info_widget.h"
 
 #include <QString>
 #include <string>
@@ -13,6 +14,9 @@ NgpFlashmastaCartridgeWidget::NgpFlashmastaCartridgeWidget(unsigned int device_i
   ui(new Ui::NgpFlashmastaCartridgeWidget), m_device_id(device_id), m_cartridge(nullptr)
 {
   ui->setupUi(this);
+  
+  m_default_widget = ui->defaultWidget;
+  m_current_widget = m_default_widget;
   
   QThread* thread = new QThread();
   m_worker = new NgpLmCartridgeFetchingWorker(m_device_id);
@@ -42,15 +46,22 @@ void NgpFlashmastaCartridgeWidget::refresh_ui()
     delete widget;
   }
   m_slot_widgets.clear();
+  m_slot_widgets.reserve(m_cartridge->num_slots() + 1);
   
   ui->slotsComboBox->insertItem(0, "Cartridge Info");
+  m_slot_widgets.push_back(new NgpFmCartridgeInfoWidget(m_cartridge, ui->verticalLayout->widget()));
+  m_slot_widgets.back()->hide();
+  ui->verticalLayout->addWidget(m_slot_widgets.back(), 1);
   
   for (unsigned int i = 0; i < m_cartridge->num_slots(); ++i)
   {
     ui->slotsComboBox->insertItem(i+1, "Slot " + QString::number(i+1));
+    m_slot_widgets.push_back(new QWidget(ui->verticalLayout->widget()));
+    ui->verticalLayout->addWidget(m_slot_widgets.back(), 1);
   }
   
   ui->slotsComboBox->setCurrentIndex(0);
+  on_slotsComboBox_currentIndexChanged(0);
 }
 
 void NgpFlashmastaCartridgeWidget::cartridge_loaded(ngp_cartridge* cartridge)
@@ -59,4 +70,20 @@ void NgpFlashmastaCartridgeWidget::cartridge_loaded(ngp_cartridge* cartridge)
   m_cartridge = cartridge;
   m_worker = nullptr;
   refresh_ui();
+}
+
+void NgpFlashmastaCartridgeWidget::on_slotsComboBox_currentIndexChanged(int index)
+{
+  m_current_widget->hide();
+  
+  if (index >= 0 && index < (int) m_slot_widgets.size())
+  {
+    m_current_widget = m_slot_widgets[index];
+  }
+  else
+  {
+    m_current_widget = m_default_widget;
+  }
+  
+  m_current_widget->show();
 }

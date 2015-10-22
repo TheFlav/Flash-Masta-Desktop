@@ -25,8 +25,14 @@ public:
 public slots:
   void cartridge_loaded(ngp_cartridge* cartridge);
   
+private slots:
+  void on_slotsComboBox_currentIndexChanged(int index);
+  
 private:
   Ui::NgpFlashmastaCartridgeWidget *ui;
+  QWidget* m_default_widget;
+  QWidget* m_current_widget;
+  
   unsigned int m_device_id;
   NgpLmCartridgeFetchingWorker* m_worker;
   ngp_cartridge* m_cartridge;

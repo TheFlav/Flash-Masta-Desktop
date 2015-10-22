@@ -31,7 +31,7 @@ using namespace std;
 MainWindow::MainWindow(QWidget *parent) 
   : QMainWindow(parent), ui(new Ui::MainWindow),
     m_target_system(system_type::UNKNOWN), m_timer(this), m_device_ids(),
-    m_device_detail_widgets(), m_default_widget(nullptr)
+    m_device_detail_widgets(), m_default_widget(nullptr), m_current_widget(nullptr)
 {
   ui->setupUi(this);
 
@@ -347,12 +347,13 @@ void MainWindow::refreshDeviceList_timeout()
           m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
           
           //auto widget = new DeviceInfoWidget(ui->scrollAreaWidgetContents->parentWidget());
-          auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents->parentWidget());
-          widget->start_polling();
-          
+          auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents);
           m_device_detail_widgets[devices[j]] = widget;
           //widget->set_device_id(devices[j]);
           widget->hide();
+          ui->scrollAreaWidgetContents->layout()->addWidget(widget);
+          
+          widget->start_polling();
           
           ++i;
           ++j;
@@ -386,12 +387,13 @@ void MainWindow::refreshDeviceList_timeout()
         m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
         
         //auto widget = new DeviceInfoWidget(ui->scrollAreaWidgetContents->parentWidget());
-        auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents->parentWidget());
-        widget->start_polling();
-        
+        auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents);
         m_device_detail_widgets[devices[j]] = widget;
         //widget->set_device_id(devices[j]);
         widget->hide();
+        ui->scrollAreaWidgetContents->layout()->addWidget(widget);
+        
+        widget->start_polling();
         
         ++i;
         ++j;
@@ -404,20 +406,16 @@ void MainWindow::refreshDeviceList_timeout()
 
 void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
 {
-  if (m_default_widget == nullptr)
+  if (m_current_widget != nullptr)
   {
-    m_default_widget = ui->scrollAreaWidgetContents;
+    m_current_widget->hide();
+    m_current_widget = nullptr;
   }
   
   if (currentRow >= 0)
   {
-    ui->scrollAreaWidgetContents->hide();
-    ui->scrollAreaWidgetContents = m_device_detail_widgets[m_device_ids[currentRow]];
-    ui->scrollAreaWidgetContents->show();
-  }
-  else
-  {
-    ui->scrollAreaWidgetContents = m_default_widget;
+    m_current_widget = m_device_detail_widgets[m_device_ids[currentRow]];
+    m_current_widget->show();
   }
 }
 

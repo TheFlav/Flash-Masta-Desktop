@@ -36,6 +36,7 @@ private:
   std::vector<unsigned int> m_device_ids;
   std::map<unsigned int, QWidget*> m_device_detail_widgets;
   QWidget* m_default_widget;
+  QWidget* m_current_widget;
 };
 
 #endif // __MAINWINDOW_H__
