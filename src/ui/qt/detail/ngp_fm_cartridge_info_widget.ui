@@ -58,30 +58,30 @@
     </spacer>
    </item>
    <item>
-    <layout class="QFormLayout" name="formLayout">
+    <layout class="QFormLayout" name="cartridgeSpecsFormLayout">
      <item row="0" column="0">
-      <widget class="QLabel" name="numSlotsLabel">
+      <widget class="QLabel" name="cartridgeSpecNumSlotsLabel">
        <property name="text">
         <string>Game Slots:</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLabel" name="numSlotsOutputLabel">
+      <widget class="QLabel" name="cartridgeSpecNumSlotsOutputLabel">
        <property name="text">
         <string/>
        </property>
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="capacityLabel">
+      <widget class="QLabel" name="cartridgeSpecCapacityLabel">
        <property name="text">
         <string>Cartridge Size:</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLabel" name="capacityOutputLabel">
+      <widget class="QLabel" name="cartridgeSpecCapacityOutputLabel">
        <property name="text">
         <string/>
        </property>

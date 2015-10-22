@@ -150,7 +150,9 @@ macx {
         -framework IOKit \
         -framework CoreFoundation \
         "$$PWD/libs/osx/libusb-1.0.a"
-
+    
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
+    
     DEFINES  +=\
         OS_MACOSX
 }
