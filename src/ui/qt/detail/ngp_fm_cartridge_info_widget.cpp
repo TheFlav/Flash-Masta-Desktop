@@ -131,8 +131,11 @@ void NgpFmCartridgeInfoWidget::setCartridgeNumChips(unsigned int num_chips)
     }
     
     // Create widgets for chip
-    QWidget* chip_size_label = new QLabel(QString("Chip ") + QString::number(chip_i) + QString(" size:"), ui->cartridgeSpecsFormLayout->widget());
+    QWidget* chip_size_label = new QLabel(QString("Chip ") + QString::number(chip_i + 1) + QString(" size:"), ui->cartridgeSpecsFormLayout->widget());
     QWidget* chip_size_field = new QLabel(QString(""), ui->cartridgeSpecsFormLayout->widget());
+    QFont font = QFont(chip_size_field->font());
+    font.setBold(true);
+    chip_size_field->setFont(font);
       
     m_cart_chip_widgets[chip_i][0] = chip_size_label;
     m_cart_chip_widgets[chip_i][1] = chip_size_field;
