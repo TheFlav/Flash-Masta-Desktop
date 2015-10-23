@@ -49,10 +49,20 @@ ngp_cartridge::~ngp_cartridge()
   }
 }
 
-// Note: documentation contained in super class cartridge
 system_type ngp_cartridge::system() const
 {
-  return system_type::NEO_GEO_POCKET;
+  return system_type::SYSTEM_NEO_GEO_POCKET;
+}
+
+cartridge_type ngp_cartridge::type() const
+{
+  // Ensure class was initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  return descriptor()->type; // TODO
 }
 
 const cartridge_descriptor* ngp_cartridge::descriptor() const
@@ -1429,6 +1439,7 @@ void ngp_cartridge::build_cartridge_destriptor()
   }
   
   ngp_chip* chip;
+  m_descriptor->type = CARTRIDGE_OFFICIAL;
   
   for (unsigned int i = 0; i < MAX_NUM_CHIPS; ++i)
   {
@@ -1447,11 +1458,17 @@ void ngp_cartridge::build_cartridge_destriptor()
     
     // Initialize chip
     m_chips[i]->test_bypass_support();
+    
+    // Use factoryProt value from chip to determine cartridge type
+    if (m_chips[i]->get_factory_prot() == 0x85)
+    {
+      m_descriptor->type = CARTRIDGE_FLASHMASTA;
+    }
   }
   
   // Initialize cartridge descriptor
   m_descriptor = new cartridge_descriptor(m_num_chips);
-  m_descriptor->type = NEO_GEO_POCKET;
+  m_descriptor->system = SYSTEM_NEO_GEO_POCKET;
   m_descriptor->num_bytes = 0;
   
   // Build chips

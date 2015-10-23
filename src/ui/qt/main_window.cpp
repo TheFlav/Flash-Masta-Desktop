@@ -30,7 +30,7 @@ using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) 
   : QMainWindow(parent), ui(new Ui::MainWindow),
-    m_target_system(system_type::UNKNOWN), m_timer(this), m_device_ids(),
+    m_target_system(system_type::SYSTEM_UNKNOWN), m_timer(this), m_device_ids(),
     m_device_info_widgets(), m_default_widget(nullptr)
 {
   ui->setupUi(this);
@@ -99,11 +99,11 @@ void MainWindow::on_actionBackupROM_triggered()
   {
     switch (cart->system())
     {
-    case system_type::NEO_GEO_POCKET:
+    case system_type::SYSTEM_NEO_GEO_POCKET:
       NgpCartridgeBackupTask(this, cart).go();
       break;
       
-    case system_type::WONDERSWAN:
+    case system_type::SYSTEM_WONDERSWAN:
       WsCartridgeBackupTask(this, cart).go();
       break;
     }
@@ -142,11 +142,11 @@ void MainWindow::on_actionRestoreROM_triggered()
   {
     switch (cart->system())
     {
-    case system_type::NEO_GEO_POCKET:
+    case system_type::SYSTEM_NEO_GEO_POCKET:
       NgpCartridgeFlashTask(this, cart).go();
       break;
       
-    case system_type::WONDERSWAN:
+    case system_type::SYSTEM_WONDERSWAN:
       WsCartridgeFlashTask(this, cart).go();
       break;
     }
@@ -185,11 +185,11 @@ void MainWindow::on_actionVerifyROM_triggered()
   {
     switch (cart->system())
     {
-    case system_type::NEO_GEO_POCKET:
+    case system_type::SYSTEM_NEO_GEO_POCKET:
       NgpCartridgeVerifyTask(this, cart).go();
       break;
       
-    case system_type::WONDERSWAN:
+    case system_type::SYSTEM_WONDERSWAN:
       WsCartridgeVerifyTask(this, cart).go();
       break;
     }
@@ -228,11 +228,11 @@ void MainWindow::on_actionBackupSave_triggered()
   {
     switch (cart->system())
     {
-    case system_type::NEO_GEO_POCKET:
+    case system_type::SYSTEM_NEO_GEO_POCKET:
       NgpCartridgeBackupSaveTask(this, cart).go();
       break;
       
-    case system_type::WONDERSWAN:
+    case system_type::SYSTEM_WONDERSWAN:
       WsCartridgeBackupSaveTask(this, cart).go();
       break;
     }
@@ -271,11 +271,11 @@ void MainWindow::on_actionRestoreSave_triggered()
   {
     switch (cart->system())
     {
-    case system_type::NEO_GEO_POCKET:
+    case system_type::SYSTEM_NEO_GEO_POCKET:
       NgpCartridgeRestoreSaveTask(this, cart).go();
       break;
       
-    case system_type::WONDERSWAN:
+    case system_type::SYSTEM_WONDERSWAN:
       WsCartridgeRestoreSaveTask(this, cart).go();
       break;
     }

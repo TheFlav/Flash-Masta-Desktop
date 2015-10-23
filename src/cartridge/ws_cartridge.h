@@ -60,10 +60,13 @@ public:
   /*!
    *  \see cartridge::system()
    *  
-   *  \returns \ref system_type::WONDERSWAN - The cartridge is compatible with
+   *  \returns \ref system_type::SYSTEM_WONDERSWAN - The cartridge is compatible with
    *           a WonderSwan or WonderSwan Color system.
    */
   system_type           system() const;
+  
+  /*! \see cartridge::type() */
+  cartridge_type        type() const;
   
   /*!
    *  \see cartridge::descriptor()

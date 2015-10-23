@@ -56,7 +56,18 @@ ws_cartridge::~ws_cartridge()
 
 system_type ws_cartridge::system() const
 {
-  return system_type::WONDERSWAN;
+  return system_type::SYSTEM_WONDERSWAN;
+}
+
+cartridge_type ws_cartridge::type() const
+{
+  // Ensure class was initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  return cartridge_type::CARTRIDGE_FLASHMASTA;
 }
 
 const cartridge_descriptor* ws_cartridge::descriptor() const
@@ -1224,7 +1235,8 @@ void ws_cartridge::build_cartridge_destriptor()
   
   // Initialize cartridge descriptor
   m_descriptor = new cartridge_descriptor(1);
-  m_descriptor->type = system_type::WONDERSWAN;
+  m_descriptor->system = system_type::SYSTEM_WONDERSWAN;
+  m_descriptor->type = cartridge_type::CARTRIDGE_FLASHMASTA;
   m_descriptor->num_bytes = 0;
   
   // Build chip

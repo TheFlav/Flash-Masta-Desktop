@@ -17,7 +17,7 @@
 
 
 
-/** \enum system_type
+/*! \enum system_type
  *  \brief Enumeration representing a system to which a game cartridge belongs.
  *  
  *  Enumeration indicating which game system an object is designed to work with.
@@ -25,14 +25,35 @@
  */
 enum system_type
 {
-  /*! \brief Unknown cartridge type */
-  UNKNOWN,
+  /*! \brief Unknown cartridge system */
+  SYSTEM_UNKNOWN,
   
   /*! \brief Neo Geo Pocket or Neo Geo Pocket Color */
-  NEO_GEO_POCKET,
+  SYSTEM_NEO_GEO_POCKET,
   
   /*! \brief Wonderswan or Wonderswan Color */
-  WONDERSWAN
+  SYSTEM_WONDERSWAN
+};
+
+
+/** \enum cartridge_type
+ *  \brief Enumeration representing the type of cartridge, such as official
+ *         or custom.
+ *  
+ *  Enumeration indicating the type of a cartridge. Used to specify if a
+ *  cartridge is an official cartridge, an unrecognized cartridge, or a
+ *  Flash Masta
+ */
+enum cartridge_type
+{
+  /*! \brief Unknown cartridge type */
+  CARTRIDGE_UNKNOWN,
+  
+  /*! \brief Official, default cartridge type */
+  CARTRIDGE_OFFICIAL,
+  
+  /*! \brief Writable Flash Masta cartridge */
+  CARTRIDGE_FLASHMASTA
 };
 
 
@@ -91,7 +112,14 @@ struct cartridge_descriptor
    *  
    *  \see system_type
    */
-  system_type               type;
+  system_type               system;
+  
+  /*! \brief Stores the type of cartridge, such as if this is an official
+   *         cartridge or a cusotmized variant.
+   *  
+   *  \see cartridge_type
+   */
+  cartridge_type            type;
   
   /*! \brief The storage capacity of the cartridge in bytes.
    */
