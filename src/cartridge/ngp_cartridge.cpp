@@ -1439,7 +1439,6 @@ void ngp_cartridge::build_cartridge_destriptor()
   }
   
   ngp_chip* chip;
-  m_descriptor->type = CARTRIDGE_OFFICIAL;
   
   for (unsigned int i = 0; i < MAX_NUM_CHIPS; ++i)
   {
@@ -1458,17 +1457,12 @@ void ngp_cartridge::build_cartridge_destriptor()
     
     // Initialize chip
     m_chips[i]->test_bypass_support();
-    
-    // Use factoryProt value from chip to determine cartridge type
-    if (m_chips[i]->get_factory_prot() == 0x85)
-    {
-      m_descriptor->type = CARTRIDGE_FLASHMASTA;
-    }
   }
   
   // Initialize cartridge descriptor
   m_descriptor = new cartridge_descriptor(m_num_chips);
   m_descriptor->system = SYSTEM_NEO_GEO_POCKET;
+  m_descriptor->type = (m_chips[0]->get_factory_prot() == 0x85 ? CARTRIDGE_FLASHMASTA : CARTRIDGE_OFFICIAL);
   m_descriptor->num_bytes = 0;
   
   // Build chips

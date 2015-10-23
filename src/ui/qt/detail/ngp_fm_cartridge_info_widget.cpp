@@ -46,11 +46,31 @@ void NgpFmCartridgeInfoWidget::buildFromCartridge(ngp_cartridge* cartridge)
     setCartridgeChipSize(chip_i, descriptor->chips[chip_i]->num_bytes);
   }
   
-  // TODO: Decide cartridge capabilities based on the cartridge's chip's identifiers
-  setGameBackupEnabled(true);
-  setGameFlashEnabled(true);
-  setSaveBackupEnabled(true);
-  setSaveRestoreEnabled(true);
+  // Decide cartridge capabilities based on the cartridge's chip's identifiers
+  switch (descriptor->type)
+  {
+  default:
+  case CARTRIDGE_UNKNOWN:
+    setGameBackupEnabled(false);
+    setGameFlashEnabled(false);
+    setSaveBackupEnabled(false);
+    setSaveRestoreEnabled(false);
+    break;
+    
+  case CARTRIDGE_OFFICIAL:
+    setGameBackupEnabled(true);
+    setGameFlashEnabled(false);
+    setSaveBackupEnabled(true);
+    setSaveRestoreEnabled(true);
+    break;
+    
+  case CARTRIDGE_FLASHMASTA:
+    setGameBackupEnabled(true);
+    setGameFlashEnabled(true);
+    setSaveBackupEnabled(false);
+    setSaveRestoreEnabled(true);
+    break;
+  }
 }
 
 
