@@ -71,10 +71,13 @@ public:
   /*!
    *  \see cartridge::system()
    *  
-   *  \returns \ref system_type::NEO_GEO_POCKET - The cartridge is compatible
-   *           with a Neo Geo Pocket or Neo Geo Pocket Color system.
+   *  \returns \ref system_type::SYSTEM_NEO_GEO_POCKET - The cartridge is
+   *           compatible with a Neo Geo Pocket or Neo Geo Pocket Color system.
    */
   system_type           system() const;
+  
+  /*! \see cartridge::type() */
+  cartridge_type        type() const;
   
   /*!
    *  \see cartridge::descriptor()

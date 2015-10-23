@@ -26,13 +26,14 @@ const int BYPASS_SUPPORTERS[3] = {
   -1    /* sentinal value (end of array) */
 };
 
-typedef ngp_chip::data_t        data_t;
-typedef ngp_chip::word_t        word_t;
-typedef ngp_chip::chip_index_t  chip_index_t;
-typedef ngp_chip::manufact_id_t manufact_id_t;
-typedef ngp_chip::device_id_t   device_id_t;
-typedef ngp_chip::protect_t     protect_t;
-typedef ngp_chip::address_t     address_t;
+typedef ngp_chip::data_t         data_t;
+typedef ngp_chip::word_t         word_t;
+typedef ngp_chip::chip_index_t   chip_index_t;
+typedef ngp_chip::manufact_id_t  manufact_id_t;
+typedef ngp_chip::device_id_t    device_id_t;
+typedef ngp_chip::factory_prot_t factory_prot_t;
+typedef ngp_chip::protect_t      protect_t;
+typedef ngp_chip::address_t      address_t;
 
 
 
@@ -140,6 +141,22 @@ device_id_t ngp_chip::get_device_id()
     
     return read(0x0001);
   }
+}
+
+factory_prot_t ngp_chip::get_factory_prot()
+{
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  if (current_mode() != AUTOSELECT)
+  {
+    enter_autoselect();
+  }
+  
+  return read(0x0003);
 }
 
 protect_t ngp_chip::get_block_protection(address_t sector_address)

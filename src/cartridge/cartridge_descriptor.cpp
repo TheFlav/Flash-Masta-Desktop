@@ -20,7 +20,7 @@ cartridge_descriptor::cartridge_descriptor(unsigned int num_chips)
 }
 
 cartridge_descriptor::cartridge_descriptor(const cartridge_descriptor& other)
-  : type(other.type), num_bytes(other.num_bytes),
+  : system(other.system), type(other.type), num_bytes(other.num_bytes),
     num_chips(other.num_chips),
     chips(other.num_chips > 0 ? new chip_descriptor*[other.num_chips] : nullptr)
 {
