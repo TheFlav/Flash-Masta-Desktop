@@ -39,6 +39,8 @@ private:
   //////////////// DATA ////////////////
 private:
   libusb_context* m_libusb;
+  std::mutex      m_libusb_mutex;
+  bool            m_libusb_init;
   
   struct connected_device
   {

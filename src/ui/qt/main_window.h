@@ -24,7 +24,7 @@ private slots:
   void on_actionVerifyROM_triggered();
   void on_actionBackupSave_triggered();
   void on_actionRestoreSave_triggered();
-  void on_refreshDeviceList_timeout();
+  void refreshDeviceList_timeout();
   
   void on_deviceListWidget_currentRowChanged(int currentRow);
   
@@ -34,8 +34,9 @@ private:
   QTimer m_timer;
   
   std::vector<unsigned int> m_device_ids;
-  std::map<unsigned int, DeviceInfoWidget*> m_device_info_widgets;
+  std::map<unsigned int, QWidget*> m_device_detail_widgets;
   QWidget* m_default_widget;
+  QWidget* m_current_widget;
 };
 
 #endif // __MAINWINDOW_H__

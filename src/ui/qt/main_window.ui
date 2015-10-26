@@ -95,6 +95,7 @@
        <height>304</height>
       </rect>
      </property>
+     <layout class="QVBoxLayout" name="verticalLayout"/>
     </widget>
    </widget>
   </widget>

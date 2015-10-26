@@ -5,11 +5,25 @@ build/*
 bin/*
 
 
-# IDE project files
+# Xcode
 *.xcodeproj
 *.xcodeproj/*
+
+# Qt
 *.pro.user
 
+# Visual Studio
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+ipch/
+*.abs
+*.ncb
+*.opensdf
+*.sdf
+*.cachefile
 
 # Miscellaneous
 .DS_Store

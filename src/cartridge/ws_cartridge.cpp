@@ -112,7 +112,7 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
   m_linkmasta->open();
   
   // Validate arguments
-  if ((slot < 0 || slot >= m_slots.size()) && slot != SLOT_ALL)
+  if ((slot < 0 || slot >= (int) m_slots.size()) && slot != SLOT_ALL)
   {
     throw std::invalid_argument("invalid slot number: " + std::to_string(slot));
   }
@@ -165,7 +165,7 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
   unsigned int curr_block = 0;
   
   unsigned int slot_offset = 0;
-  for (unsigned int i = 0; i < slot; ++i)
+  for (unsigned int i = 0; i < (unsigned int) slot; ++i)
   {
     slot_offset += m_linkmasta->read_slot_size(i);
   }
@@ -336,7 +336,7 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task
   m_linkmasta->open();
   
   // Validate arguments
-  if ((slot < 0 || slot >= m_slots.size()) && slot != SLOT_ALL)
+  if ((slot < 0 || slot >= (int) m_slots.size()) && slot != SLOT_ALL)
   {
     throw std::invalid_argument("invalid slot number: " + std::to_string(slot));
   }
@@ -365,7 +365,7 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task
   
   // Search for starting block, since it's not clear exactly where it will be
   unsigned int slot_offset = 0;
-  for (unsigned int i = 0; i < slot; ++i)
+  for (unsigned int i = 0; i < (unsigned int) slot; ++i)
   {
     slot_offset += m_linkmasta->read_slot_size(i);
   }
@@ -542,7 +542,7 @@ bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, task
   m_linkmasta->open();
   
   // Validate arguments
-  if ((slot < 0 || slot >= m_slots.size()) && slot != SLOT_ALL)
+  if ((slot < 0 || slot >= (int) m_slots.size()) && slot != SLOT_ALL)
   {
     throw std::invalid_argument("invalid slot number: " + std::to_string(slot));
   }
@@ -572,7 +572,7 @@ bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, task
   
   // Search for starting block, since it's not clear exactly where it will be
   unsigned int slot_offset = 0;
-  for (unsigned int i = 0; i < slot; ++i)
+  for (unsigned int i = 0; i < (unsigned int) slot; ++i)
   {
     slot_offset += m_linkmasta->read_slot_size(i);
   }
@@ -1158,7 +1158,7 @@ unsigned int ws_cartridge::slot_size(int slot) const
     throw std::runtime_error("ERROR"); // TODO
   }
   
-  if (slot >= 0 && slot < num_slots())
+  if (slot >= 0 && slot < (int) num_slots())
   {
     return m_slots[slot];
   }
@@ -1180,7 +1180,7 @@ std::string ws_cartridge::fetch_game_name(int slot)
   m_linkmasta->open();
   
   // Jump to selected slot
-  if (slot < 0 || slot >= m_linkmasta->read_num_slots())
+  if (slot < 0 || slot >= (int) m_linkmasta->read_num_slots())
   {
     throw std::invalid_argument("invalid slot number: " + std::to_string(slot));
   }
