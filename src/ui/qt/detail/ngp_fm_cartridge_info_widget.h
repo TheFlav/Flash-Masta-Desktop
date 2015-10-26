@@ -38,6 +38,9 @@ public:
   void setSaveRestoreEnabled(bool enabled);
   
 private:
+  QString stringifyBytesToBits(unsigned int num_bytes, bool reduce = true);
+  
+private:
   void clearChipData();
   
   Ui::NgpFmCartridgeInfoWidget *ui;

@@ -4,8 +4,6 @@
 #include <QString>
 #include <QLabel>
 
-QString stringifyBytesToBits(unsigned int num_bytes, bool reduce = true);
-
 
 
 NgpFmCartridgeInfoWidget::NgpFmCartridgeInfoWidget(ngp_cartridge* cartridge, QWidget *parent) :
@@ -279,7 +277,7 @@ void NgpFmCartridgeInfoWidget::clearChipData()
 //////// HELPER FUNCTIONS ////////
 
 
-QString stringifyBytesToBits(unsigned int num_bytes, bool reduce)
+QString NgpFmCartridgeInfoWidget::stringifyBytesToBits(unsigned int num_bytes, bool reduce)
 {
   QString text;
   if (reduce && (num_bytes & 0x7FFFFFF) == 0)

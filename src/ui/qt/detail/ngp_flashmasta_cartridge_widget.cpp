@@ -4,6 +4,7 @@
 #include "ngp_flashmasta_cartridge_slot_widget.h"
 #include "../worker/ngp_lm_cartridge_fetching_worker.h"
 #include "ngp_fm_cartridge_info_widget.h"
+#include "fm_cartridge_slot_widget.h"
 
 #include <QString>
 #include <string>
@@ -56,7 +57,8 @@ void NgpFlashmastaCartridgeWidget::refresh_ui()
   for (unsigned int i = 0; i < m_cartridge->num_slots(); ++i)
   {
     ui->slotsComboBox->insertItem(i+1, "Slot " + QString::number(i+1));
-    m_slot_widgets.push_back(new QWidget(ui->verticalLayout->widget()));
+    m_slot_widgets.push_back(new FmCartridgeSlotWidget(m_cartridge, (int) i, ui->verticalLayout->widget()));
+    m_slot_widgets.back()->hide();
     ui->verticalLayout->addWidget(m_slot_widgets.back(), 1);
   }
   
