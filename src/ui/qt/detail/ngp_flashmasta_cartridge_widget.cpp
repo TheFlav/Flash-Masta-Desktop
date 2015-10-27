@@ -56,15 +56,28 @@ void NgpFlashmastaCartridgeWidget::refresh_ui()
   
   for (unsigned int i = 0; i < m_cartridge->num_slots(); ++i)
   {
+    FmCartridgeSlotWidget* slot_widget = new FmCartridgeSlotWidget(m_cartridge, (int) i, ui->verticalLayout->widget());
+    m_slot_widgets.push_back(slot_widget);
+    slot_widget->hide();
+    
+    ui->verticalLayout->addWidget(slot_widget, 1);
     ui->slotsComboBox->insertItem(i+1, "Slot " + QString::number(i+1));
-    m_slot_widgets.push_back(new FmCartridgeSlotWidget(m_cartridge, (int) i, ui->verticalLayout->widget()));
-    m_slot_widgets.back()->hide();
-    ui->verticalLayout->addWidget(m_slot_widgets.back(), 1);
+    
+    connect(slot_widget, SIGNAL(gameBackupTriggered()), this, SLOT(when_gameBackupTriggered()));
+    connect(slot_widget, SIGNAL(gameFlashTriggered()), this, SLOT(when_gameFlashTriggered()));
+    connect(slot_widget, SIGNAL(gameVerifyTriggered()), this, SLOT(when_gameVerifyTriggered()));
+    connect(slot_widget, SIGNAL(saveBackupTriggered()), this, SLOT(when_saveBackupTriggered()));
+    connect(slot_widget, SIGNAL(saveRestoreTriggered()), this, SLOT(when_saveRestoreTriggered()));
+    connect(slot_widget, SIGNAL(saveVerifyTriggered()), this, SLOT(when_saveVerifyTriggered()));
   }
   
   ui->slotsComboBox->setCurrentIndex(0);
   on_slotsComboBox_currentIndexChanged(0);
 }
+
+
+
+// public slots:
 
 void NgpFlashmastaCartridgeWidget::cartridge_loaded(ngp_cartridge* cartridge)
 {
@@ -73,6 +86,40 @@ void NgpFlashmastaCartridgeWidget::cartridge_loaded(ngp_cartridge* cartridge)
   m_worker = nullptr;
   refresh_ui();
 }
+
+void NgpFlashmastaCartridgeWidget::when_gameBackupTriggered()
+{
+  emit gameBackupTriggered();
+}
+
+void NgpFlashmastaCartridgeWidget::when_gameFlashTriggered()
+{
+  emit gameFlashTriggered();
+}
+
+void NgpFlashmastaCartridgeWidget::when_gameVerifyTriggered()
+{
+  emit gameVerifyTriggered();
+}
+
+void NgpFlashmastaCartridgeWidget::when_saveBackupTriggered()
+{
+  emit saveBackupTriggered();
+}
+
+void NgpFlashmastaCartridgeWidget::when_saveRestoreTriggered()
+{
+  emit saveRestoreTriggered();
+}
+
+void NgpFlashmastaCartridgeWidget::when_saveVerifyTriggered()
+{
+  emit saveVerifyTriggered();
+}
+
+
+
+// private slots:
 
 void NgpFlashmastaCartridgeWidget::on_slotsComboBox_currentIndexChanged(int index)
 {

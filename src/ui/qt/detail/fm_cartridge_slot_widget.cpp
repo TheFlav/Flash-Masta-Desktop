@@ -6,6 +6,8 @@
 
 
 
+// public:
+
 FmCartridgeSlotWidget::FmCartridgeSlotWidget(cartridge* cart, int slot, QWidget *parent) :
   QWidget(parent),
   ui(new Ui::FmCartridgeSlotWidget)
@@ -48,7 +50,16 @@ void FmCartridgeSlotWidget::buildFromCartridge(cartridge* cart, int slot)
   default:
     break;
   }
+  
+  setGameBackupEnabled(false);
+  setGameFlashEnabled(false);
+  setGameVerifyEnabled(false);
+  setSaveBackupEnabled(false);
+  setSaveRestoreEnabled(false);
+  setSaveVerifyEnabled(false);
 }
+
+// private:
 
 void FmCartridgeSlotWidget::buildFromNgpCartridge(ngp_cartridge* cart, int slot)
 {
@@ -72,6 +83,8 @@ void FmCartridgeSlotWidget::buildFromWsCartridge(ws_cartridge* cart, int slot)
 }
 
 
+
+// public:
 
 int FmCartridgeSlotWidget::slotNumber() const
 {
@@ -136,6 +149,10 @@ void FmCartridgeSlotWidget::setSlotGameName(QString name)
   ui->slotInfoGameTitleOutputLabel->setText(name);
 }
 
+
+
+// public slots:
+
 void FmCartridgeSlotWidget::setGameBackupEnabled(bool enabled)
 {
   m_game_backup_enabled = enabled;
@@ -174,8 +191,43 @@ void FmCartridgeSlotWidget::setSaveVerifyEnabled(bool enabled)
 
 
 
-//////// HELPER FUNCTIONS ////////
+// private slots:
 
+void FmCartridgeSlotWidget::on_slotActionBackupGameButton_clicked()
+{
+  emit gameBackupTriggered();
+}
+
+void FmCartridgeSlotWidget::on_slotActionFlashGameButton_clicked()
+{
+  emit gameFlashTriggered();
+}
+
+void FmCartridgeSlotWidget::on_slotActionVerifyGameButton_clicked()
+{
+  emit gameVerifyTriggered();
+}
+
+void FmCartridgeSlotWidget::on_slotActionBackupSaveButton_clicked()
+{
+  emit saveBackupTriggered();
+}
+
+void FmCartridgeSlotWidget::on_slotActionRestoreSaveButton_clicked()
+{
+  emit saveRestoreTriggered();
+}
+
+void FmCartridgeSlotWidget::on_slotActionVerifySaveButton_clicked()
+{
+  emit saveVerifyTriggered();
+}
+
+
+
+// private:
+
+//////// HELPER FUNCTIONS ////////
 
 QString FmCartridgeSlotWidget::stringifyBytesToBits(unsigned int num_bytes, bool reduce)
 {
@@ -198,3 +250,4 @@ QString FmCartridgeSlotWidget::stringifyBytesToBits(unsigned int num_bytes, bool
   }
   return text;
 }
+

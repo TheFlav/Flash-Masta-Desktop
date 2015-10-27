@@ -38,12 +38,30 @@ public:
   
   void setSlotSize(unsigned int num_bytes);
   void setSlotGameName(QString name);
+  
+public slots:
   void setGameBackupEnabled(bool enabled);
   void setGameFlashEnabled(bool enabled);
   void setGameVerifyEnabled(bool enabled);
   void setSaveBackupEnabled(bool enabled);
   void setSaveRestoreEnabled(bool enabled);
   void setSaveVerifyEnabled(bool enabled);
+  
+private slots:
+  void on_slotActionBackupGameButton_clicked();
+  void on_slotActionFlashGameButton_clicked();
+  void on_slotActionVerifyGameButton_clicked();
+  void on_slotActionBackupSaveButton_clicked();
+  void on_slotActionRestoreSaveButton_clicked();
+  void on_slotActionVerifySaveButton_clicked();
+  
+signals:
+  void gameBackupTriggered();
+  void gameFlashTriggered();
+  void gameVerifyTriggered();
+  void saveBackupTriggered();
+  void saveRestoreTriggered();
+  void saveVerifyTriggered();
   
 private:
   QString stringifyBytesToBits(unsigned int num_bytes, bool reduce = true);
