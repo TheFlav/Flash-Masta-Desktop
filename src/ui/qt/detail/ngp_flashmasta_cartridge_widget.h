@@ -24,30 +24,18 @@ public:
   
 public slots:
   void cartridge_loaded(ngp_cartridge* cartridge);
-  void when_gameBackupTriggered();
-  void when_gameFlashTriggered();
-  void when_gameVerifyTriggered();
-  void when_saveBackupTriggered();
-  void when_saveRestoreTriggered();
-  void when_saveVerifyTriggered();
+  void device_selected(int old_device_id, int new_device_id);
+  void update_enabled_actions();
   
 private slots:
   void on_slotsComboBox_currentIndexChanged(int index);
-  
-signals:
-  void gameBackupTriggered();
-  void gameFlashTriggered();
-  void gameVerifyTriggered();
-  void saveBackupTriggered();
-  void saveRestoreTriggered();
-  void saveVerifyTriggered();
-  void slotSelected(int slot);
-  void slotDeselected(int slot);
   
 private:
   Ui::NgpFlashmastaCartridgeWidget *ui;
   QWidget* m_default_widget;
   QWidget* m_current_widget;
+  int m_current_slot;
+  bool m_is_selected;
   
   unsigned int m_device_id;
   NgpLmCartridgeFetchingWorker* m_worker;

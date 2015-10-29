@@ -18,6 +18,17 @@ public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
   
+private:
+  cartridge* build_cartridge_for_device(int id);
+  
+public slots:
+  void setGameBackupEnabled(bool enabled);
+  void setGameFlashEnabled(bool enabled);
+  void setGameVerifyEnabled(bool enabled);
+  void setSaveBackupEnabled(bool enabled);
+  void setSaveRestoreEnabled(bool enabled);
+  void setSaveVerifyEnabled(bool enabled);
+  
 private slots:
   void on_actionBackupROM_triggered();
   void on_actionRestoreROM_triggered();

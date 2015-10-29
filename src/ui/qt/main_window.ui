@@ -189,6 +189,14 @@
     <string>Restores game save data from a file on your computer to the selected slot on the selected cartridge.</string>
    </property>
   </action>
+  <action name="actionVerifySave">
+   <property name="text">
+    <string>Verify Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Verify game save data from a file on your computer with the save data on the selected slot on the selected cartridge.</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

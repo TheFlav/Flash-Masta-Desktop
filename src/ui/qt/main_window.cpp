@@ -52,7 +52,7 @@ MainWindow::~MainWindow()
 
 
 
-cartridge* build_cartridge_for_device(int id)
+cartridge* MainWindow::build_cartridge_for_device(int id)
 {
   linkmasta_device* linkmasta;
   cartridge* cart;
@@ -80,6 +80,42 @@ cartridge* build_cartridge_for_device(int id)
 }
 
 
+
+// public slots:
+
+void MainWindow::setGameBackupEnabled(bool enabled)
+{
+  ui->actionBackupROM->setEnabled(true);
+}
+
+void MainWindow::setGameFlashEnabled(bool enabled)
+{
+  ui->actionRestoreROM->setEnabled(enabled);
+}
+
+void MainWindow::setGameVerifyEnabled(bool enabled)
+{
+  ui->actionVerifyROM->setEnabled(enabled);
+}
+
+void MainWindow::setSaveBackupEnabled(bool enabled)
+{
+  ui->actionBackupSave->setEnabled(enabled);
+}
+
+void MainWindow::setSaveRestoreEnabled(bool enabled)
+{
+  ui->actionRestoreSave->setEnabled(enabled);
+}
+
+void MainWindow::setSaveVerifyEnabled(bool enabled)
+{
+  ui->actionVerifySave->setEnabled(enabled);
+}
+
+
+
+// private slots:
 
 void MainWindow::on_actionBackupROM_triggered()
 {
@@ -391,6 +427,12 @@ void MainWindow::refreshDeviceList_timeout()
         m_device_detail_widgets[devices[j]] = widget;
         //widget->set_device_id(devices[j]);
         widget->hide();
+        connect(widget, SIGNAL(setGameBackupEnabled(bool)), this, SLOT(setGameBackupEnabled(bool)));
+        connect(widget, SIGNAL(setGameFlashEnabled(bool)), this, SLOT(setGameFlashEnabled(bool)));
+        connect(widget, SIGNAL(setGameVerifyEnabled(bool)), this, SLOT(setGameVerifyEnabled(bool)));
+        connect(widget, SIGNAL(setSaveBackupenabled(bool)), this, SLOT(setSaveBackupEnabled(bool)));
+        connect(widget, SIGNAL(setSaveRestoreEnabled(bool)), this, SLOT(setSaveRestoreEnabled(bool)));
+        connect(widget, SIGNAL(setSaveVerifyEnabled(bool)), this, SLOT(setSaveVerifyEnabled(bool)));
         ui->scrollAreaWidgetContents->layout()->addWidget(widget);
         
         widget->start_polling();

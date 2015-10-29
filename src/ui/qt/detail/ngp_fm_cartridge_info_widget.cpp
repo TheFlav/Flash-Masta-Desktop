@@ -1,14 +1,15 @@
 #include "ngp_fm_cartridge_info_widget.h"
 #include "ui_ngp_fm_cartridge_info_widget.h"
 #include "cartridge/ngp_cartridge.h"
+#include "../flash_masta.h"
 #include <QString>
 #include <QLabel>
 
 
 
-NgpFmCartridgeInfoWidget::NgpFmCartridgeInfoWidget(ngp_cartridge* cartridge, QWidget *parent) :
+NgpFmCartridgeInfoWidget::NgpFmCartridgeInfoWidget(int device_id, ngp_cartridge* cartridge, QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::NgpFmCartridgeInfoWidget), m_cart_chip_widgets(nullptr), m_cart_chip_sizes(nullptr)
+  ui(new Ui::NgpFmCartridgeInfoWidget), m_device_id(device_id), m_cart_chip_widgets(nullptr), m_cart_chip_sizes(nullptr)
 {
   ui->setupUi(this);
   
@@ -51,22 +52,28 @@ void NgpFmCartridgeInfoWidget::buildFromCartridge(ngp_cartridge* cartridge)
   case CARTRIDGE_UNKNOWN:
     setGameBackupEnabled(false);
     setGameFlashEnabled(false);
+    setGameVerifyEnabled(false);
     setSaveBackupEnabled(false);
     setSaveRestoreEnabled(false);
+    setSaveVerifyEnabled(false);
     break;
     
   case CARTRIDGE_OFFICIAL:
     setGameBackupEnabled(true);
     setGameFlashEnabled(false);
+    setGameVerifyEnabled(false);
     setSaveBackupEnabled(true);
     setSaveRestoreEnabled(true);
+    setSaveVerifyEnabled(false);
     break;
     
   case CARTRIDGE_FLASHMASTA:
     setGameBackupEnabled(true);
     setGameFlashEnabled(true);
+    setGameVerifyEnabled(false);
     setSaveBackupEnabled(false);
     setSaveRestoreEnabled(true);
+    setSaveVerifyEnabled(false);
     break;
   }
 }
@@ -102,6 +109,11 @@ bool NgpFmCartridgeInfoWidget::gameFlashEnabled() const
   return m_game_flash_enabled;
 }
 
+bool NgpFmCartridgeInfoWidget::gameVerifyEnabled() const
+{
+  return m_game_verify_enabled;
+}
+
 bool NgpFmCartridgeInfoWidget::saveBackupEnabled() const
 {
   return m_save_backup_enabled;
@@ -112,7 +124,65 @@ bool NgpFmCartridgeInfoWidget::saveRestoreEnabled() const
   return m_save_restore_enabled;
 }
 
+bool NgpFmCartridgeInfoWidget::saveVerifyEnabled() const
+{
+  return m_save_verify_enabled;
+}
 
+
+
+// private:
+
+void NgpFmCartridgeInfoWidget::clearChipData()
+{
+  // Delete existing widgets for chips
+  if (m_cart_chip_widgets != nullptr)
+  {
+    for (unsigned int chip_i = 0; m_cart_chip_widgets[chip_i] != nullptr; chip_i++)
+    {
+      for (unsigned int widget_i = 0; m_cart_chip_widgets[chip_i][widget_i] != nullptr; widget_i++)
+      {
+        m_cart_chip_widgets[chip_i][widget_i]->hide();
+        delete m_cart_chip_widgets[chip_i][widget_i];
+      }
+      delete [] m_cart_chip_widgets[chip_i];
+    }
+    delete [] m_cart_chip_widgets;
+    m_cart_chip_widgets = nullptr;
+  }
+  
+  // Clear chip size array
+  if (m_cart_chip_sizes != nullptr)
+  {
+    delete [] m_cart_chip_sizes;
+  }
+}
+
+QString NgpFmCartridgeInfoWidget::stringifyBytesToBits(unsigned int num_bytes, bool reduce)
+{
+  QString text;
+  if (reduce && (num_bytes & 0x7FFFFFF) == 0)
+  {
+    text = QString::number(num_bytes >> 27) + QString(" Gib");
+  }
+  else if (reduce && (num_bytes & 0x1FFFF) == 0)
+  {
+    text = QString::number(num_bytes >> 17) + QString(" Mib");
+  }
+  else if (reduce && (num_bytes & 0x7F) == 0)
+  {
+    text = QString::number(num_bytes >> 7) + QString(" Kib");
+  }
+  else
+  {
+    text = QString::number(((unsigned long long) num_bytes) << 3) + QString(" b");
+  }
+  return text;
+}
+
+
+
+// public slots:
 
 void NgpFmCartridgeInfoWidget::setCartridgeSize(unsigned int num_bytes)
 {
@@ -214,6 +284,11 @@ void NgpFmCartridgeInfoWidget::setGameFlashEnabled(bool enabled)
   }
 }
 
+void NgpFmCartridgeInfoWidget::setGameVerifyEnabled(bool enabled)
+{
+  m_game_verify_enabled = enabled;
+}
+
 void NgpFmCartridgeInfoWidget::setSaveBackupEnabled(bool enabled)
 {
   m_save_backup_enabled = enabled;
@@ -246,56 +321,25 @@ void NgpFmCartridgeInfoWidget::setSaveRestoreEnabled(bool enabled)
   }
 }
 
-
-
-void NgpFmCartridgeInfoWidget::clearChipData()
+void NgpFmCartridgeInfoWidget::setSaveVerifyEnabled(bool enabled)
 {
-  // Delete existing widgets for chips
-  if (m_cart_chip_widgets != nullptr)
-  {
-    for (unsigned int chip_i = 0; m_cart_chip_widgets[chip_i] != nullptr; chip_i++)
-    {
-      for (unsigned int widget_i = 0; m_cart_chip_widgets[chip_i][widget_i] != nullptr; widget_i++)
-      {
-        m_cart_chip_widgets[chip_i][widget_i]->hide();
-        delete m_cart_chip_widgets[chip_i][widget_i];
-      }
-      delete [] m_cart_chip_widgets[chip_i];
-    }
-    delete [] m_cart_chip_widgets;
-    m_cart_chip_widgets = nullptr;
-  }
+  m_save_verify_enabled = enabled;
+}
+
+
+
+// private slots:
+
+void NgpFmCartridgeInfoWidget::onDeviceSelected(int old_device_id, int new_device_id)
+{
+  (void) old_device_id;
+  if (new_device_id != m_device_id) return;
   
-  // Clear chip size array
-  if (m_cart_chip_sizes != nullptr)
-  {
-    delete [] m_cart_chip_sizes;
-  }
+  FlashMasta* app = FlashMasta::get_instance();
+  app->setGameBackupEnabled(m_game_backup_enabled);
+  app->setGameFlashEnabled(m_game_flash_enabled);
+  app->setGameVerifyEnabled(m_game_verify_enabled);
+  app->setSaveBackupEnabled(m_save_backup_enabled);
+  app->setSaveRestoreEnabled(m_save_restore_enabled);
+  app->setSaveVerifyEnabled(m_save_verify_enabled);
 }
-
-
-//////// HELPER FUNCTIONS ////////
-
-
-QString NgpFmCartridgeInfoWidget::stringifyBytesToBits(unsigned int num_bytes, bool reduce)
-{
-  QString text;
-  if (reduce && (num_bytes & 0x7FFFFFF) == 0)
-  {
-    text = QString::number(num_bytes >> 27) + QString(" Gib");
-  }
-  else if (reduce && (num_bytes & 0x1FFFF) == 0)
-  {
-    text = QString::number(num_bytes >> 17) + QString(" Mib");
-  }
-  else if (reduce && (num_bytes & 0x7F) == 0)
-  {
-    text = QString::number(num_bytes >> 7) + QString(" Kib");
-  }
-  else
-  {
-    text = QString::number(((unsigned long long) num_bytes) << 3) + QString(" b");
-  }
-  return text;
-}
-

@@ -3,6 +3,8 @@
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
 #include "cartridge/ws_cartridge.h"
+#include "../flash_masta.h"
+#include "../main_window.h"
 
 
 
@@ -18,6 +20,23 @@ FmCartridgeSlotWidget::FmCartridgeSlotWidget(cartridge* cart, int slot, QWidget 
   {
     buildFromCartridge(cart, slot);
   }
+  
+  FlashMasta* app = FlashMasta::get_instance();
+  MainWindow* win = app->get_main_window();
+  
+  connect(app, SIGNAL(gameBackupEnabledChanged(bool)), this, SLOT(setGameBackupEnabled(bool)));
+  connect(app, SIGNAL(gameFlashEnabledChanged(bool)), this, SLOT(setGameFlashEnabled(bool)));
+  connect(app, SIGNAL(gameVerifyEnabledChanged(bool)), this, SLOT(setGameVerifyEnabled(bool)));
+  connect(app, SIGNAL(saveBackupEnabledChanged(bool)), this, SLOT(setSaveBackupEnabled(bool)));
+  connect(app, SIGNAL(saveRestoreEnabledChanged(bool)), this, SLOT(setSaveRestoreEnabled(bool)));
+  connect(app, SIGNAL(saveVerifyEnabledChanged(bool)), this, SLOT(setSaveVerifyEnabled(bool)));
+  
+  connect(ui->slotActionBackupGameButton, SIGNAL(clicked(bool)), win, SLOT(on_actionBackupROM_triggered()));
+  connect(ui->slotActionFlashGameButton, SIGNAL(clicked(bool)), win, SLOT(on_actionRestoreROM_triggered()));
+  connect(ui->slotActionVerifyGameButton, SIGNAL(clicked(bool)), win, SLOT(on_actionVerifyROM_triggered()));
+  connect(ui->slotActionBackupSaveButton, SIGNAL(clicked(bool)), win, SLOT(on_actionBackupSave_triggered()));
+  connect(ui->slotActionFlashSaveButton, SIGNAL(clicked(bool)), win, SLOT(on_actionRestoreSave_triggered()));
+  connect(ui->slotActionVerifySaveButton, SIGNAL(clicked(bool)), win, SLOT(on_actionVerifySave_triggered()));
 }
 
 FmCartridgeSlotWidget::~FmCartridgeSlotWidget()
@@ -133,6 +152,34 @@ bool FmCartridgeSlotWidget::saveVerifyEnabled() const
 
 
 
+// private:
+
+QString FmCartridgeSlotWidget::stringifyBytesToBits(unsigned int num_bytes, bool reduce)
+{
+  QString text;
+  if (reduce && (num_bytes & 0x7FFFFFF) == 0)
+  {
+    text = QString::number(num_bytes >> 27) + QString(" Gib");
+  }
+  else if (reduce && (num_bytes & 0x1FFFF) == 0)
+  {
+    text = QString::number(num_bytes >> 17) + QString(" Mib");
+  }
+  else if (reduce && (num_bytes & 0x7F) == 0)
+  {
+    text = QString::number(num_bytes >> 7) + QString(" Kib");
+  }
+  else
+  {
+    text = QString::number(((unsigned long long) num_bytes) << 3) + QString(" b");
+  }
+  return text;
+}
+
+
+
+// public slots:
+
 void FmCartridgeSlotWidget::setSlotSize(unsigned int num_bytes)
 {
   m_slot_num_bytes = num_bytes;
@@ -148,10 +195,6 @@ void FmCartridgeSlotWidget::setSlotGameName(QString name)
   
   ui->slotInfoGameTitleOutputLabel->setText(name);
 }
-
-
-
-// public slots:
 
 void FmCartridgeSlotWidget::setGameBackupEnabled(bool enabled)
 {
@@ -188,66 +231,3 @@ void FmCartridgeSlotWidget::setSaveVerifyEnabled(bool enabled)
   m_save_verify_enabled = enabled;
   ui->slotActionVerifySaveButton->setEnabled(m_save_verify_enabled);
 }
-
-
-
-// private slots:
-
-void FmCartridgeSlotWidget::on_slotActionBackupGameButton_clicked()
-{
-  emit gameBackupTriggered();
-}
-
-void FmCartridgeSlotWidget::on_slotActionFlashGameButton_clicked()
-{
-  emit gameFlashTriggered();
-}
-
-void FmCartridgeSlotWidget::on_slotActionVerifyGameButton_clicked()
-{
-  emit gameVerifyTriggered();
-}
-
-void FmCartridgeSlotWidget::on_slotActionBackupSaveButton_clicked()
-{
-  emit saveBackupTriggered();
-}
-
-void FmCartridgeSlotWidget::on_slotActionRestoreSaveButton_clicked()
-{
-  emit saveRestoreTriggered();
-}
-
-void FmCartridgeSlotWidget::on_slotActionVerifySaveButton_clicked()
-{
-  emit saveVerifyTriggered();
-}
-
-
-
-// private:
-
-//////// HELPER FUNCTIONS ////////
-
-QString FmCartridgeSlotWidget::stringifyBytesToBits(unsigned int num_bytes, bool reduce)
-{
-  QString text;
-  if (reduce && (num_bytes & 0x7FFFFFF) == 0)
-  {
-    text = QString::number(num_bytes >> 27) + QString(" Gib");
-  }
-  else if (reduce && (num_bytes & 0x1FFFF) == 0)
-  {
-    text = QString::number(num_bytes >> 17) + QString(" Mib");
-  }
-  else if (reduce && (num_bytes & 0x7F) == 0)
-  {
-    text = QString::number(num_bytes >> 7) + QString(" Kib");
-  }
-  else
-  {
-    text = QString::number(((unsigned long long) num_bytes) << 3) + QString(" b");
-  }
-  return text;
-}
-

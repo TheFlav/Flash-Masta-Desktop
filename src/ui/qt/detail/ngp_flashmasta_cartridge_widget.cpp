@@ -12,12 +12,14 @@
 
 NgpFlashmastaCartridgeWidget::NgpFlashmastaCartridgeWidget(unsigned int device_id, QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::NgpFlashmastaCartridgeWidget), m_device_id(device_id), m_cartridge(nullptr)
+  ui(new Ui::NgpFlashmastaCartridgeWidget), m_device_id(device_id), m_cartridge(nullptr), m_current_slot(-1)
 {
   ui->setupUi(this);
   
   m_default_widget = ui->defaultWidget;
   m_current_widget = m_default_widget;
+  
+  connect(FlashMasta::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(device_selected(int,int)));
   
   QThread* thread = new QThread();
   m_worker = new NgpLmCartridgeFetchingWorker(m_device_id);
@@ -50,7 +52,7 @@ void NgpFlashmastaCartridgeWidget::refresh_ui()
   m_slot_widgets.reserve(m_cartridge->num_slots() + 1);
   
   ui->slotsComboBox->insertItem(0, "Cartridge Info");
-  m_slot_widgets.push_back(new NgpFmCartridgeInfoWidget(m_cartridge, ui->verticalLayout->widget()));
+  m_slot_widgets.push_back(new NgpFmCartridgeInfoWidget((int) m_device_id, m_cartridge, ui->verticalLayout->widget()));
   m_slot_widgets.back()->hide();
   ui->verticalLayout->addWidget(m_slot_widgets.back(), 1);
   
@@ -62,17 +64,11 @@ void NgpFlashmastaCartridgeWidget::refresh_ui()
     
     ui->verticalLayout->addWidget(slot_widget, 1);
     ui->slotsComboBox->insertItem(i+1, "Slot " + QString::number(i+1));
-    
-    connect(slot_widget, SIGNAL(gameBackupTriggered()), this, SLOT(when_gameBackupTriggered()));
-    connect(slot_widget, SIGNAL(gameFlashTriggered()), this, SLOT(when_gameFlashTriggered()));
-    connect(slot_widget, SIGNAL(gameVerifyTriggered()), this, SLOT(when_gameVerifyTriggered()));
-    connect(slot_widget, SIGNAL(saveBackupTriggered()), this, SLOT(when_saveBackupTriggered()));
-    connect(slot_widget, SIGNAL(saveRestoreTriggered()), this, SLOT(when_saveRestoreTriggered()));
-    connect(slot_widget, SIGNAL(saveVerifyTriggered()), this, SLOT(when_saveVerifyTriggered()));
   }
   
   ui->slotsComboBox->setCurrentIndex(0);
   on_slotsComboBox_currentIndexChanged(0);
+  update_enabled_actions();
 }
 
 
@@ -87,34 +83,36 @@ void NgpFlashmastaCartridgeWidget::cartridge_loaded(ngp_cartridge* cartridge)
   refresh_ui();
 }
 
-void NgpFlashmastaCartridgeWidget::when_gameBackupTriggered()
+void NgpFlashmastaCartridgeWidget::device_selected(int old_device_id, int new_device_id)
 {
-  emit gameBackupTriggered();
+  (void) old_device_id;
+  if (new_device_id != m_device_id) return;
+  update_enabled_actions();
 }
 
-void NgpFlashmastaCartridgeWidget::when_gameFlashTriggered()
+void NgpFlashmastaCartridgeWidget::update_enabled_actions()
 {
-  emit gameFlashTriggered();
-}
-
-void NgpFlashmastaCartridgeWidget::when_gameVerifyTriggered()
-{
-  emit gameVerifyTriggered();
-}
-
-void NgpFlashmastaCartridgeWidget::when_saveBackupTriggered()
-{
-  emit saveBackupTriggered();
-}
-
-void NgpFlashmastaCartridgeWidget::when_saveRestoreTriggered()
-{
-  emit saveRestoreTriggered();
-}
-
-void NgpFlashmastaCartridgeWidget::when_saveVerifyTriggered()
-{
-  emit saveVerifyTriggered();
+  FlashMasta* app = FlashMasta::get_instance();
+  if (m_cartridge == nullptr || m_slot_widgets.empty() || m_slot_widgets[0] == nullptr)
+  {
+    app->setGameBackupEnabled(false);
+    app->setGameFlashEnabled(false);
+    app->setGameVerifyEnabled(false);
+    app->setSaveBackupEnabled(false);
+    app->setSaveRestoreEnabled(false);
+    app->setSaveVerifyEnabled(false);
+  }
+  else
+  {
+    NgpFmCartridgeInfoWidget* widget = (NgpFmCartridgeInfoWidget*) m_slot_widgets[0];
+    
+    app->setGameBackupEnabled(widget->gameBackupEnabled());
+    app->setGameFlashEnabled(widget->gameFlashEnabled());
+    app->setGameVerifyEnabled(widget->gameVerifyEnabled());
+    app->setSaveBackupEnabled(widget->saveBackupEnabled());
+    app->setSaveRestoreEnabled(widget->saveRestoreEnabled());
+    app->setSaveVerifyEnabled(widget->saveVerifyEnabled());
+  }
 }
 
 
@@ -128,11 +126,14 @@ void NgpFlashmastaCartridgeWidget::on_slotsComboBox_currentIndexChanged(int inde
   if (index >= 0 && index < (int) m_slot_widgets.size())
   {
     m_current_widget = m_slot_widgets[index];
+    m_current_slot = index-1;
   }
   else
   {
     m_current_widget = m_default_widget;
+    m_current_slot = -1;
   }
   
   m_current_widget->show();
+  FlashMasta::get_instance()->setSelectedSlot(index);
 }
