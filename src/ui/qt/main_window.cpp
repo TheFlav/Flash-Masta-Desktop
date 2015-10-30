@@ -98,7 +98,9 @@ cartridge* MainWindow::build_cartridge_for_device(int id)
     break;
   }
   
+  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(id));
   cart->init();
+  FlashMasta::get_instance()->get_device_manager()->release_device(id);
   return cart;
 }
 
@@ -140,24 +142,30 @@ void MainWindow::setSaveVerifyEnabled(bool enabled)
 
 // private slots:
 
+#define PRE_ACTION \
+  int device_index = FlashMasta::get_instance()->get_selected_device();\
+  int slot_index = FlashMasta::get_instance()->get_selected_slot();\
+  cartridge* cart = (device_index != -1 && slot_index != -1 ? build_cartridge_for_device(device_index) : nullptr);\
+  \
+  if (cart == nullptr)\
+  {\
+    QMessageBox msgBox(this);\
+    msgBox.setText("Please select a Flash Masta and a game slot.");\
+    msgBox.exec();\
+    return;\
+  }\
+  \
+  /* Mark device as in-use, wait until available */\
+  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(device_index));
+
+#define POST_ACTION \
+  FlashMasta::get_instance()->get_device_manager()->release_device(device_index);\
+  delete cart;
+
+
 void MainWindow::triggerActionBackupGame()
 {
-  int index = ui->deviceListWidget->currentRow();
-  
-  if (index >= 0)
-  {
-    index = m_device_ids[index];
-  }
-  else
-  {
-    return;
-  }
-  
-  // Mark device as in-use, wait until available
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
-  
-  cartridge* cart = build_cartridge_for_device(index);
-  cart->init();
+  PRE_ACTION
   
   try
   {
@@ -183,28 +191,12 @@ void MainWindow::triggerActionBackupGame()
     msgBox.exec();    
   }
   
-  delete cart;
-  FlashMasta::get_instance()->get_device_manager()->release_device(index);
+  POST_ACTION
 }
 
 void MainWindow::triggerActionFlashGame()
 {
-  int index = ui->deviceListWidget->currentRow();
-  
-  if (index >= 0)
-  {
-    index = m_device_ids[index];
-  }
-  else
-  {
-    return;
-  }
-  
-  // Mark device as in-use, wait until available
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
-  
-  cartridge* cart = build_cartridge_for_device(index);
-  cart->init();
+  PRE_ACTION
   
   try
   {
@@ -230,28 +222,12 @@ void MainWindow::triggerActionFlashGame()
     msgBox.exec();    
   }
   
-  delete cart;
-  FlashMasta::get_instance()->get_device_manager()->release_device(index);
+  POST_ACTION
 }
 
 void MainWindow::triggerActionVerifyGame()
 {
-  int index = ui->deviceListWidget->currentRow();
-  
-  if (index >= 0)
-  {
-    index = m_device_ids[index];
-  }
-  else
-  {
-    return;
-  }
-  
-  // Mark device as in-use, wait until available
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
-  
-  cartridge* cart = build_cartridge_for_device(index);
-  cart->init();
+  PRE_ACTION
   
   try
   {
@@ -276,28 +252,12 @@ void MainWindow::triggerActionVerifyGame()
     msgBox.exec();    
   }
   
-  delete cart;
-  FlashMasta::get_instance()->get_device_manager()->release_device(index);
+  POST_ACTION
 }
 
 void MainWindow::triggerActionBackupSave()
 {
-  int index = ui->deviceListWidget->currentRow();
-  
-  if (index >= 0)
-  {
-    index = m_device_ids[index];
-  }
-  else
-  {
-    return;
-  }
-  
-  // Mark device as in-use, wait until available
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
-  
-  cartridge* cart = build_cartridge_for_device(index);
-  cart->init();
+  PRE_ACTION
   
   try
   {
@@ -322,28 +282,12 @@ void MainWindow::triggerActionBackupSave()
     msgBox.exec();    
   }
   
-  delete cart;
-  FlashMasta::get_instance()->get_device_manager()->release_device(index);
+  POST_ACTION
 }
 
 void MainWindow::triggerActionRestoreSave()
 {
-  int index = ui->deviceListWidget->currentRow();
-  
-  if (index >= 0)
-  {
-    index = m_device_ids[index];
-  }
-  else
-  {
-    return;
-  }
-  
-  // Mark device as in-use, wait until available
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
-  
-  cartridge* cart = build_cartridge_for_device(index);
-  cart->init();
+  PRE_ACTION
   
   try
   {
@@ -368,8 +312,7 @@ void MainWindow::triggerActionRestoreSave()
     msgBox.exec();    
   }
   
-  delete cart;
-  FlashMasta::get_instance()->get_device_manager()->release_device(index);
+  POST_ACTION
 }
 
 void MainWindow::triggerActionVerifySave()

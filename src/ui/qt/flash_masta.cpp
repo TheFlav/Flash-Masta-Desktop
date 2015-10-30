@@ -46,6 +46,11 @@ int FlashMasta::get_selected_device() const
   return m_selected_device;
 }
 
+int FlashMasta::get_selected_slot() const
+{
+  return m_selected_slot;
+}
+
 
 
 // public slots:

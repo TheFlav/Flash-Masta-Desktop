@@ -16,6 +16,7 @@ public:
   DeviceManager* get_device_manager() const;
   MainWindow* get_main_window() const;
   int get_selected_device() const;
+  int get_selected_slot() const;
   
 public slots:
   void setGameBackupEnabled(bool enabled);
