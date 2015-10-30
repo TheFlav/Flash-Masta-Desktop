@@ -2,6 +2,7 @@
 #include "ui_ngp_fm_cartridge_info_widget.h"
 #include "cartridge/ngp_cartridge.h"
 #include "../flash_masta.h"
+#include "../device_manager.h"
 #include <QString>
 #include <QLabel>
 
@@ -9,7 +10,8 @@
 
 NgpFmCartridgeInfoWidget::NgpFmCartridgeInfoWidget(int device_id, ngp_cartridge* cartridge, QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::NgpFmCartridgeInfoWidget), m_device_id(device_id), m_cart_chip_widgets(nullptr), m_cart_chip_sizes(nullptr)
+  ui(new Ui::NgpFmCartridgeInfoWidget), m_cart_chip_widgets(nullptr),
+  m_device_id(device_id), m_cart_chip_sizes(nullptr)
 {
   ui->setupUi(this);
   
@@ -17,13 +19,17 @@ NgpFmCartridgeInfoWidget::NgpFmCartridgeInfoWidget(int device_id, ngp_cartridge*
   {
     setGameBackupEnabled(false);
     setGameFlashEnabled(false);
+    setGameVerifyEnabled(false);
     setSaveBackupEnabled(false);
     setSaveRestoreEnabled(false);
+    setSaveVerifyEnabled(false);
   }
   else
   {
     buildFromCartridge(cartridge);
   }
+  
+  connect(FlashMasta::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(onDeviceSelected(int,int)));
 }
 
 NgpFmCartridgeInfoWidget::~NgpFmCartridgeInfoWidget()
@@ -35,6 +41,8 @@ NgpFmCartridgeInfoWidget::~NgpFmCartridgeInfoWidget()
 
 void NgpFmCartridgeInfoWidget::buildFromCartridge(ngp_cartridge* cartridge)
 {
+  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(m_device_id));
+  
   const cartridge_descriptor* descriptor = cartridge->descriptor();
   
   setCartridgeSize(descriptor->num_bytes);
@@ -61,21 +69,23 @@ void NgpFmCartridgeInfoWidget::buildFromCartridge(ngp_cartridge* cartridge)
   case CARTRIDGE_OFFICIAL:
     setGameBackupEnabled(true);
     setGameFlashEnabled(false);
-    setGameVerifyEnabled(false);
+    setGameVerifyEnabled(true);
     setSaveBackupEnabled(true);
     setSaveRestoreEnabled(true);
-    setSaveVerifyEnabled(false);
+    setSaveVerifyEnabled(true);
     break;
     
   case CARTRIDGE_FLASHMASTA:
     setGameBackupEnabled(true);
     setGameFlashEnabled(true);
-    setGameVerifyEnabled(false);
+    setGameVerifyEnabled(true);
     setSaveBackupEnabled(false);
     setSaveRestoreEnabled(true);
-    setSaveVerifyEnabled(false);
+    setSaveVerifyEnabled(true);
     break;
   }
+  
+  FlashMasta::get_instance()->get_device_manager()->release_device(m_device_id);
 }
 
 

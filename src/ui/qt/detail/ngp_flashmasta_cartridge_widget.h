@@ -25,6 +25,7 @@ public:
 public slots:
   void cartridge_loaded(ngp_cartridge* cartridge);
   void device_selected(int old_device_id, int new_device_id);
+  void slot_selected(int old_slot_id, int new_slot_id);
   void update_enabled_actions();
   
 private slots:

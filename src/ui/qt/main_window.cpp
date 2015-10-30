@@ -34,7 +34,30 @@ MainWindow::MainWindow(QWidget *parent)
     m_device_detail_widgets(), m_default_widget(nullptr), m_current_widget(nullptr)
 {
   ui->setupUi(this);
-
+  
+  // connect ui to actions
+  FlashMasta* app = FlashMasta::get_instance();
+  connect(ui->actionBackupROM, SIGNAL(triggered(bool)), this, SLOT(triggerActionBackupGame()));
+  connect(ui->actionRestoreROM, SIGNAL(triggered(bool)), this, SLOT(triggerActionFlashGame()));
+  connect(ui->actionVerifyROM, SIGNAL(triggered(bool)), this, SLOT(triggerActionVerifyGame()));
+  connect(ui->actionBackupSave, SIGNAL(triggered(bool)), this, SLOT(triggerActionBackupSave()));
+  connect(ui->actionRestoreSave, SIGNAL(triggered(bool)), this, SLOT(triggerActionRestoreSave()));
+  connect(ui->actionVerifySave, SIGNAL(triggered(bool)), this, SLOT(triggerActionVerifySave()));
+  connect(app, SIGNAL(gameBackupEnabledChanged(bool)), this, SLOT(setGameBackupEnabled(bool)));
+  connect(app, SIGNAL(gameFlashEnabledChanged(bool)), this, SLOT(setGameFlashEnabled(bool)));
+  connect(app, SIGNAL(gameVerifyEnabledChanged(bool)), this, SLOT(setGameVerifyEnabled(bool)));
+  connect(app, SIGNAL(saveBackupEnabledChanged(bool)), this, SLOT(setSaveBackupEnabled(bool)));
+  connect(app, SIGNAL(saveRestoreEnabledChanged(bool)), this, SLOT(setSaveRestoreEnabled(bool)));
+  connect(app, SIGNAL(saveVerifyEnabledChanged(bool)), this, SLOT(setSaveVerifyEnabled(bool)));
+  
+  // Disable all actions
+  setGameBackupEnabled(false);
+  setGameFlashEnabled(false);
+  setGameVerifyEnabled(false);
+  setSaveBackupEnabled(false);
+  setSaveRestoreEnabled(false);
+  setSaveVerifyEnabled(false);
+  
   // Hide toolbar if on windows
 #ifdef OS_WINDOWS
   ui->mainToolBar->hide();
@@ -85,7 +108,7 @@ cartridge* MainWindow::build_cartridge_for_device(int id)
 
 void MainWindow::setGameBackupEnabled(bool enabled)
 {
-  ui->actionBackupROM->setEnabled(true);
+  ui->actionBackupROM->setEnabled(enabled);
 }
 
 void MainWindow::setGameFlashEnabled(bool enabled)
@@ -117,7 +140,7 @@ void MainWindow::setSaveVerifyEnabled(bool enabled)
 
 // private slots:
 
-void MainWindow::on_actionBackupROM_triggered()
+void MainWindow::triggerActionBackupGame()
 {
   int index = ui->deviceListWidget->currentRow();
   
@@ -164,7 +187,7 @@ void MainWindow::on_actionBackupROM_triggered()
   FlashMasta::get_instance()->get_device_manager()->release_device(index);
 }
 
-void MainWindow::on_actionRestoreROM_triggered()
+void MainWindow::triggerActionFlashGame()
 {
   int index = ui->deviceListWidget->currentRow();
   
@@ -211,7 +234,7 @@ void MainWindow::on_actionRestoreROM_triggered()
   FlashMasta::get_instance()->get_device_manager()->release_device(index);
 }
 
-void MainWindow::on_actionVerifyROM_triggered()
+void MainWindow::triggerActionVerifyGame()
 {
   int index = ui->deviceListWidget->currentRow();
   
@@ -257,7 +280,7 @@ void MainWindow::on_actionVerifyROM_triggered()
   FlashMasta::get_instance()->get_device_manager()->release_device(index);
 }
 
-void MainWindow::on_actionBackupSave_triggered()
+void MainWindow::triggerActionBackupSave()
 {
   int index = ui->deviceListWidget->currentRow();
   
@@ -303,7 +326,7 @@ void MainWindow::on_actionBackupSave_triggered()
   FlashMasta::get_instance()->get_device_manager()->release_device(index);
 }
 
-void MainWindow::on_actionRestoreSave_triggered()
+void MainWindow::triggerActionRestoreSave()
 {
   int index = ui->deviceListWidget->currentRow();
   
@@ -347,6 +370,11 @@ void MainWindow::on_actionRestoreSave_triggered()
   
   delete cart;
   FlashMasta::get_instance()->get_device_manager()->release_device(index);
+}
+
+void MainWindow::triggerActionVerifySave()
+{
+  // TODO
 }
 
 void MainWindow::refreshDeviceList_timeout()
@@ -427,12 +455,6 @@ void MainWindow::refreshDeviceList_timeout()
         m_device_detail_widgets[devices[j]] = widget;
         //widget->set_device_id(devices[j]);
         widget->hide();
-        connect(widget, SIGNAL(setGameBackupEnabled(bool)), this, SLOT(setGameBackupEnabled(bool)));
-        connect(widget, SIGNAL(setGameFlashEnabled(bool)), this, SLOT(setGameFlashEnabled(bool)));
-        connect(widget, SIGNAL(setGameVerifyEnabled(bool)), this, SLOT(setGameVerifyEnabled(bool)));
-        connect(widget, SIGNAL(setSaveBackupenabled(bool)), this, SLOT(setSaveBackupEnabled(bool)));
-        connect(widget, SIGNAL(setSaveRestoreEnabled(bool)), this, SLOT(setSaveRestoreEnabled(bool)));
-        connect(widget, SIGNAL(setSaveVerifyEnabled(bool)), this, SLOT(setSaveVerifyEnabled(bool)));
         ui->scrollAreaWidgetContents->layout()->addWidget(widget);
         
         widget->start_polling();
@@ -458,6 +480,11 @@ void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
   {
     m_current_widget = m_device_detail_widgets[m_device_ids[currentRow]];
     m_current_widget->show();
+    FlashMasta::get_instance()->setSelectedDevice(m_device_ids[currentRow]);
+  }
+  else
+  {
+    FlashMasta::get_instance()->setSelectedDevice(-1);
   }
 }
 

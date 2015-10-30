@@ -4,15 +4,16 @@
 #include "cartridge/ngp_cartridge.h"
 #include "cartridge/ws_cartridge.h"
 #include "../flash_masta.h"
+#include "../device_manager.h"
 #include "../main_window.h"
 
 
 
 // public:
 
-FmCartridgeSlotWidget::FmCartridgeSlotWidget(cartridge* cart, int slot, QWidget *parent) :
+FmCartridgeSlotWidget::FmCartridgeSlotWidget(int device_id, cartridge* cart, int slot, QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::FmCartridgeSlotWidget)
+  ui(new Ui::FmCartridgeSlotWidget), m_device_id(device_id)
 {
   ui->setupUi(this);
   
@@ -31,12 +32,12 @@ FmCartridgeSlotWidget::FmCartridgeSlotWidget(cartridge* cart, int slot, QWidget 
   connect(app, SIGNAL(saveRestoreEnabledChanged(bool)), this, SLOT(setSaveRestoreEnabled(bool)));
   connect(app, SIGNAL(saveVerifyEnabledChanged(bool)), this, SLOT(setSaveVerifyEnabled(bool)));
   
-  connect(ui->slotActionBackupGameButton, SIGNAL(clicked(bool)), win, SLOT(on_actionBackupROM_triggered()));
-  connect(ui->slotActionFlashGameButton, SIGNAL(clicked(bool)), win, SLOT(on_actionRestoreROM_triggered()));
-  connect(ui->slotActionVerifyGameButton, SIGNAL(clicked(bool)), win, SLOT(on_actionVerifyROM_triggered()));
-  connect(ui->slotActionBackupSaveButton, SIGNAL(clicked(bool)), win, SLOT(on_actionBackupSave_triggered()));
-  connect(ui->slotActionFlashSaveButton, SIGNAL(clicked(bool)), win, SLOT(on_actionRestoreSave_triggered()));
-  connect(ui->slotActionVerifySaveButton, SIGNAL(clicked(bool)), win, SLOT(on_actionVerifySave_triggered()));
+  connect(ui->slotActionBackupGameButton, SIGNAL(clicked(bool)), win, SLOT(triggerActionBackupGame()));
+  connect(ui->slotActionFlashGameButton, SIGNAL(clicked(bool)), win, SLOT(triggerActionFlashGame()));
+  connect(ui->slotActionVerifyGameButton, SIGNAL(clicked(bool)), win, SLOT(triggerActionVerifyGame()));
+  connect(ui->slotActionBackupSaveButton, SIGNAL(clicked(bool)), win, SLOT(triggerActionBackupSave()));
+  connect(ui->slotActionFlashSaveButton, SIGNAL(clicked(bool)), win, SLOT(triggerActionRestoreSave()));
+  connect(ui->slotActionVerifySaveButton, SIGNAL(clicked(bool)), win, SLOT(triggerActionVerifySave()));
 }
 
 FmCartridgeSlotWidget::~FmCartridgeSlotWidget()
@@ -84,7 +85,10 @@ void FmCartridgeSlotWidget::buildFromNgpCartridge(ngp_cartridge* cart, int slot)
 {
   (void) slot;
   
+  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(m_device_id));
   std::string game_name = cart->fetch_game_name(m_slot);
+  FlashMasta::get_instance()->get_device_manager()->release_device(m_device_id);
+  
   if (game_name.empty())
   {
     game_name = "Unknown";

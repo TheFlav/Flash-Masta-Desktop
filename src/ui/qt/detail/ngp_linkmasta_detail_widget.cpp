@@ -59,6 +59,8 @@ void NgpLinkmastaDetailWidget::cartridge_removed()
     delete m_cartridge_widget;
     m_cartridge_widget = nullptr;
   }
+  
+  FlashMasta::get_instance()->setSelectedSlot(-1);
 }
 
 void NgpLinkmastaDetailWidget::cartridge_inserted()

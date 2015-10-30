@@ -8,12 +8,14 @@ class MainWindow;
 
 class FlashMasta: public QApplication
 {
+  Q_OBJECT
 public:
   FlashMasta(int argc, char** argv, int flags = ApplicationFlags);
   ~FlashMasta();
   
   DeviceManager* get_device_manager() const;
   MainWindow* get_main_window() const;
+  int get_selected_device() const;
   
 public slots:
   void setGameBackupEnabled(bool enabled);

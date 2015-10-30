@@ -5,6 +5,7 @@
 #include "../worker/ngp_lm_cartridge_fetching_worker.h"
 #include "ngp_fm_cartridge_info_widget.h"
 #include "fm_cartridge_slot_widget.h"
+#include "../device_manager.h"
 
 #include <QString>
 #include <string>
@@ -12,7 +13,8 @@
 
 NgpFlashmastaCartridgeWidget::NgpFlashmastaCartridgeWidget(unsigned int device_id, QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::NgpFlashmastaCartridgeWidget), m_device_id(device_id), m_cartridge(nullptr), m_current_slot(-1)
+  ui(new Ui::NgpFlashmastaCartridgeWidget), m_current_slot(-1),
+  m_device_id(device_id), m_cartridge(nullptr)
 {
   ui->setupUi(this);
   
@@ -20,6 +22,7 @@ NgpFlashmastaCartridgeWidget::NgpFlashmastaCartridgeWidget(unsigned int device_i
   m_current_widget = m_default_widget;
   
   connect(FlashMasta::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(device_selected(int,int)));
+  connect(FlashMasta::get_instance(), SIGNAL(selectedSlotChanged(int,int)), this, SLOT(slot_selected(int,int)));
   
   QThread* thread = new QThread();
   m_worker = new NgpLmCartridgeFetchingWorker(m_device_id);
@@ -58,7 +61,7 @@ void NgpFlashmastaCartridgeWidget::refresh_ui()
   
   for (unsigned int i = 0; i < m_cartridge->num_slots(); ++i)
   {
-    FmCartridgeSlotWidget* slot_widget = new FmCartridgeSlotWidget(m_cartridge, (int) i, ui->verticalLayout->widget());
+    FmCartridgeSlotWidget* slot_widget = new FmCartridgeSlotWidget(m_device_id, m_cartridge, (int) i, ui->verticalLayout->widget());
     m_slot_widgets.push_back(slot_widget);
     slot_widget->hide();
     
@@ -68,7 +71,6 @@ void NgpFlashmastaCartridgeWidget::refresh_ui()
   
   ui->slotsComboBox->setCurrentIndex(0);
   on_slotsComboBox_currentIndexChanged(0);
-  update_enabled_actions();
 }
 
 
@@ -86,7 +88,15 @@ void NgpFlashmastaCartridgeWidget::cartridge_loaded(ngp_cartridge* cartridge)
 void NgpFlashmastaCartridgeWidget::device_selected(int old_device_id, int new_device_id)
 {
   (void) old_device_id;
-  if (new_device_id != m_device_id) return;
+  if (new_device_id != (int) m_device_id) return;
+  FlashMasta::get_instance()->setSelectedSlot(m_current_slot);
+}
+
+void NgpFlashmastaCartridgeWidget::slot_selected(int old_slot_id, int new_slot_id)
+{
+  (void) old_slot_id;
+  (void) new_slot_id;
+  if (FlashMasta::get_instance()->get_selected_device() != (int) m_device_id) return;
   update_enabled_actions();
 }
 
@@ -135,5 +145,5 @@ void NgpFlashmastaCartridgeWidget::on_slotsComboBox_currentIndexChanged(int inde
   }
   
   m_current_widget->show();
-  FlashMasta::get_instance()->setSelectedSlot(index);
+  FlashMasta::get_instance()->setSelectedSlot(index - 1);
 }

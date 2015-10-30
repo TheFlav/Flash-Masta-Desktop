@@ -5,7 +5,8 @@
 
 NgpFlashMastaCartridgeSlotWidget::NgpFlashMastaCartridgeSlotWidget(unsigned int device_id, ngp_cartridge* cartridge, unsigned int slot, QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::NgpFlashMastaCartridgeSlotWidget), m_device_id(device_id), m_cartridge(cartridge), m_slot(slot)
+  ui(new Ui::NgpFlashMastaCartridgeSlotWidget), m_device_id(device_id),
+  m_cartridge(cartridge), m_slot(slot)
 {
   ui->setupUi(this);
 }

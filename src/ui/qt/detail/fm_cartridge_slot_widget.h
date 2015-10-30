@@ -17,7 +17,7 @@ class FmCartridgeSlotWidget : public QWidget
   Q_OBJECT
   
 public:
-  explicit FmCartridgeSlotWidget(cartridge* cart = 0, int slot = -1, QWidget *parent = 0);
+  explicit FmCartridgeSlotWidget(int device_id, cartridge* cart = 0, int slot = -1, QWidget *parent = 0);
   ~FmCartridgeSlotWidget();
   
   void buildFromCartridge(cartridge* cart, int slot);
@@ -53,6 +53,7 @@ private:
   Ui::FmCartridgeSlotWidget *ui;
   
   int m_slot;
+  int m_device_id;
   unsigned int m_slot_num_bytes;
   QString m_slot_game_name;
   

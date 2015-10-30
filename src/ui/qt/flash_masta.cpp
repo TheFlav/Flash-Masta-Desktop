@@ -8,7 +8,7 @@ const int FlashMasta::NO_SLOT = -1;
 
 FlashMasta::FlashMasta(int argc, char **argv, int flags)
   : QApplication(argc, argv, flags),
-    m_device_manager(nullptr), m_main_window(nullptr),
+    m_main_window(nullptr), m_device_manager(nullptr),
     m_game_backup_enabled(false), m_game_flash_enabled(false),
     m_game_verify_enabled(false), m_save_backup_enabled(false),
     m_save_restore_enabled(false), m_save_verify_enabled(false),
@@ -39,6 +39,11 @@ DeviceManager* FlashMasta::get_device_manager() const
 MainWindow* FlashMasta::get_main_window() const
 {
   return m_main_window;
+}
+
+int FlashMasta::get_selected_device() const
+{
+  return m_selected_device;
 }
 
 
@@ -80,6 +85,16 @@ void FlashMasta::setSelectedDevice(int device_id)
   int old_id = m_selected_device;
   m_selected_device = device_id;
   emit selectedDeviceChanged(old_id, device_id);
+  
+  if (m_selected_device == -1 || m_selected_slot == -1)
+  {
+    setGameBackupEnabled(false);
+    setGameFlashEnabled(false);
+    setGameVerifyEnabled(false);
+    setSaveBackupEnabled(false);
+    setSaveRestoreEnabled(false);
+    setSaveVerifyEnabled(false);
+  }
 }
 
 void FlashMasta::setSelectedSlot(int slot_id)
@@ -87,6 +102,16 @@ void FlashMasta::setSelectedSlot(int slot_id)
   int old_id = m_selected_slot;
   m_selected_slot = slot_id;
   emit selectedSlotChanged(old_id, slot_id);
+  
+  if (m_selected_device == -1 || m_selected_slot == -1)
+  {
+    setGameBackupEnabled(false);
+    setGameFlashEnabled(false);
+    setGameVerifyEnabled(false);
+    setSaveBackupEnabled(false);
+    setSaveRestoreEnabled(false);
+    setSaveVerifyEnabled(false);
+  }
 }
 
 
@@ -95,7 +120,10 @@ void FlashMasta::setSelectedSlot(int slot_id)
 
 void FlashMasta::mainWindowDestroyed(QObject* object)
 {
-  m_main_window = nullptr;
+  if (object == m_main_window)
+  {
+    m_main_window = nullptr;
+  }
 }
 
 

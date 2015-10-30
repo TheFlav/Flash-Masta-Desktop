@@ -28,13 +28,12 @@ public slots:
   void setSaveBackupEnabled(bool enabled);
   void setSaveRestoreEnabled(bool enabled);
   void setSaveVerifyEnabled(bool enabled);
-  
-private slots:
-  void on_actionBackupROM_triggered();
-  void on_actionRestoreROM_triggered();
-  void on_actionVerifyROM_triggered();
-  void on_actionBackupSave_triggered();
-  void on_actionRestoreSave_triggered();
+  void triggerActionBackupGame();
+  void triggerActionFlashGame();
+  void triggerActionVerifyGame();
+  void triggerActionBackupSave();
+  void triggerActionRestoreSave();
+  void triggerActionVerifySave();
   void refreshDeviceList_timeout();
   
   void on_deviceListWidget_currentRowChanged(int currentRow);
