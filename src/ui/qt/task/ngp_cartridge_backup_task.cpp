@@ -4,7 +4,8 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-NgpCartridgeBackupTask::NgpCartridgeBackupTask(QWidget *parent, cartridge* cart) : NgpCartridgeTask(parent, cart)
+NgpCartridgeBackupTask::NgpCartridgeBackupTask(QWidget *parent, cartridge* cart, int slot)
+  : NgpCartridgeTask(parent, cart, slot)
 {
   // Nothing else to do
 }
@@ -37,12 +38,20 @@ void NgpCartridgeBackupTask::run_task()
     return;
   }
   
-  set_progress_label("Creating cartridge backup");
+  // Let user know what's happening
+  if (m_slot == -1)
+  {
+    set_progress_label("Backing up entire cartridge to file");
+  }
+  else
+  {
+    set_progress_label(QString("Backing up slot " + QString::number(m_slot + 1) + QString(" to file")));
+  }
   
   // Begin task
   try
   {
-    m_cartridge->backup_cartridge_game_data(*m_fout, cartridge::SLOT_ALL, this);
+    m_cartridge->backup_cartridge_game_data(*m_fout, (m_slot == -1 ? cartridge::SLOT_ALL : m_slot), this);
   }
   catch (std::exception& ex)
   {

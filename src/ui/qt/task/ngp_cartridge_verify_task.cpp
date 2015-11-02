@@ -4,7 +4,8 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-NgpCartridgeVerifyTask::NgpCartridgeVerifyTask(QWidget *parent, cartridge* cart) : NgpCartridgeTask(parent, cart)
+NgpCartridgeVerifyTask::NgpCartridgeVerifyTask(QWidget *parent, cartridge* cart, int slot)
+  : NgpCartridgeTask(parent, cart, slot)
 {
   // Nothing else to do
 }
@@ -37,12 +38,19 @@ void NgpCartridgeVerifyTask::run_task()
     return;
   }
   
-  set_progress_label("Verifying cartridge");
+  if (m_slot == -1)
+  {
+    set_progress_label("Comparing cartridge data to file");
+  }
+  else
+  {
+    set_progress_label(QString("Comparing slot ") + QString::number(m_slot+1) + QString(" data to file"));
+  }
   
   // Begin task
   try
   {
-    if (m_cartridge->compare_cartridge_game_data(*m_fin, cartridge::SLOT_ALL, this) && !is_task_cancelled())
+    if (m_cartridge->compare_cartridge_game_data(*m_fin, (m_slot == -1 ? cartridge::SLOT_ALL : m_slot), this) && !is_task_cancelled())
     {
       QMessageBox msgBox;
       msgBox.setText("Cartridge and file match.");

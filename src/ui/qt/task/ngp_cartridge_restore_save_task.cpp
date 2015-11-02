@@ -4,7 +4,8 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-NgpCartridgeRestoreSaveTask::NgpCartridgeRestoreSaveTask(QWidget* parent, cartridge* cart): NgpCartridgeTask(parent, cart)
+NgpCartridgeRestoreSaveTask::NgpCartridgeRestoreSaveTask(QWidget* parent, cartridge* cart, int slot)
+  : NgpCartridgeTask(parent, cart, slot)
 {
   // Nothing else to do
 }
@@ -39,12 +40,19 @@ void NgpCartridgeRestoreSaveTask::run_task()
     return;
   }
   
-  set_progress_label("Restoring save data to cartridge");
+  if (m_slot == -1)
+  {
+    set_progress_label(QString("Restoring save data to entire cartridge"));
+  }
+  else
+  {
+    set_progress_label(QString("Restoring save data to slot ") + QString::number(m_slot+1));
+  }
   
   // Begin task
   try
   {
-    m_cartridge->restore_cartridge_save_data(*m_fin, cartridge::SLOT_ALL, this);
+    m_cartridge->restore_cartridge_save_data(*m_fin, (m_slot == -1 ? cartridge::SLOT_ALL : m_slot), this);
   }
   catch (std::exception& ex)
   {

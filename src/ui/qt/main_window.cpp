@@ -28,13 +28,56 @@
 using namespace std;
 
 
+#define PRE_ACTION \
+  int device_index = FlashMasta::get_instance()->get_selected_device();\
+  int slot_index = FlashMasta::get_instance()->get_selected_slot();\
+  cartridge* cart = (device_index != -1 && slot_index != -1 ? build_cartridge_for_device(device_index) : nullptr);\
+  \
+  if (cart == nullptr)\
+  {\
+    QMessageBox msgBox(this);\
+    msgBox.setText("Please select a Flash Masta and a game slot.");\
+    msgBox.exec();\
+    return;\
+  }\
+  \
+  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(device_index));
+
+#define POST_ACTION \
+  FlashMasta::get_instance()->get_device_manager()->release_device(device_index);\
+  delete cart;
+
+
+
 MainWindow::MainWindow(QWidget *parent) 
   : QMainWindow(parent), ui(new Ui::MainWindow),
-    m_target_system(system_type::UNKNOWN), m_timer(this), m_device_ids(),
-    m_device_detail_widgets(), m_default_widget(nullptr)
+    m_target_system(system_type::SYSTEM_UNKNOWN), m_timer(this), m_device_ids(),
+    m_device_detail_widgets(), m_default_widget(nullptr), m_current_widget(nullptr)
 {
   ui->setupUi(this);
-
+  
+  // remove blue glow aroudn QListView on Macs
+  ui->deviceListWidget->setAttribute(Qt::WA_MacShowFocusRect, false);
+  
+  // connect ui to actions
+  FlashMasta* app = FlashMasta::get_instance();
+  connect(ui->actionBackupROM, SIGNAL(triggered(bool)), this, SLOT(triggerActionBackupGame()));
+  connect(ui->actionRestoreROM, SIGNAL(triggered(bool)), this, SLOT(triggerActionFlashGame()));
+  connect(ui->actionVerifyROM, SIGNAL(triggered(bool)), this, SLOT(triggerActionVerifyGame()));
+  connect(ui->actionBackupSave, SIGNAL(triggered(bool)), this, SLOT(triggerActionBackupSave()));
+  connect(ui->actionRestoreSave, SIGNAL(triggered(bool)), this, SLOT(triggerActionRestoreSave()));
+  connect(ui->actionVerifySave, SIGNAL(triggered(bool)), this, SLOT(triggerActionVerifySave()));
+  connect(app, SIGNAL(gameBackupEnabledChanged(bool)), this, SLOT(setGameBackupEnabled(bool)));
+  connect(app, SIGNAL(gameFlashEnabledChanged(bool)), this, SLOT(setGameFlashEnabled(bool)));
+  connect(app, SIGNAL(gameVerifyEnabledChanged(bool)), this, SLOT(setGameVerifyEnabled(bool)));
+  connect(app, SIGNAL(saveBackupEnabledChanged(bool)), this, SLOT(setSaveBackupEnabled(bool)));
+  connect(app, SIGNAL(saveRestoreEnabledChanged(bool)), this, SLOT(setSaveRestoreEnabled(bool)));
+  connect(app, SIGNAL(saveVerifyEnabledChanged(bool)), this, SLOT(setSaveVerifyEnabled(bool)));
+  
+  // Refresh action states
+  app->setSelectedDevice(app->get_selected_device());
+  app->setSelectedSlot(app->get_selected_slot());
+  
   // Hide toolbar if on windows
 #ifdef OS_WINDOWS
   ui->mainToolBar->hide();
@@ -52,7 +95,7 @@ MainWindow::~MainWindow()
 
 
 
-cartridge* build_cartridge_for_device(int id)
+cartridge* MainWindow::build_cartridge_for_device(int id)
 {
   linkmasta_device* linkmasta;
   cartridge* cart;
@@ -75,40 +118,59 @@ cartridge* build_cartridge_for_device(int id)
     break;
   }
   
+  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(id));
   cart->init();
+  FlashMasta::get_instance()->get_device_manager()->release_device(id);
   return cart;
 }
 
 
 
-void MainWindow::on_actionBackupROM_triggered()
+// public slots:
+
+void MainWindow::setGameBackupEnabled(bool enabled)
 {
-  int index = ui->deviceListWidget->currentRow();
-  
-  if (index >= 0)
-  {
-    index = m_device_ids[index];
-  }
-  else
-  {
-    return;
-  }
-  
-  // Mark device as in-use, wait until available
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
-  
-  cartridge* cart = build_cartridge_for_device(index);
-  cart->init();
+  ui->actionBackupROM->setEnabled(enabled);
+}
+
+void MainWindow::setGameFlashEnabled(bool enabled)
+{
+  ui->actionRestoreROM->setEnabled(enabled);
+}
+
+void MainWindow::setGameVerifyEnabled(bool enabled)
+{
+  ui->actionVerifyROM->setEnabled(enabled);
+}
+
+void MainWindow::setSaveBackupEnabled(bool enabled)
+{
+  ui->actionBackupSave->setEnabled(enabled);
+}
+
+void MainWindow::setSaveRestoreEnabled(bool enabled)
+{
+  ui->actionRestoreSave->setEnabled(enabled);
+}
+
+void MainWindow::setSaveVerifyEnabled(bool enabled)
+{
+  ui->actionVerifySave->setEnabled(enabled);
+}
+
+void MainWindow::triggerActionBackupGame()
+{
+  PRE_ACTION
   
   try
   {
     switch (cart->system())
     {
-    case system_type::NEO_GEO_POCKET:
-      NgpCartridgeBackupTask(this, cart).go();
+    case system_type::SYSTEM_NEO_GEO_POCKET:
+      NgpCartridgeBackupTask(this, cart, FlashMasta::get_instance()->get_selected_slot()).go();
       break;
       
-    case system_type::WONDERSWAN:
+    case system_type::SYSTEM_WONDERSWAN:
       WsCartridgeBackupTask(this, cart).go();
       break;
       
@@ -124,38 +186,22 @@ void MainWindow::on_actionBackupROM_triggered()
     msgBox.exec();    
   }
   
-  delete cart;
-  FlashMasta::get_instance()->get_device_manager()->release_device(index);
+  POST_ACTION
 }
 
-void MainWindow::on_actionRestoreROM_triggered()
+void MainWindow::triggerActionFlashGame()
 {
-  int index = ui->deviceListWidget->currentRow();
-  
-  if (index >= 0)
-  {
-    index = m_device_ids[index];
-  }
-  else
-  {
-    return;
-  }
-  
-  // Mark device as in-use, wait until available
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
-  
-  cartridge* cart = build_cartridge_for_device(index);
-  cart->init();
+  PRE_ACTION
   
   try
   {
     switch (cart->system())
     {
-    case system_type::NEO_GEO_POCKET:
-      NgpCartridgeFlashTask(this, cart).go();
+    case system_type::SYSTEM_NEO_GEO_POCKET:
+      NgpCartridgeFlashTask(this, cart, FlashMasta::get_instance()->get_selected_slot()).go();
       break;
       
-    case system_type::WONDERSWAN:
+    case system_type::SYSTEM_WONDERSWAN:
       WsCartridgeFlashTask(this, cart).go();
       break;
       
@@ -171,38 +217,22 @@ void MainWindow::on_actionRestoreROM_triggered()
     msgBox.exec();    
   }
   
-  delete cart;
-  FlashMasta::get_instance()->get_device_manager()->release_device(index);
+  POST_ACTION
 }
 
-void MainWindow::on_actionVerifyROM_triggered()
+void MainWindow::triggerActionVerifyGame()
 {
-  int index = ui->deviceListWidget->currentRow();
-  
-  if (index >= 0)
-  {
-    index = m_device_ids[index];
-  }
-  else
-  {
-    return;
-  }
-  
-  // Mark device as in-use, wait until available
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
-  
-  cartridge* cart = build_cartridge_for_device(index);
-  cart->init();
+  PRE_ACTION
   
   try
   {
     switch (cart->system())
     {
-    case system_type::NEO_GEO_POCKET:
-      NgpCartridgeVerifyTask(this, cart).go();
+    case system_type::SYSTEM_NEO_GEO_POCKET:
+      NgpCartridgeVerifyTask(this, cart, FlashMasta::get_instance()->get_selected_slot()).go();
       break;
       
-    case system_type::WONDERSWAN:
+    case system_type::SYSTEM_WONDERSWAN:
       WsCartridgeVerifyTask(this, cart).go();
       break;
       
@@ -217,38 +247,22 @@ void MainWindow::on_actionVerifyROM_triggered()
     msgBox.exec();    
   }
   
-  delete cart;
-  FlashMasta::get_instance()->get_device_manager()->release_device(index);
+  POST_ACTION
 }
 
-void MainWindow::on_actionBackupSave_triggered()
+void MainWindow::triggerActionBackupSave()
 {
-  int index = ui->deviceListWidget->currentRow();
-  
-  if (index >= 0)
-  {
-    index = m_device_ids[index];
-  }
-  else
-  {
-    return;
-  }
-  
-  // Mark device as in-use, wait until available
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
-  
-  cartridge* cart = build_cartridge_for_device(index);
-  cart->init();
+  PRE_ACTION
   
   try
   {
     switch (cart->system())
     {
-    case system_type::NEO_GEO_POCKET:
-      NgpCartridgeBackupSaveTask(this, cart).go();
+    case system_type::SYSTEM_NEO_GEO_POCKET:
+      NgpCartridgeBackupSaveTask(this, cart, FlashMasta::get_instance()->get_selected_slot()).go();
       break;
       
-    case system_type::WONDERSWAN:
+    case system_type::SYSTEM_WONDERSWAN:
       WsCartridgeBackupSaveTask(this, cart).go();
       break;
       
@@ -263,38 +277,22 @@ void MainWindow::on_actionBackupSave_triggered()
     msgBox.exec();    
   }
   
-  delete cart;
-  FlashMasta::get_instance()->get_device_manager()->release_device(index);
+  POST_ACTION
 }
 
-void MainWindow::on_actionRestoreSave_triggered()
+void MainWindow::triggerActionRestoreSave()
 {
-  int index = ui->deviceListWidget->currentRow();
-  
-  if (index >= 0)
-  {
-    index = m_device_ids[index];
-  }
-  else
-  {
-    return;
-  }
-  
-  // Mark device as in-use, wait until available
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(index));
-  
-  cartridge* cart = build_cartridge_for_device(index);
-  cart->init();
+  PRE_ACTION
   
   try
   {
     switch (cart->system())
     {
-    case system_type::NEO_GEO_POCKET:
-      NgpCartridgeRestoreSaveTask(this, cart).go();
+    case system_type::SYSTEM_NEO_GEO_POCKET:
+      NgpCartridgeRestoreSaveTask(this, cart, FlashMasta::get_instance()->get_selected_slot()).go();
       break;
       
-    case system_type::WONDERSWAN:
+    case system_type::SYSTEM_WONDERSWAN:
       WsCartridgeRestoreSaveTask(this, cart).go();
       break;
       
@@ -309,8 +307,12 @@ void MainWindow::on_actionRestoreSave_triggered()
     msgBox.exec();    
   }
   
-  delete cart;
-  FlashMasta::get_instance()->get_device_manager()->release_device(index);
+  POST_ACTION
+}
+
+void MainWindow::triggerActionVerifySave()
+{
+  // TODO
 }
 
 void MainWindow::refreshDeviceList_timeout()
@@ -347,12 +349,13 @@ void MainWindow::refreshDeviceList_timeout()
           m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
           
           //auto widget = new DeviceInfoWidget(ui->scrollAreaWidgetContents->parentWidget());
-          auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents->parentWidget());
-          widget->start_polling();
-          
+          auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents);
           m_device_detail_widgets[devices[j]] = widget;
           //widget->set_device_id(devices[j]);
           widget->hide();
+          ui->scrollAreaWidgetContents->layout()->addWidget(widget);
+          
+          widget->start_polling();
           
           ++i;
           ++j;
@@ -386,12 +389,13 @@ void MainWindow::refreshDeviceList_timeout()
         m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
         
         //auto widget = new DeviceInfoWidget(ui->scrollAreaWidgetContents->parentWidget());
-        auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents->parentWidget());
-        widget->start_polling();
-        
+        auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents);
         m_device_detail_widgets[devices[j]] = widget;
         //widget->set_device_id(devices[j]);
         widget->hide();
+        ui->scrollAreaWidgetContents->layout()->addWidget(widget);
+        
+        widget->start_polling();
         
         ++i;
         ++j;
@@ -402,22 +406,27 @@ void MainWindow::refreshDeviceList_timeout()
   m_timer.start(10);
 }
 
+
+
+// private slots:
+
 void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
 {
-  if (m_default_widget == nullptr)
+  if (m_current_widget != nullptr)
   {
-    m_default_widget = ui->scrollAreaWidgetContents;
+    m_current_widget->hide();
+    m_current_widget = nullptr;
   }
   
   if (currentRow >= 0)
   {
-    ui->scrollAreaWidgetContents->hide();
-    ui->scrollAreaWidgetContents = m_device_detail_widgets[m_device_ids[currentRow]];
-    ui->scrollAreaWidgetContents->show();
+    m_current_widget = m_device_detail_widgets[m_device_ids[currentRow]];
+    m_current_widget->show();
+    FlashMasta::get_instance()->setSelectedDevice(m_device_ids[currentRow]);
   }
   else
   {
-    ui->scrollAreaWidgetContents = m_default_widget;
+    FlashMasta::get_instance()->setSelectedDevice(-1);
   }
 }
 

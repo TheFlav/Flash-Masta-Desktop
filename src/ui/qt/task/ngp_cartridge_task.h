@@ -17,7 +17,7 @@ class NgpCartridgeTask : public QObject, public task_controller
 {
   Q_OBJECT
 public:
-  explicit              NgpCartridgeTask(QWidget *parent, cartridge* cart);
+  explicit              NgpCartridgeTask(QWidget *parent, cartridge* cart, int slot = -1);
   virtual               ~NgpCartridgeTask();
   
   virtual void          go();
@@ -32,6 +32,7 @@ protected:
   virtual QString       get_progress_label() const;
   virtual void          set_progress_label(QString label);
   cartridge*            m_cartridge;
+  int                   m_slot;
   
 private:
   std::mutex*           m_mutex;

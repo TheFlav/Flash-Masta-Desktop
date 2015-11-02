@@ -51,6 +51,9 @@ public:
   /*! \brief Type used for the device's device id. */
   typedef unsigned int     device_id_t;
   
+  /*! \brief Type used for the device's factoryProt flags. */
+  typedef unsigned int     factory_prot_t;
+  
   /*!
    *  \brief Type used for indicating whether a sector on the device is
    *         write protected.
@@ -197,6 +200,25 @@ public:
    *  \see current_mode()
    */
   device_id_t             get_device_id();
+  
+  /*! \brief Commands the device to fetch the factoryProt value.
+   *  
+   *  Sends the command sequence necessary to enter \ref chip_mode::AUTOSELECT
+   *  mode before requesting the device's factoryProt value. The success of this
+   *  operation is not guaranteed.
+   *  
+   *  This function is a blocking function that can take several seconds to
+   *  complete.
+   *  
+   *  Causes the device to enter \ref chip_mode::AUTOSELECT mode.
+   *  
+   *  \returns If the operation executes as expected, will return the device's
+   *           factoryProt value. Otherwise, the result is undefined.
+   *  
+   *  \see chip_mode::AUTOSELECT
+   *  \see current_mode()
+   */
+  factory_prot_t          get_factory_prot();
   
   /*! \brief Queries the device on the protection status of a specific sector.
    *  

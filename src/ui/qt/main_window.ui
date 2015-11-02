@@ -95,6 +95,7 @@
        <height>304</height>
       </rect>
      </property>
+     <layout class="QVBoxLayout" name="verticalLayout"/>
     </widget>
    </widget>
   </widget>
@@ -186,6 +187,14 @@
    </property>
    <property name="toolTip">
     <string>Restores game save data from a file on your computer to the selected slot on the selected cartridge.</string>
+   </property>
+  </action>
+  <action name="actionVerifySave">
+   <property name="text">
+    <string>Verify Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Verify game save data from a file on your computer with the save data on the selected slot on the selected cartridge.</string>
    </property>
   </action>
  </widget>

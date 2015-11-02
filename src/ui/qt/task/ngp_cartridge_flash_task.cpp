@@ -4,7 +4,8 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-NgpCartridgeFlashTask::NgpCartridgeFlashTask(QWidget* parent, cartridge* cart): NgpCartridgeTask(parent, cart)
+NgpCartridgeFlashTask::NgpCartridgeFlashTask(QWidget* parent, cartridge* cart, int slot)
+  : NgpCartridgeTask(parent, cart, slot)
 {
   // Nothing else to do
 }
@@ -15,6 +16,20 @@ NgpCartridgeFlashTask::~NgpCartridgeFlashTask()
 }
 
 
+
+void NgpCartridgeFlashTask::go()
+{
+  if (m_cartridge->type() != cartridge_type::CARTRIDGE_FLASHMASTA)
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Unable to flash data to cartridge.\n\nBecause of the cartridge type, this software is unable to overwrite the data stored on this cartridge.");
+    msgBox.exec();
+  }
+  else
+  {
+    NgpCartridgeTask::go();
+  }
+}
 
 void NgpCartridgeFlashTask::run_task()
 {
@@ -39,12 +54,19 @@ void NgpCartridgeFlashTask::run_task()
     return;
   }
   
-  set_progress_label("Writing data to cartridge");
+  if (m_slot == -1)
+  {
+    set_progress_label(QString("Flashing data from file to entire cartridge"));
+  }
+  else
+  {
+    set_progress_label(QString("Flashing data from file to slot ") + QString::number(m_slot+1));
+  }
   
   // Begin task
   try
   {
-    m_cartridge->restore_cartridge_game_data(*m_fin, cartridge::SLOT_ALL, this);
+    m_cartridge->restore_cartridge_game_data(*m_fin, (m_slot == -1 ? cartridge::SLOT_ALL : m_slot), this);
   }
   catch (std::exception& ex)
   {

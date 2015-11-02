@@ -49,18 +49,36 @@ public:
    *  Gets an enum for the cartridge system for which this cartridge was built
    *  for. This enum can be used for determining how to treat this object and
    *  what to cast it to. If the system type us unknown or is undefined, this
-   *  function will return system_type::UNKNOWN.
+   *  function will return \ref system_type::SYSTEM_UNKNOWN.
    *  
-   *  \returns \ref system_type::UNKNOWN - The system type is unknown or
+   *  \returns \ref system_type::SYSTEM_UNKNOWN - The system type is unknown or
    *           undefined.
-   *  \returns \ref system_type::NEO_GEO_POCKET - The cartridge is compatible
-   *           with a Neo Geo Pocket or Neo Geo Pocket Color system.
-   *  \returns \ref system_type::WONDERSWAN - The cartridge is compatible with a
-   *           WonderSwan or a WonderSwan color system.
+   *  \returns \ref system_type::SYSTEM_NEO_GEO_POCKET - The cartridge is
+   *           compatible with a Neo Geo Pocket or Neo Geo Pocket Color system.
+   *  \returns \ref system_type::SYSTEM_WONDERSWAN - The cartridge is compatible
+   *           with a WonderSwan or a WonderSwan color system.
    *  
    *  \see system_type
    */
   virtual system_type system() const = 0;
+  
+  /*! \brief Get the type of cartridge. Used to determine whether the cartridge
+   *         is an official cartridge, a Flash Masta, or unrecognized.
+   *  
+   *  Gets an enum representing the cartridge type. This enum can be used for
+   *  determining how to operate on the object and what methods are available or
+   *  unavailable. If the cartridge type is unknown or undefined, this function
+   *   will return \ref cartridge_type::CARTRIDGE_UNKNOWN.
+   *  
+   *  \return \ref cartridge_type::CARTRIDGE_UNKOWN - The cartridge type is
+   *          unknown, unrecognized, or undefined.
+   *  \return \ref cartridge_type::CARTRIDGE_OFFICIAL - The cartridge is an
+   *          official, unmodified cartridge.
+   *  \return \ref cartridge_type::CARTRIDGE_FLASHMASTA - The cartridge is a
+   *          Flash Masta, which is a modified official cartridge that can be
+   *          written to and behaves differently.
+   */
+  virtual cartridge_type type() const = 0;
   
   /*! \brief Gets a [cartridge_descriptor](\ref cartridge_descriptor) that
    *  provies information about the hardware of this cartridge instance.
