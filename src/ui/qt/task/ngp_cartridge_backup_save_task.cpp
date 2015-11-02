@@ -4,7 +4,8 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-NgpCartridgeBackupSaveTask::NgpCartridgeBackupSaveTask(QWidget *parent, cartridge* cart) : NgpCartridgeTask(parent, cart)
+NgpCartridgeBackupSaveTask::NgpCartridgeBackupSaveTask(QWidget *parent, cartridge* cart, int slot)
+  : NgpCartridgeTask(parent, cart, slot)
 {
   // Nothing else to do
 }
@@ -12,6 +13,20 @@ NgpCartridgeBackupSaveTask::NgpCartridgeBackupSaveTask(QWidget *parent, cartridg
 NgpCartridgeBackupSaveTask::~NgpCartridgeBackupSaveTask()
 {
   // Nothing else to do
+}
+
+void NgpCartridgeBackupSaveTask::go()
+{
+  if (m_cartridge->type() == cartridge_type::CARTRIDGE_FLASHMASTA)
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Unable to backup save game data.\n\nBecause of the cartridge type, this software is unable to detect where the game save data is stored.");
+    msgBox.exec();
+  }
+  else
+  {
+    NgpCartridgeTask::go();
+  }
 }
 
 void NgpCartridgeBackupSaveTask::run_task()
@@ -37,12 +52,19 @@ void NgpCartridgeBackupSaveTask::run_task()
     return;
   }
   
-  set_progress_label("Creating game save backup");
+  if (m_slot == -1)
+  {
+    set_progress_label(QString("Backing up save data in entire cartridge to file"));
+  }
+  else
+  {
+    set_progress_label(QString("Backing up save data in slot ") + QString::number(m_slot+1) + QString(" to file"));
+  }
   
   // Begin task
   try
   {
-    m_cartridge->backup_cartridge_save_data(*m_fout, cartridge::SLOT_ALL, this);
+    m_cartridge->backup_cartridge_save_data(*m_fout, (m_slot == -1 ? cartridge::SLOT_ALL : m_slot), this);
   }
   catch (std::exception& ex)
   {

@@ -167,7 +167,7 @@ void MainWindow::triggerActionBackupGame()
     switch (cart->system())
     {
     case system_type::SYSTEM_NEO_GEO_POCKET:
-      NgpCartridgeBackupTask(this, cart).go();
+      NgpCartridgeBackupTask(this, cart, FlashMasta::get_instance()->get_selected_slot()).go();
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
@@ -259,7 +259,7 @@ void MainWindow::triggerActionBackupSave()
     switch (cart->system())
     {
     case system_type::SYSTEM_NEO_GEO_POCKET:
-      NgpCartridgeBackupSaveTask(this, cart).go();
+      NgpCartridgeBackupSaveTask(this, cart, FlashMasta::get_instance()->get_selected_slot()).go();
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
