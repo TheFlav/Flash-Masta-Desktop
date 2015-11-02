@@ -28,12 +28,36 @@
 using namespace std;
 
 
+#define PRE_ACTION \
+  int device_index = FlashMasta::get_instance()->get_selected_device();\
+  int slot_index = FlashMasta::get_instance()->get_selected_slot();\
+  cartridge* cart = (device_index != -1 && slot_index != -1 ? build_cartridge_for_device(device_index) : nullptr);\
+  \
+  if (cart == nullptr)\
+  {\
+    QMessageBox msgBox(this);\
+    msgBox.setText("Please select a Flash Masta and a game slot.");\
+    msgBox.exec();\
+    return;\
+  }\
+  \
+  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(device_index));
+
+#define POST_ACTION \
+  FlashMasta::get_instance()->get_device_manager()->release_device(device_index);\
+  delete cart;
+
+
+
 MainWindow::MainWindow(QWidget *parent) 
   : QMainWindow(parent), ui(new Ui::MainWindow),
     m_target_system(system_type::SYSTEM_UNKNOWN), m_timer(this), m_device_ids(),
     m_device_detail_widgets(), m_default_widget(nullptr), m_current_widget(nullptr)
 {
   ui->setupUi(this);
+  
+  // remove blue glow aroudn QListView on Macs
+  ui->deviceListWidget->setAttribute(Qt::WA_MacShowFocusRect, false);
   
   // connect ui to actions
   FlashMasta* app = FlashMasta::get_instance();
@@ -50,13 +74,9 @@ MainWindow::MainWindow(QWidget *parent)
   connect(app, SIGNAL(saveRestoreEnabledChanged(bool)), this, SLOT(setSaveRestoreEnabled(bool)));
   connect(app, SIGNAL(saveVerifyEnabledChanged(bool)), this, SLOT(setSaveVerifyEnabled(bool)));
   
-  // Disable all actions
-  setGameBackupEnabled(false);
-  setGameFlashEnabled(false);
-  setGameVerifyEnabled(false);
-  setSaveBackupEnabled(false);
-  setSaveRestoreEnabled(false);
-  setSaveVerifyEnabled(false);
+  // Refresh action states
+  app->setSelectedDevice(app->get_selected_device());
+  app->setSelectedSlot(app->get_selected_slot());
   
   // Hide toolbar if on windows
 #ifdef OS_WINDOWS
@@ -137,31 +157,6 @@ void MainWindow::setSaveVerifyEnabled(bool enabled)
 {
   ui->actionVerifySave->setEnabled(enabled);
 }
-
-
-
-// private slots:
-
-#define PRE_ACTION \
-  int device_index = FlashMasta::get_instance()->get_selected_device();\
-  int slot_index = FlashMasta::get_instance()->get_selected_slot();\
-  cartridge* cart = (device_index != -1 && slot_index != -1 ? build_cartridge_for_device(device_index) : nullptr);\
-  \
-  if (cart == nullptr)\
-  {\
-    QMessageBox msgBox(this);\
-    msgBox.setText("Please select a Flash Masta and a game slot.");\
-    msgBox.exec();\
-    return;\
-  }\
-  \
-  /* Mark device as in-use, wait until available */\
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(device_index));
-
-#define POST_ACTION \
-  FlashMasta::get_instance()->get_device_manager()->release_device(device_index);\
-  delete cart;
-
 
 void MainWindow::triggerActionBackupGame()
 {
@@ -410,6 +405,10 @@ void MainWindow::refreshDeviceList_timeout()
   
   m_timer.start(10);
 }
+
+
+
+// private slots:
 
 void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
 {

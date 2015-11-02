@@ -36,6 +36,7 @@ public slots:
   void triggerActionVerifySave();
   void refreshDeviceList_timeout();
   
+private slots:
   void on_deviceListWidget_currentRowChanged(int currentRow);
   
 private:
