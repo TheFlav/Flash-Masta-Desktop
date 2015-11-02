@@ -198,7 +198,7 @@ void MainWindow::triggerActionFlashGame()
     switch (cart->system())
     {
     case system_type::SYSTEM_NEO_GEO_POCKET:
-      NgpCartridgeFlashTask(this, cart).go();
+      NgpCartridgeFlashTask(this, cart, FlashMasta::get_instance()->get_selected_slot()).go();
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
@@ -229,7 +229,7 @@ void MainWindow::triggerActionVerifyGame()
     switch (cart->system())
     {
     case system_type::SYSTEM_NEO_GEO_POCKET:
-      NgpCartridgeVerifyTask(this, cart).go();
+      NgpCartridgeVerifyTask(this, cart, FlashMasta::get_instance()->get_selected_slot()).go();
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
@@ -289,7 +289,7 @@ void MainWindow::triggerActionRestoreSave()
     switch (cart->system())
     {
     case system_type::SYSTEM_NEO_GEO_POCKET:
-      NgpCartridgeRestoreSaveTask(this, cart).go();
+      NgpCartridgeRestoreSaveTask(this, cart, FlashMasta::get_instance()->get_selected_slot()).go();
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
