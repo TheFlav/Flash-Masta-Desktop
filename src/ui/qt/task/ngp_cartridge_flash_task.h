@@ -7,8 +7,11 @@
 class NgpCartridgeFlashTask: public NgpCartridgeTask
 {
 public:
-  explicit NgpCartridgeFlashTask(QWidget* parent, cartridge* cart);
+  explicit NgpCartridgeFlashTask(QWidget* parent, cartridge* cart, int slot = -1);
   ~NgpCartridgeFlashTask();
+  
+public:
+  void go();
   
 protected:
   void run_task();

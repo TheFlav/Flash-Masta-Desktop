@@ -49,10 +49,20 @@ ngp_cartridge::~ngp_cartridge()
   }
 }
 
-// Note: documentation contained in super class cartridge
 system_type ngp_cartridge::system() const
 {
-  return system_type::NEO_GEO_POCKET;
+  return system_type::SYSTEM_NEO_GEO_POCKET;
+}
+
+cartridge_type ngp_cartridge::type() const
+{
+  // Ensure class was initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  return descriptor()->type; // TODO
 }
 
 const cartridge_descriptor* ngp_cartridge::descriptor() const
@@ -95,7 +105,7 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, tas
     chip_lower_bound = 0;
     chip_upper_bound = descriptor()->num_chips;
   }
-  else if (slot < num_slots())
+  else if (slot < (int) num_slots())
   {
     // Adjust chip bounds to just the given slot
     chip_lower_bound = slot;
@@ -274,7 +284,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, tas
     chip_lower_bound = 0;
     chip_upper_bound = descriptor()->num_chips;
   }
-  else if (slot < num_slots())
+  else if (slot < (int) num_slots())
   {
     // Adjust chip bounds to just the given slot
     chip_lower_bound = slot;
@@ -473,7 +483,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, tas
     chip_lower_bound = 0;
     chip_upper_bound = descriptor()->num_chips;
   }
-  else if (slot < num_slots())
+  else if (slot < (int) num_slots())
   {
     // Adjust chip bounds to just the given slot
     chip_lower_bound = slot;
@@ -685,7 +695,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, tas
     chip_lower_bound = 0;
     chip_upper_bound = descriptor()->num_chips;
   }
-  else if (slot < num_slots())
+  else if (slot < (int) num_slots())
   {
     // Adjust chip bounds to just the given slot
     chip_lower_bound = slot;
@@ -899,7 +909,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
     chip_lower_bound = 0;
     chip_upper_bound = descriptor()->num_chips;
   }
-  else if (slot < num_slots())
+  else if (slot < (int) num_slots())
   {
     // Adjust chip bounds to just the given slot
     chip_lower_bound = slot;
@@ -1127,7 +1137,7 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, tas
     chip_lower_bound = 0;
     chip_upper_bound = descriptor()->num_chips;
   }
-  else if (slot < num_slots())
+  else if (slot < (int) num_slots())
   {
     // Adjust chip bounds to just the given slot
     chip_lower_bound = slot;
@@ -1372,7 +1382,7 @@ unsigned int ngp_cartridge::slot_size(int slot) const
   {
     return descriptor()->num_bytes;
   }
-  else if (slot < descriptor()->num_chips)
+  else if (slot < (int) descriptor()->num_chips)
   {
     return descriptor()->chips[slot]->num_bytes;
   }
@@ -1391,7 +1401,7 @@ std::string ngp_cartridge::fetch_game_name(int slot)
   }
   
   // Verify parameters
-  if (slot >= num_slots() || slot < 0)
+  if (slot >= (int) num_slots() || slot < 0)
   {
     throw std::invalid_argument("Invalid slot number");
   }
@@ -1451,7 +1461,8 @@ void ngp_cartridge::build_cartridge_destriptor()
   
   // Initialize cartridge descriptor
   m_descriptor = new cartridge_descriptor(m_num_chips);
-  m_descriptor->type = NEO_GEO_POCKET;
+  m_descriptor->system = SYSTEM_NEO_GEO_POCKET;
+  m_descriptor->type = (m_chips[0]->get_factory_prot() == 0x85 ? CARTRIDGE_FLASHMASTA : CARTRIDGE_OFFICIAL);
   m_descriptor->num_bytes = 0;
   
   // Build chips

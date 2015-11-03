@@ -11,8 +11,8 @@
 
 using namespace usb;
 
-NgpCartridgeTask::NgpCartridgeTask(QWidget *parent, cartridge* cart) 
-  : QObject(parent), task_controller(), m_cartridge(cart),
+NgpCartridgeTask::NgpCartridgeTask(QWidget *parent, cartridge* cart, int slot) 
+  : QObject(parent), task_controller(), m_cartridge(cart), m_slot(slot),
     m_mutex(new std::mutex()), m_progress(nullptr), m_progress_label()
 {
   // Nothing else to do

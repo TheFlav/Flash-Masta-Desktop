@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,11 +12,12 @@ TARGET = FlashMasta
 TEMPLATE = app
 
 CONFIG +=\
-    c++11
+    c++11 \
+    static \
+    staticlib
 
 SOURCES +=\
     src/ui/qt/main.cpp \
-    src/hardware/PC-App-CLI/NeoLinkmasta.c \
     src/cartridge/ngp_cartridge.cpp \
     src/cartridge/cartridge_descriptor.cpp \
     src/cartridge/ngp_chip.cpp \
@@ -57,12 +58,16 @@ SOURCES +=\
     src/ui/qt/task/ws_cartridge_verify_task.cpp \
     src/ui/qt/device_manager.cpp \
     src/ui/qt/libusb_device_manager.cpp \
-    src/ui/qt/device_info_widget.cpp
+    src/ui/qt/detail/ngp_linkmasta_detail_widget.cpp \
+    src/ui/qt/detail/ngp_official_cartridge_widget.cpp \
+    src/ui/qt/worker/ngp_lm_cartridge_polling_worker.cpp \
+    src/ui/qt/detail/ngp_flashmasta_cartridge_widget.cpp \
+    src/ui/qt/detail/ngp_flashmasta_cartridge_slot_widget.cpp \
+    src/ui/qt/worker/ngp_lm_cartridge_fetching_worker.cpp \
+    src/ui/qt/detail/ngp_fm_cartridge_info_widget.cpp \
+    src/ui/qt/detail/fm_cartridge_slot_widget.cpp
 
 HEADERS  +=\
-    src/hardware/AVR/ids.h \
-    src/hardware/AVR/messages.h \
-    src/hardware/PC-App-CLI/NeoLinkmasta.h \
     src/cartridge/cartridge.h \
     src/cartridge/ngp_cartridge.h \
     src/common/types.h \
@@ -107,14 +112,28 @@ HEADERS  +=\
     src/ui/qt/task/ws_cartridge_verify_task.h \
     src/ui/qt/device_manager.h \
     src/ui/qt/libusb_device_manager.h \
-    src/ui/qt/device_info_widget.h
+    src/ui/qt/detail/ngp_linkmasta_detail_widget.h \
+    src/ui/qt/detail/ngp_official_cartridge_widget.h \
+    src/ui/qt/worker/ngp_lm_cartridge_polling_worker.h \
+    src/ui/qt/detail/ngp_flashmasta_cartridge_widget.h \
+    src/ui/qt/detail/ngp_flashmasta_cartridge_slot_widget.h \
+    src/ui/qt/worker/ngp_lm_cartridge_fetching_worker.h \
+    src/ui/qt/detail/ngp_fm_cartridge_info_widget.h \
+    src/ui/qt/detail/fm_cartridge_slot_widget.h
 
 FORMS    +=\
-    src/ui/qt/mainwindow.ui \
-    src/ui/qt/device_info_widget.ui
+    src/ui/qt/main_window.ui \
+    src/ui/qt/detail/ngp_linkmasta_detail_widget.ui \
+    src/ui/qt/detail/ngp_official_cartridge_widget.ui \
+    src/ui/qt/detail/ngp_flashmasta_cartridge_widget.ui \
+    src/ui/qt/detail/ngp_flashmasta_cartridge_slot_widget.ui \
+    src/ui/qt/detail/ngp_fm_cartridge_info_widget.ui \
+    src/ui/qt/detail/fm_cartridge_slot_widget.ui
 
 DISTFILES += \
-    README.md
+    README.md \
+    res/check.svg \
+    res/cross.svg
 
 INCLUDEPATH +=\
     src \
@@ -127,22 +146,27 @@ macx {
     QMAKE_MAC_SDK = macosx10.11
     
     QMAKE_LFLAGS +=\
-        -L"$$PWD/libs/osx"
+        -L"$$PWD/libs/osx"\
+        -lobjc
 
     LIBS     +=\
-        -framework IOKit\
-        -framework CoreFoundation\
-        -lusb-1.0
-
+        -framework IOKit \
+        -framework CoreFoundation \
+        "$$PWD/libs/osx/libusb-1.0.a"
+    
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
+    
     DEFINES  +=\
         OS_MACOSX
 }
 win32 {
     INCLUDEPATH +=\
-        includes\win32
+        includes/win
 
     LIBS     +=\
-        -L"$$PWD/libs/win32" -l"usb-1.0"
+        "$$PWD/libs/win32/libusb-1.0.a"
+		#-L"$$PWD/libs/win32" -l"usb-1.0"
+		
 
     DEFINES  +=\
         OS_WINDOWS

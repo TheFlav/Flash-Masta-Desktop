@@ -34,6 +34,7 @@ public:
   
 protected:
   unsigned int                      generate_id();
+  void                              start_auto_refresh();
   virtual void                      refresh_device_list() = 0;
   static linkmasta_device*          build_linkmasta_device(usb::usb_device* device);
   
@@ -46,6 +47,7 @@ private:
 private:
   std::thread                       m_refresh_thread;
   bool                              m_thread_kill_flag;
+  bool                              m_thread_dead;
   
   unsigned int                      curr_id;
 };

@@ -8,9 +8,14 @@ using namespace std;
 
 
 LibusbDeviceManager::LibusbDeviceManager()
-  : DeviceManager()
+  : DeviceManager(), m_libusb_init(false)
 {
+  m_libusb_mutex.lock();
   libusb_init(&m_libusb);
+  m_libusb_init = true;
+  m_libusb_mutex.unlock();
+  
+  start_auto_refresh();
 }
 
 LibusbDeviceManager::~LibusbDeviceManager()
@@ -21,7 +26,10 @@ LibusbDeviceManager::~LibusbDeviceManager()
     libusb_unref_device(entry.second.device);
   }
   
+  m_libusb_mutex.lock();
   libusb_exit(m_libusb);
+  m_libusb_init = false;
+  m_libusb_mutex.unlock();
 }
 
 
@@ -249,6 +257,13 @@ void LibusbDeviceManager::release_device(unsigned int id)
 
 void LibusbDeviceManager::refresh_device_list()
 {
+  m_libusb_mutex.lock();
+  if (!m_libusb_init)
+  {
+    m_libusb_mutex.unlock();
+    return;
+  }
+  
   libusb_device** device_list;
   int num_devices = libusb_get_device_list(m_libusb, &device_list);
   std::map<unsigned int, bool> device_status;
@@ -328,6 +343,8 @@ void LibusbDeviceManager::refresh_device_list()
   
   // Free the libusb list
   libusb_free_device_list(device_list, 1);
+  
+  m_libusb_mutex.unlock();
 }
 
 bool LibusbDeviceManager::is_supported(unsigned int vendor_id, unsigned int product_id)
