@@ -46,7 +46,8 @@ private:
   
   std::vector<unsigned int> m_device_ids;
   std::map<unsigned int, QWidget*> m_device_detail_widgets;
-  QWidget* m_default_widget;
+  QWidget* m_prompt_no_devices;
+  QWidget* m_prompt_none_selected;
   QWidget* m_current_widget;
 };
 

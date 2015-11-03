@@ -52,11 +52,16 @@ using namespace std;
 MainWindow::MainWindow(QWidget *parent) 
   : QMainWindow(parent), ui(new Ui::MainWindow),
     m_target_system(system_type::SYSTEM_UNKNOWN), m_timer(this), m_device_ids(),
-    m_device_detail_widgets(), m_default_widget(nullptr), m_current_widget(nullptr)
+    m_device_detail_widgets(), m_prompt_no_devices(nullptr),
+    m_prompt_none_selected(nullptr), m_current_widget(nullptr)
 {
+  // Set up UI
   ui->setupUi(this);
+  m_prompt_no_devices = ui->promptNoDevices;
+  m_prompt_none_selected = ui->promptNoneSelected;
+  m_prompt_none_selected->hide();
   
-  // remove blue glow aroudn QListView on Macs
+  // Remove blue glow aroudn QListView on Macs
   ui->deviceListWidget->setAttribute(Qt::WA_MacShowFocusRect, false);
   
   // connect ui to actions
@@ -403,6 +408,21 @@ void MainWindow::refreshDeviceList_timeout()
     }
   }
   
+  if (m_device_ids.empty())
+  {
+    m_prompt_no_devices->show();
+    m_prompt_none_selected->hide();
+  }
+  else
+  {
+    m_prompt_no_devices->hide();
+    
+    if (this->m_current_widget == nullptr)
+    {
+      m_prompt_none_selected->show();
+    }
+  }
+  
   m_timer.start(10);
 }
 
@@ -417,6 +437,11 @@ void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
     m_current_widget->hide();
     m_current_widget = nullptr;
   }
+  else
+  {
+    m_prompt_no_devices->hide();
+    m_prompt_none_selected->hide();
+  }
   
   if (currentRow >= 0)
   {
@@ -426,6 +451,14 @@ void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
   }
   else
   {
+    if (m_device_ids.empty())
+    {
+      m_prompt_no_devices->show();
+    }
+    else
+    {
+      m_prompt_none_selected->show();
+    }
     FlashMasta::get_instance()->setSelectedDevice(-1);
   }
 }
