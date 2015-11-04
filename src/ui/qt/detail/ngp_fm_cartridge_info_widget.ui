@@ -184,7 +184,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>../../../../res/check.svg</pixmap>
+          <pixmap resource="../../../../resources.qrc">:/res/res/check.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -203,7 +203,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>../../../../res/cross.svg</pixmap>
+          <pixmap resource="../../../../resources.qrc">:/res/res/cross.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -278,7 +278,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>../../../../res/check.svg</pixmap>
+          <pixmap resource="../../../../resources.qrc">:/res/res/check.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -297,7 +297,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>../../../../res/cross.svg</pixmap>
+          <pixmap resource="../../../../resources.qrc">:/res/res/cross.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -372,7 +372,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>../../../../res/check.svg</pixmap>
+          <pixmap resource="../../../../resources.qrc">:/res/res/check.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -391,7 +391,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>../../../../res/cross.svg</pixmap>
+          <pixmap resource="../../../../resources.qrc">:/res/res/cross.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -466,7 +466,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>../../../../res/check.svg</pixmap>
+          <pixmap resource="../../../../resources.qrc">:/res/res/check.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -485,7 +485,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>../../../../res/cross.svg</pixmap>
+          <pixmap resource="../../../../resources.qrc">:/res/res/cross.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -720,6 +720,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

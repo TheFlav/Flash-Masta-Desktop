@@ -131,9 +131,7 @@ FORMS    +=\
     src/ui/qt/detail/fm_cartridge_slot_widget.ui
 
 DISTFILES += \
-    README.md \
-    res/check.svg \
-    res/cross.svg
+    README.md
 
 INCLUDEPATH +=\
     src \
@@ -158,6 +156,10 @@ macx {
     
     DEFINES  +=\
         OS_MACOSX
+
+    APP_QML_FILES.files = $$PWD/resources.qrc
+    APP_QML_FILES.path = Contents/Resources
+    QMAKE_BUNDLE_DATA += APP_QML_FILES
 }
 win32 {
     INCLUDEPATH +=\
@@ -171,3 +173,6 @@ win32 {
     DEFINES  +=\
         OS_WINDOWS
 }
+
+RESOURCES += \
+    resources.qrc

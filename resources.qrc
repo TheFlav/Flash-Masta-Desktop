@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/res">
+        <file>res/check.svg</file>
+        <file>res/cross.svg</file>
+    </qresource>
+</RCC>
