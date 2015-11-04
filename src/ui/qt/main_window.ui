@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>557</width>
-    <height>350</height>
+    <width>650</width>
+    <height>450</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -87,15 +87,54 @@
      <bool>true</bool>
     </property>
     <widget class="QWidget" name="scrollAreaWidgetContents">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>400</width>
-       <height>304</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout"/>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="promptNoDevices">
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(128, 128, 128);</string>
+        </property>
+        <property name="text">
+         <string>Connect a Flash Masta or Link Masta
+to your computer</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>16</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="promptNoneSelected">
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(128, 128, 128);</string>
+        </property>
+        <property name="text">
+         <string>Select a device from the sidebar</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
   </widget>
@@ -104,7 +143,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>557</width>
+     <width>650</width>
      <height>22</height>
     </rect>
    </property>

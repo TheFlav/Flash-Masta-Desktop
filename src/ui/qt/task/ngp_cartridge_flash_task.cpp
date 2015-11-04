@@ -54,6 +54,61 @@ void NgpCartridgeFlashTask::run_task()
     return;
   }
   
+  // Gather size of file to flash
+  unsigned int file_size;
+  m_fin->seekg(0, m_fin->end);
+  file_size = m_fin->tellg();
+  m_fin->seekg(0, m_fin->beg);
+  
+  if (file_size > m_cartridge->descriptor()->num_bytes)
+  {
+    QMessageBox::information((QWidget*) parent(), "File Too Large",
+                             "The selected file is too large to fit on this cartridge.",
+                             QMessageBox::Ok);
+    m_fin->close();
+    delete m_fin;
+    return;
+  }
+  else if (m_slot != -1 && file_size > m_cartridge->slot_size(m_slot))
+  {
+    QMessageBox::information((QWidget*) parent(), "File Too Large",
+                             "The selected file is too large to fit in the selected slot. "
+                             "Consider writing to the entire cartridge instead.",
+                             QMessageBox::Ok);
+    m_fin->close();
+    delete m_fin;
+    return;
+  }
+  else
+  {
+    // Display a warning if it looks like the file was not made for this cartridge
+    if (m_cartridge->type() == cartridge_type::CARTRIDGE_FLASHMASTA
+        && m_slot != -1
+        && file_size < m_cartridge->slot_size(m_slot))
+    {
+      QMessageBox::StandardButton reply;
+      reply = QMessageBox::question((QWidget*) parent(), "Compatibility Warning",
+                                    "The selected file is smaller than the selected slot on this cartridge. "
+                                    "There is a chance that the game will not work as expected due to hardware differences. "
+                                    "Continue?", QMessageBox::Cancel|QMessageBox::Ok, QMessageBox::Ok);
+      
+      switch (reply)
+      {
+      case QMessageBox::Ok:
+        // User's ok with it, so we continue
+        break;
+        
+      case QMessageBox::Cancel:
+      default:
+        // User decides to cancel, so we cancel
+        m_fin->close();
+        delete m_fin;
+        return;
+        break;
+      }
+    }
+  }  
+  
   if (m_slot == -1)
   {
     set_progress_label(QString("Flashing data from file to entire cartridge"));
