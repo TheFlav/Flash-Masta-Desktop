@@ -2,6 +2,7 @@
 #include "ui_ngp_fm_cartridge_info_widget.h"
 #include "cartridge/ngp_cartridge.h"
 #include "../flash_masta.h"
+#include "../main_window.h"
 #include "../device_manager.h"
 #include <QString>
 #include <QLabel>
@@ -29,7 +30,14 @@ NgpFmCartridgeInfoWidget::NgpFmCartridgeInfoWidget(int device_id, ngp_cartridge*
     buildFromCartridge(cartridge);
   }
   
+  MainWindow* mw = FlashMasta::get_instance()->get_main_window();
   connect(FlashMasta::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(onDeviceSelected(int,int)));
+  connect(ui->cartActionBackupGameButton, SIGNAL(clicked(bool)), mw, SLOT(triggerActionBackupGame()));
+  connect(ui->cartActionFlashGameButton, SIGNAL(clicked(bool)), mw, SLOT(triggerActionFlashGame()));
+  connect(ui->cartActionVerifyGameButton, SIGNAL(clicked(bool)), mw, SLOT(triggerActionVerifyGame()));
+  connect(ui->cartActionBackupSaveButton, SIGNAL(clicked(bool)), mw, SLOT(triggerActionBackupSave()));
+  connect(ui->cartActionRestoreSaveButton, SIGNAL(clicked(bool)), mw, SLOT(triggerActionRestoreSave()));
+  connect(ui->cartActionVerifySaveButton, SIGNAL(clicked(bool)), mw, SLOT(triggerActionVerifySave()));
 }
 
 NgpFmCartridgeInfoWidget::~NgpFmCartridgeInfoWidget()
@@ -276,6 +284,7 @@ void NgpFmCartridgeInfoWidget::setGameBackupEnabled(bool enabled)
     ui->gameBackupDisabledLabel->show();
     ui->gameBackupEnabledLabel->hide();
   }
+  ui->cartActionBackupGameButton->setEnabled(m_game_backup_enabled);
 }
 
 void NgpFmCartridgeInfoWidget::setGameFlashEnabled(bool enabled)
@@ -292,11 +301,13 @@ void NgpFmCartridgeInfoWidget::setGameFlashEnabled(bool enabled)
     ui->gameFlashDisabledLabel->show();
     ui->gameFlashEnabledLabel->hide();
   }
+  ui->cartActionFlashGameButton->setEnabled(enabled);
 }
 
 void NgpFmCartridgeInfoWidget::setGameVerifyEnabled(bool enabled)
 {
   m_game_verify_enabled = enabled;
+  ui->cartActionVerifyGameButton->setEnabled(enabled);
 }
 
 void NgpFmCartridgeInfoWidget::setSaveBackupEnabled(bool enabled)
@@ -313,6 +324,7 @@ void NgpFmCartridgeInfoWidget::setSaveBackupEnabled(bool enabled)
     ui->saveBackupDisabledLabel->show();
     ui->saveBackupEnabledLabel->hide();
   }
+  ui->cartActionBackupSaveButton->setEnabled(enabled);
 }
 
 void NgpFmCartridgeInfoWidget::setSaveRestoreEnabled(bool enabled)
@@ -329,11 +341,13 @@ void NgpFmCartridgeInfoWidget::setSaveRestoreEnabled(bool enabled)
     ui->saveRestoreDisabledLabel->show();
     ui->saveRestoreEnabledLabel->hide();
   }
+  ui->cartActionRestoreSaveButton->setEnabled(enabled);
 }
 
 void NgpFmCartridgeInfoWidget::setSaveVerifyEnabled(bool enabled)
 {
   m_save_verify_enabled = enabled;
+  ui->cartActionVerifySaveButton->setEnabled(enabled);
 }
 
 

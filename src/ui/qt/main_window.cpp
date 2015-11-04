@@ -30,8 +30,7 @@ using namespace std;
 
 #define PRE_ACTION \
   int device_index = FlashMasta::get_instance()->get_selected_device();\
-  int slot_index = FlashMasta::get_instance()->get_selected_slot();\
-  cartridge* cart = (device_index != -1 && slot_index != -1 ? build_cartridge_for_device(device_index) : nullptr);\
+  cartridge* cart = (device_index != -1 ? build_cartridge_for_device(device_index) : nullptr);\
   \
   if (cart == nullptr)\
   {\

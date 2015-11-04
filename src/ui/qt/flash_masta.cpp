@@ -91,7 +91,7 @@ void FlashMasta::setSelectedDevice(int device_id)
   m_selected_device = device_id;
   emit selectedDeviceChanged(old_id, device_id);
   
-  if (m_selected_device == -1 || m_selected_slot == -1)
+  if (m_selected_device == -1)
   {
     setGameBackupEnabled(false);
     setGameFlashEnabled(false);
@@ -108,7 +108,7 @@ void FlashMasta::setSelectedSlot(int slot_id)
   m_selected_slot = slot_id;
   emit selectedSlotChanged(old_id, slot_id);
   
-  if (m_selected_device == -1 || m_selected_slot == -1)
+  if (m_selected_device == -1)
   {
     setGameBackupEnabled(false);
     setGameFlashEnabled(false);

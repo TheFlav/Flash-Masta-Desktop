@@ -145,7 +145,7 @@
       </spacer>
      </item>
      <item>
-      <layout class="QGridLayout" name="slotActionGridLayout">
+      <layout class="QGridLayout" name="slotActionsGridLayout">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -163,6 +163,12 @@
        </property>
        <item row="0" column="1">
         <widget class="QPushButton" name="slotActionBackupSaveButton">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>32</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>250</width>
@@ -170,12 +176,18 @@
           </size>
          </property>
          <property name="text">
-          <string>Backup Game Save</string>
+          <string>Backup Save Data</string>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
         <widget class="QPushButton" name="slotActionFlashSaveButton">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>32</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>250</width>
@@ -183,12 +195,18 @@
           </size>
          </property>
          <property name="text">
-          <string>Restore Game Save</string>
+          <string>Restore Save Data</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
         <widget class="QPushButton" name="slotActionFlashGameButton">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>32</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>250</width>
@@ -202,6 +220,12 @@
        </item>
        <item row="0" column="0">
         <widget class="QPushButton" name="slotActionBackupGameButton">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>32</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>250</width>
@@ -215,6 +239,12 @@
        </item>
        <item row="3" column="0">
         <widget class="QPushButton" name="slotActionVerifyGameButton">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>32</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>250</width>
@@ -228,6 +258,12 @@
        </item>
        <item row="3" column="1">
         <widget class="QPushButton" name="slotActionVerifySaveButton">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>32</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>250</width>
@@ -235,7 +271,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Verify Game Save</string>
+          <string>Verify Save Data</string>
          </property>
         </widget>
        </item>
