@@ -2,6 +2,9 @@
 #include "ui_main_window.h"
 
 #include <vector>
+#include <set>
+#include <algorithm>
+#include <iterator>
 #include <QString>
 #include <QLayout>
 #include <string>
@@ -52,13 +55,11 @@ MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent), ui(new Ui::MainWindow),
     m_target_system(system_type::SYSTEM_UNKNOWN), m_timer(this), m_device_ids(),
     m_device_detail_widgets(), m_prompt_no_devices(nullptr),
-    m_prompt_none_selected(nullptr), m_current_widget(nullptr)
+    m_current_widget(nullptr)
 {
   // Set up UI
   ui->setupUi(this);
   m_prompt_no_devices = ui->promptNoDevices;
-  m_prompt_none_selected = ui->promptNoneSelected;
-  m_prompt_none_selected->hide();
   
   // Remove blue glow aroudn QListView on Macs
   ui->deviceListWidget->setAttribute(Qt::WA_MacShowFocusRect, false);
@@ -321,104 +322,86 @@ void MainWindow::triggerActionVerifySave()
 
 void MainWindow::refreshDeviceList_timeout()
 {
-  vector<unsigned int> devices;
+  vector<unsigned int> connected_devices;
   
-  if (FlashMasta::get_instance()->get_device_manager()->try_get_connected_devices(devices))
+  set<unsigned int> known_devices;
+  set<unsigned int> current_devices;
+  set<unsigned int> new_devices;
+  set<unsigned int> removed_devices;
+  
+  if (FlashMasta::get_instance()->get_device_manager()->try_get_connected_devices(connected_devices))
   {
-    // Compare known devices with new devices and update list
-    for (unsigned int i = 0, j = 0; i < m_device_ids.size() || j < devices.size();)
+    // Construct sets. Use STL algorithms to generate set of removed devices and
+    // set of newly connected devices.
+    for (auto device_id : m_device_ids) known_devices.insert(device_id);
+    for (auto device_id : connected_devices) current_devices.insert(device_id);
+    set_difference(current_devices.begin(), current_devices.end(),
+                   known_devices.begin(), known_devices.end(),
+                   inserter(new_devices, new_devices.end()));
+    set_difference(known_devices.begin(), known_devices.end(),
+                   current_devices.begin(), current_devices.end(),
+                   inserter(removed_devices, removed_devices.end()));
+    
+    // Handle disconnected devices
+    for (unsigned int i = 0; i < m_device_ids.size();)
     {
-      if (i < m_device_ids.size() && j < devices.size())
+      auto device_id = m_device_ids[i];
+      if (removed_devices.find(device_id) != removed_devices.end())
       {
-        if (m_device_ids[i] < devices[j])
-        {
-          // Device has been disconnected
-          delete ui->deviceListWidget->takeItem(i);
-          auto it = m_device_detail_widgets.find(m_device_ids[i]);
-          if (it != m_device_detail_widgets.end())
-          {
-            delete it->second;
-            m_device_detail_widgets.erase(it);
-          }
-          m_device_ids.erase(m_device_ids.begin() + i);
-        }
-        else if (m_device_ids[i] > devices[j])
-        {
-          // Devices was skipped/added in the middle
-          QListWidgetItem *item = new QListWidgetItem(QString(FlashMasta::get_instance()->get_device_manager()->get_product_string(devices[j]).c_str()));
-          auto size = item->sizeHint();
-          size.setHeight(40);
-          item->setSizeHint(size);
-          ui->deviceListWidget->insertItem(i, item);
-          m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
-          
-          //auto widget = new DeviceInfoWidget(ui->scrollAreaWidgetContents->parentWidget());
-          auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents);
-          m_device_detail_widgets[devices[j]] = widget;
-          //widget->set_device_id(devices[j]);
-          widget->hide();
-          ui->scrollAreaWidgetContents->layout()->addWidget(widget);
-          
-          widget->start_polling();
-          
-          ++i;
-          ++j;
-        }
-        else
-        {
-          ++i;
-          ++j;
-        }
-      }
-      else if (i < m_device_ids.size())
-      {
-        // Device was disconnected
+        // Remove listing from device list
         delete ui->deviceListWidget->takeItem(i);
+        
+        // Find and delete device's widget
         auto it = m_device_detail_widgets.find(m_device_ids[i]);
         if (it != m_device_detail_widgets.end())
         {
           delete it->second;
           m_device_detail_widgets.erase(it);
         }
+        
+        // Forget device id
         m_device_ids.erase(m_device_ids.begin() + i);
+        
+        // Display prompt if no devices are connected
+        if (m_device_ids.empty())
+        {
+          m_prompt_no_devices->show();
+        }
       }
-      else if (j < devices.size())
+      else
       {
-        // Device was connected
-        QListWidgetItem *item = new QListWidgetItem(QString(FlashMasta::get_instance()->get_device_manager()->get_product_string(devices[j]).c_str()));
-        auto size = item->sizeHint();
-        size.setHeight(40);
-        item->setSizeHint(size);
-        ui->deviceListWidget->insertItem(i, item);
-        m_device_ids.insert(m_device_ids.begin() + i, devices[j]);
-        
-        //auto widget = new DeviceInfoWidget(ui->scrollAreaWidgetContents->parentWidget());
-        auto widget = new NgpLinkmastaDetailWidget(devices[j], ui->scrollAreaWidgetContents);
-        m_device_detail_widgets[devices[j]] = widget;
-        //widget->set_device_id(devices[j]);
-        widget->hide();
-        ui->scrollAreaWidgetContents->layout()->addWidget(widget);
-        
-        widget->start_polling();
-        
-        ++i;
-        ++j;
+        i++;
       }
     }
-  }
-  
-  if (m_device_ids.empty())
-  {
-    m_prompt_no_devices->show();
-    m_prompt_none_selected->hide();
-  }
-  else
-  {
-    m_prompt_no_devices->hide();
     
-    if (this->m_current_widget == nullptr)
+    // Handle newly connected devices
+    for (auto device_id : new_devices)
     {
-      m_prompt_none_selected->show();
+      // Instantiate a new item and append it to the list widget
+      QListWidgetItem *item = new QListWidgetItem(QString(FlashMasta::get_instance()->get_device_manager()->get_product_string(device_id).c_str()));
+      auto size = item->sizeHint();
+      size.setHeight(40);
+      item->setSizeHint(size);
+      ui->deviceListWidget->insertItem(ui->deviceListWidget->count(), item);
+      
+      // Remember this device id
+      m_device_ids.push_back(device_id);
+      
+      // Instantiate widget object for connected device
+      auto widget = new NgpLinkmastaDetailWidget(device_id, ui->scrollAreaWidgetContents);
+      m_device_detail_widgets[device_id] = widget;
+      widget->hide();
+      ui->scrollAreaWidgetContents->layout()->addWidget(widget);
+      widget->start_polling();
+      
+      // Auto-select device if it is only connected device
+      if (m_device_ids.size() == 1)
+      {
+        item->setSelected(true);
+        widget->show();
+        m_prompt_no_devices->hide();
+        FlashMasta::get_instance()->setSelectedDevice(device_id);
+      }
     }
   }
   
@@ -439,7 +422,6 @@ void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
   else
   {
     m_prompt_no_devices->hide();
-    m_prompt_none_selected->hide();
   }
   
   if (currentRow >= 0)
@@ -450,14 +432,6 @@ void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
   }
   else
   {
-    if (m_device_ids.empty())
-    {
-      m_prompt_no_devices->show();
-    }
-    else
-    {
-      m_prompt_none_selected->show();
-    }
     FlashMasta::get_instance()->setSelectedDevice(-1);
   }
 }

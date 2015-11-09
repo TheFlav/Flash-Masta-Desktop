@@ -87,6 +87,14 @@
      <bool>true</bool>
     </property>
     <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>400</width>
+       <height>404</height>
+      </rect>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QLabel" name="promptNoDevices">
@@ -110,27 +118,6 @@ to your computer</string>
         </property>
         <property name="margin">
          <number>16</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="promptNoneSelected">
-        <property name="font">
-         <font>
-          <pointsize>18</pointsize>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgb(128, 128, 128);</string>
-        </property>
-        <property name="text">
-         <string>Select a device from the sidebar</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
         </property>
        </widget>
       </item>
