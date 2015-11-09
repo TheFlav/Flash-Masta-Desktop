@@ -19,10 +19,14 @@ public:
   void start_polling();
   void stop_polling();
   
+private:
+  void disable_actions();
+  
 public slots:
   void cartridge_removed();
   void cartridge_inserted();
   void selected_device_changed(int old_device, int new_device);
+  void selected_slot_changed(int old_slot, int new_slot);
   
 private:
   Ui::NgpLinkmastaDetailWidget *ui;
