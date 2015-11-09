@@ -22,6 +22,7 @@ public:
 public slots:
   void cartridge_removed();
   void cartridge_inserted();
+  void selected_device_changed(int old_device, int new_device);
   
 private:
   Ui::NgpLinkmastaDetailWidget *ui;

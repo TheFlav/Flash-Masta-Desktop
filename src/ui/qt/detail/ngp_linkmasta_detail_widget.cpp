@@ -10,6 +10,8 @@ NgpLinkmastaDetailWidget::NgpLinkmastaDetailWidget(unsigned int device_id, QWidg
 {
   ui->setupUi(this);
   m_default_widget = ui->contentWidget;
+  
+  connect(FlashMasta::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(selected_device_changed(int,int)));
 }
 
 NgpLinkmastaDetailWidget::~NgpLinkmastaDetailWidget()
@@ -75,6 +77,21 @@ void NgpLinkmastaDetailWidget::cartridge_inserted()
   ui->verticalLayout->addWidget(m_cartridge_widget, 1);
   m_cartridge_widget->show();
   m_default_widget->hide();
+}
+
+void NgpLinkmastaDetailWidget::selected_device_changed(int old_device, int new_device)
+{
+  (void) old_device;
+  if (new_device == (int) m_device_id && m_cartridge_widget == nullptr)
+  {
+    FlashMasta* app = FlashMasta::get_instance();
+    app->setGameBackupEnabled(false);
+    app->setGameFlashEnabled(false);
+    app->setGameVerifyEnabled(false);
+    app->setSaveBackupEnabled(false);
+    app->setSaveRestoreEnabled(false);
+    app->setSaveVerifyEnabled(false);
+  }
 }
 
 
