@@ -1,7 +1,6 @@
 #include "ngp_flashmasta_cartridge_widget.h"
 #include "ui_ngp_flashmasta_cartridge_widget.h"
 #include "cartridge/ngp_cartridge.h"
-#include "ngp_flashmasta_cartridge_slot_widget.h"
 #include "../worker/ngp_lm_cartridge_fetching_worker.h"
 #include "ngp_fm_cartridge_info_widget.h"
 #include "fm_cartridge_slot_widget.h"
