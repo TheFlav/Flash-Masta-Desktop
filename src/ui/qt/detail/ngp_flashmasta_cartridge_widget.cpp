@@ -66,7 +66,7 @@ void NgpFlashmastaCartridgeWidget::refresh_ui()
     slot_widget->hide();
     
     ui->verticalLayout->addWidget(slot_widget, 1);
-    ui->slotsComboBox->insertItem(i+1, "Slot " + QString::number(i+1));
+    ui->slotsComboBox->insertItem(i+1, "Slot " + QString::number(i+1) + " - " + slot_widget->slotGameName());
   }
   
   ui->slotsComboBox->setCurrentIndex(0);
