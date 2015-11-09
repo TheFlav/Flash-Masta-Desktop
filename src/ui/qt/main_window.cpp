@@ -324,13 +324,16 @@ void MainWindow::refreshDeviceList_timeout()
 {
   vector<unsigned int> connected_devices;
   
-  set<unsigned int> known_devices;
-  set<unsigned int> current_devices;
-  set<unsigned int> new_devices;
-  set<unsigned int> removed_devices;
+  set<unsigned int> known_devices;    // devices we knew about previously
+  set<unsigned int> current_devices;  // devices that are currently connected
+  set<unsigned int> new_devices;      // newly connected devices
+  set<unsigned int> removed_devices;  // recently removed devices
   
   if (FlashMasta::get_instance()->get_device_manager()->try_get_connected_devices(connected_devices))
   {
+    // new row selection after updating list
+    int selection = -1;
+    
     // Construct sets. Use STL algorithms to generate set of removed devices and
     // set of newly connected devices.
     for (auto device_id : m_device_ids) known_devices.insert(device_id);
@@ -346,10 +349,18 @@ void MainWindow::refreshDeviceList_timeout()
     for (unsigned int i = 0; i < m_device_ids.size();)
     {
       auto device_id = m_device_ids[i];
+      auto item = ui->deviceListWidget->item(i);
+      if (item->isSelected())
+      {
+        selection = i;
+      }
+      
       if (removed_devices.find(device_id) != removed_devices.end())
       {
         // Remove listing from device list
-        delete ui->deviceListWidget->takeItem(i);
+        if (item->isSelected()) m_current_widget = nullptr;
+        ui->deviceListWidget->takeItem(i);
+        delete item;
         
         // Find and delete device's widget
         auto it = m_device_detail_widgets.find(m_device_ids[i]);
@@ -361,13 +372,6 @@ void MainWindow::refreshDeviceList_timeout()
         
         // Forget device id
         m_device_ids.erase(m_device_ids.begin() + i);
-        
-        // Display prompt if no devices are connected
-        if (m_device_ids.empty())
-        {
-          m_prompt_no_devices->show();
-          m_current_widget = nullptr;
-        }
       }
       else
       {
@@ -394,16 +398,26 @@ void MainWindow::refreshDeviceList_timeout()
       widget->hide();
       ui->scrollAreaWidgetContents->layout()->addWidget(widget);
       widget->start_polling();
-      
-      // Auto-select device if it is only connected device
-      if (m_device_ids.size() == 1)
+    }
+    
+    // Update selection if selected device was disconnected
+    if (selection >= ui->deviceListWidget->count())
+    {
+      selection = ui->deviceListWidget->count() - 1;
+    }
+    if (selection < 0 && ui->deviceListWidget->count() > 0)
+    {
+      selection = 0;
+    }
+    
+    // Select device in list and act as if user selected it
+    if (selection < 0 || !ui->deviceListWidget->item(selection)->isSelected())
+    {
+      if (selection >= 0)
       {
-        item->setSelected(true);
-        m_current_widget = widget;
-        widget->show();
-        m_prompt_no_devices->hide();
-        FlashMasta::get_instance()->setSelectedDevice(device_id);
+        ui->deviceListWidget->item(selection)->setSelected(true);
       }
+      on_deviceListWidget_currentRowChanged(selection);
     }
   }
   
