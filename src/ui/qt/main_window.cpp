@@ -366,6 +366,7 @@ void MainWindow::refreshDeviceList_timeout()
         if (m_device_ids.empty())
         {
           m_prompt_no_devices->show();
+          m_current_widget = nullptr;
         }
       }
       else
@@ -398,6 +399,7 @@ void MainWindow::refreshDeviceList_timeout()
       if (m_device_ids.size() == 1)
       {
         item->setSelected(true);
+        m_current_widget = widget;
         widget->show();
         m_prompt_no_devices->hide();
         FlashMasta::get_instance()->setSelectedDevice(device_id);
