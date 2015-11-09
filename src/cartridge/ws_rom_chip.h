@@ -20,7 +20,7 @@ class task_controller;
  *         WonderSwan cartridge.
  *  
  *  Class for controlling and interacting with a flash storage chip on a
- *  WonderSwan cartridge. Contains logic for manipultaI ing the device's current
+ *  WonderSwan cartridge. Contains logic for manipulating the device's current
  *  mode, erasing sectors on the device, programming the device, and getting
  *  device information.
  *  
@@ -35,7 +35,7 @@ class task_controller;
 class ws_rom_chip
 {
 public:
-  /*  \brief Type used for data content. */
+  /* \brief Type used for data content. */
   typedef unsigned char   data_t;
   
   /*! \brief Type used for sending commands and reading words from the chip */
