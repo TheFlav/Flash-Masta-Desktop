@@ -1,5 +1,5 @@
-#ifndef FM_CARTRIDGE_SLOT_WIDGET_H
-#define FM_CARTRIDGE_SLOT_WIDGET_H
+#ifndef __FM_CARTRIDGE_SLOT_WIDGET_H__
+#define __FM_CARTRIDGE_SLOT_WIDGET_H__
 
 #include <QWidget>
 #include <QString>
@@ -65,4 +65,4 @@ private:
   bool m_save_verify_enabled;
 };
 
-#endif // FM_CARTRIDGE_SLOT_WIDGET_H
+#endif // __FM_CARTRIDGE_SLOT_WIDGET_H__

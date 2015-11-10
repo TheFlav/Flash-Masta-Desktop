@@ -1,8 +1,8 @@
 #include "main_window.h"
-#include "flash_masta.h"
+#include "flash_masta_app.h"
 
 int main(int argc, char *argv[])
 {
-  FlashMasta a(argc, argv);
+  FlashMastaApp a(argc, argv);
   return a.exec();
 }

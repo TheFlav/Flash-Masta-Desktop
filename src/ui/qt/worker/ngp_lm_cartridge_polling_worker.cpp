@@ -1,6 +1,6 @@
 #include "ngp_lm_cartridge_polling_worker.h"
 
-#include "../flash_masta.h"
+#include "../flash_masta_app.h"
 #include "../device_manager.h"
 #include "cartridge/ngp_cartridge.h"
 
@@ -35,14 +35,14 @@ void NgpLmCartridgePollingWorker::stop()
 
 void NgpLmCartridgePollingWorker::run()
 {
-  if (!FlashMasta::get_instance()->get_device_manager()->claim_device(m_id))
+  if (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_id))
   {
     // Do nothing
     return;
   }
   
   // This function simply tests if a cartridge was connected or disconnected
-  linkmasta_device* linkmasta = FlashMasta::get_instance()->get_device_manager()->get_linkmasta_device(m_id);
+  linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(m_id);
   bool device_connected;
   
   try
@@ -52,12 +52,12 @@ void NgpLmCartridgePollingWorker::run()
   catch (std::runtime_error& e)
   {
     // Do nothing; fail quietly
-    FlashMasta::get_instance()->get_device_manager()->release_device(m_id);
+    FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_id);
     return;
   }
   
   // Must release device when done using it so as to not block other functions
-  FlashMasta::get_instance()->get_device_manager()->release_device(m_id);
+  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_id);
   
   if (m_device_connected == device_connected)
   {
@@ -69,11 +69,11 @@ void NgpLmCartridgePollingWorker::run()
   
   if (m_device_connected)
   {
-    emit cartridge_inserted();
+    emit cartridgeInserted();
   }
   else
   {
-    emit cartridge_removed();
+    emit cartridgeRemoved();
   }
 }
 

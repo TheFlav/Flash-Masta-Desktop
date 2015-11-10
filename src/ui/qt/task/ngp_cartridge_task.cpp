@@ -93,12 +93,12 @@ bool NgpCartridgeTask::is_task_cancelled() const
 
 
 
-QString NgpCartridgeTask::get_progress_label() const
+QString NgpCartridgeTask::getProgressLabel() const
 {
   return m_progress_label;
 }
 
-void NgpCartridgeTask::set_progress_label(QString label)
+void NgpCartridgeTask::setProgressLabel(QString label)
 {
   m_progress_label = label;
 }

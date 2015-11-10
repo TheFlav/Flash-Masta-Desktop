@@ -1,5 +1,5 @@
-#ifndef NGP_LINKMASTA_DETAIL_WIDGET_H
-#define NGP_LINKMASTA_DETAIL_WIDGET_H
+#ifndef __NGP_LINKMASTA_DETAIL_WIDGET_H__
+#define __NGP_LINKMASTA_DETAIL_WIDGET_H__
 
 #include <QWidget>
 #include <QThread>
@@ -16,17 +16,17 @@ public:
   explicit NgpLinkmastaDetailWidget(unsigned int device_id, QWidget *parent = 0);
   ~NgpLinkmastaDetailWidget();
   
-  void start_polling();
-  void stop_polling();
+  void startPolling();
+  void stopPolling();
   
 private:
-  void disable_actions();
+  void disableActions();
   
 public slots:
-  void cartridge_removed();
-  void cartridge_inserted();
-  void selected_device_changed(int old_device, int new_device);
-  void selected_slot_changed(int old_slot, int new_slot);
+  void cartridgeRemoved();
+  void cartridgeInserted();
+  void selectedDeviceChanged(int old_device, int new_device);
+  void selectedSlotChanged(int old_slot, int new_slot);
   
 private:
   Ui::NgpLinkmastaDetailWidget *ui;
@@ -37,4 +37,4 @@ private:
   QThread* m_pooling_thread;
 };
 
-#endif // NGP_LINKMASTA_DETAIL_WIDGET_H
+#endif // __NGP_LINKMASTA_DETAIL_WIDGET_H__

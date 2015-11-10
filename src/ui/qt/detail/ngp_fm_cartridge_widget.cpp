@@ -1,4 +1,4 @@
-#include "ngp_flashmasta_cartridge_widget.h"
+#include "ngp_fm_cartridge_widget.h"
 #include "ui_ngp_flashmasta_cartridge_widget.h"
 #include "cartridge/ngp_cartridge.h"
 #include "../worker/ngp_lm_cartridge_fetching_worker.h"
@@ -20,14 +20,14 @@ NgpFlashmastaCartridgeWidget::NgpFlashmastaCartridgeWidget(unsigned int device_i
   m_default_widget = ui->defaultWidget;
   m_current_widget = m_default_widget;
   
-  connect(FlashMasta::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(device_selected(int,int)));
-  connect(FlashMasta::get_instance(), SIGNAL(selectedSlotChanged(int,int)), this, SLOT(slot_selected(int,int)));
+  connect(FlashMastaApp::getInstance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(deviceSelected(int,int)));
+  connect(FlashMastaApp::getInstance(), SIGNAL(selectedSlotChanged(int,int)), this, SLOT(slotSelected(int,int)));
   
   QThread* thread = new QThread();
   m_worker = new NgpLmCartridgeFetchingWorker(m_device_id);
   m_worker->moveToThread(thread);
   connect(thread, SIGNAL(started()), m_worker, SLOT(run()));
-  connect(m_worker, SIGNAL(finished(ngp_cartridge*)), this, SLOT(cartridge_loaded(ngp_cartridge*)));
+  connect(m_worker, SIGNAL(finished(ngp_cartridge*)), this, SLOT(cartridgeLoaded(ngp_cartridge*)));
   connect(m_worker, SIGNAL(finished(ngp_cartridge*)), thread, SLOT(quit()));
   connect(m_worker, SIGNAL(finished(ngp_cartridge*)), m_worker, SLOT(deleteLater()));
   connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
@@ -42,7 +42,7 @@ NgpFlashmastaCartridgeWidget::~NgpFlashmastaCartridgeWidget()
   delete ui;
 }
 
-void NgpFlashmastaCartridgeWidget::refresh_ui()
+void NgpFlashmastaCartridgeWidget::refreshUi()
 {
   // Reset everything and erase cached data
   ui->slotsComboBox->clear();
@@ -76,32 +76,32 @@ void NgpFlashmastaCartridgeWidget::refresh_ui()
 
 // public slots:
 
-void NgpFlashmastaCartridgeWidget::cartridge_loaded(ngp_cartridge* cartridge)
+void NgpFlashmastaCartridgeWidget::cartridgeLoaded(ngp_cartridge* cartridge)
 {
   if (m_cartridge != nullptr) delete m_cartridge;
   m_cartridge = cartridge;
   m_worker = nullptr;
-  refresh_ui();
+  refreshUi();
 }
 
-void NgpFlashmastaCartridgeWidget::device_selected(int old_device_id, int new_device_id)
+void NgpFlashmastaCartridgeWidget::deviceSelected(int old_device_id, int new_device_id)
 {
   (void) old_device_id;
   if (new_device_id != (int) m_device_id) return;
-  FlashMasta::get_instance()->setSelectedSlot(m_current_slot);
+  FlashMastaApp::getInstance()->setSelectedSlot(m_current_slot);
 }
 
-void NgpFlashmastaCartridgeWidget::slot_selected(int old_slot_id, int new_slot_id)
+void NgpFlashmastaCartridgeWidget::slotSelected(int old_slot_id, int new_slot_id)
 {
   (void) old_slot_id;
   (void) new_slot_id;
-  if (FlashMasta::get_instance()->get_selected_device() != (int) m_device_id) return;
-  update_enabled_actions();
+  if (FlashMastaApp::getInstance()->getSelectedDevice() != (int) m_device_id) return;
+  updateEnabledActions();
 }
 
-void NgpFlashmastaCartridgeWidget::update_enabled_actions()
+void NgpFlashmastaCartridgeWidget::updateEnabledActions()
 {
-  FlashMasta* app = FlashMasta::get_instance();
+  FlashMastaApp* app = FlashMastaApp::getInstance();
   if (m_cartridge == nullptr || m_slot_widgets.empty() || m_slot_widgets[0] == nullptr)
   {
     app->setGameBackupEnabled(false);
@@ -144,5 +144,5 @@ void NgpFlashmastaCartridgeWidget::on_slotsComboBox_currentIndexChanged(int inde
   }
   
   m_current_widget->show();
-  FlashMasta::get_instance()->setSelectedSlot(index - 1);
+  FlashMastaApp::getInstance()->setSelectedSlot(index - 1);
 }

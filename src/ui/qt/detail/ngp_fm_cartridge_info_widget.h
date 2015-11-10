@@ -1,5 +1,5 @@
-#ifndef NGP_FM_CARTRIDGE_INFO_WIDGET_H
-#define NGP_FM_CARTRIDGE_INFO_WIDGET_H
+#ifndef __NGP_FM_CARTRIDGE_INFO_WIDGET_H__
+#define __NGP_FM_CARTRIDGE_INFO_WIDGET_H__
 
 #include <QWidget>
 
@@ -66,5 +66,4 @@ private:
   bool m_save_verify_enabled;
 };
 
-#endif // NGP_FM_CARTRIDGE_INFO_WIDGET_H
-
+#endif // __NGP_FM_CARTRIDGE_INFO_WIDGET_H__

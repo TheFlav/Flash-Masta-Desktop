@@ -1,5 +1,5 @@
-#ifndef __MAINWINDOW_H__
-#define __MAINWINDOW_H__
+#ifndef __MAIN_WINDOW_H__
+#define __MAIN_WINDOW_H__
 
 #include <QMainWindow>
 #include <QTimer>
@@ -51,4 +51,4 @@ private:
   QWidget* m_current_widget;
 };
 
-#endif // __MAINWINDOW_H__
+#endif // __MAIN_WINDOW_H__

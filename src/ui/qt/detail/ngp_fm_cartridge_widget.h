@@ -1,9 +1,9 @@
-#ifndef NGP_FLASHMASTA_CARTRIDGE_WIDGET_H
-#define NGP_FLASHMASTA_CARTRIDGE_WIDGET_H
+#ifndef __NGP_FLASHMASTA_CARTRIDGE_WIDGET_H__
+#define __NGP_FLASHMASTA_CARTRIDGE_WIDGET_H__
 
 #include <QWidget>
 
-#include "../flash_masta.h"
+#include "../flash_masta_app.h"
 #include <vector>
 
 namespace Ui {
@@ -20,13 +20,14 @@ class NgpFlashmastaCartridgeWidget : public QWidget
 public:
   explicit NgpFlashmastaCartridgeWidget(unsigned int device_id, QWidget *parent = 0);
   ~NgpFlashmastaCartridgeWidget();
-  void refresh_ui();
+  
+  void refreshUi();
   
 public slots:
-  void cartridge_loaded(ngp_cartridge* cartridge);
-  void device_selected(int old_device_id, int new_device_id);
-  void slot_selected(int old_slot_id, int new_slot_id);
-  void update_enabled_actions();
+  void cartridgeLoaded(ngp_cartridge* cartridge);
+  void deviceSelected(int old_device_id, int new_device_id);
+  void slotSelected(int old_slot_id, int new_slot_id);
+  void updateEnabledActions();
   
 private slots:
   void on_slotsComboBox_currentIndexChanged(int index);
@@ -44,4 +45,4 @@ private:
   std::vector<QWidget*> m_slot_widgets;
 };
 
-#endif // NGP_FLASHMASTA_CARTRIDGE_WIDGET_H
+#endif // __NGP_FLASHMASTA_CARTRIDGE_WIDGET_H__

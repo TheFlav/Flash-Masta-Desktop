@@ -1,5 +1,5 @@
-#ifndef NGPLMOFFICIALCARTRIDGEINFOWORKER_H
-#define NGPLMOFFICIALCARTRIDGEINFOWORKER_H
+#ifndef __NGP_LM_OFFICIAL_CARTRIDGE_INFO_WORKER_H__
+#define __NGP_LM_OFFICIAL_CARTRIDGE_INFO_WORKER_H__
 
 #include <QObject>
 #include <QMutex>
@@ -12,12 +12,12 @@ class NgpLmCartridgeFetchingWorker : public QObject
 public:
   explicit NgpLmCartridgeFetchingWorker(unsigned int device_id, QObject *parent = 0);
   
-signals:
-  void finished(ngp_cartridge* cart);
-  
 public slots:
   void run();
   void cancel();
+  
+signals:
+  void finished(ngp_cartridge* cart);
   
 private:
   unsigned int m_device_id;
@@ -25,4 +25,4 @@ private:
   bool m_cancelled;
 };
 
-#endif // NGPLMOFFICIALCARTRIDGEINFOWORKER_H
+#endif // __NGP_LM_OFFICIAL_CARTRIDGE_INFO_WORKER_H__

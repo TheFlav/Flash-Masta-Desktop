@@ -42,11 +42,11 @@ void NgpCartridgeRestoreSaveTask::run_task()
   
   if (m_slot == -1)
   {
-    set_progress_label(QString("Restoring save data to entire cartridge"));
+    setProgressLabel(QString("Restoring save data to entire cartridge"));
   }
   else
   {
-    set_progress_label(QString("Restoring save data to slot ") + QString::number(m_slot+1));
+    setProgressLabel(QString("Restoring save data to slot ") + QString::number(m_slot+1));
   }
   
   // Begin task
