@@ -19,7 +19,7 @@ public:
   ~MainWindow();
   
 private:
-  cartridge* build_cartridge_for_device(int id);
+  cartridge* buildCartridgeForDevice(int id);
   
 public slots:
   void setGameBackupEnabled(bool enabled);
