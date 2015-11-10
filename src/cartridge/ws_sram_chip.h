@@ -9,8 +9,8 @@
  *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
  */
 
-#ifndef __WS_SRAM_CHIP__
-#define __WS_SRAM_CHIP__
+#ifndef __WS_SRAM_CHIP_H__
+#define __WS_SRAM_CHIP_H__
 
 class linkmasta_device;
 class task_controller;
@@ -65,16 +65,95 @@ public:
    */
                           ~ws_sram_chip();
   
+  /*! \brief Reads a single word from the chip.
+   *  
+   *  Reads a single word from the chip at the provided address. Due to the
+   *  nature of SRAM, the result of this operation, if successful, should always
+   *  return the exact data stored at the supplied address.
+   *  
+   *  \param[in] address The address of the data to fetch.
+   *  
+   *  \returns The word of data stored at the supplied address.
+   */
   word_t                  read(address_t address);
   
+  /*! \brief Writes a single word of data to the chip.
+   *  
+   *  Writes a single word of data to the chip. Due to the nature of SRAM, the
+   *  result of this operation, if successfull, will always result in stored
+   *  data being overwritten with the supplied data.
+   *  
+   *  \param[in] address The address at which to store \ref data.
+   *  \param[in] data The data to store at \ref address.
+   */
   void                    write(address_t address, word_t data);
   
+  /*! \param Reads multiple sequential bytes from storage.
+   *  
+   *  Reads multiple sequential bytes from storage and outputs the results to
+   *  a supplied location.
+   *  
+   *  This function is a blocking function that can take several seconds to
+   *  complete. A \ref task_controller object may be optionally provided to
+   *  allow for mid-process communication and progress updates. If no controller
+   *  is supplied or **nullptr** is given, then this feature will be ignored.
+   *  
+   *  \param[in] address The starting address to begin reading data.
+   *  \param[out] data Array to output data from the device.
+   *  \param[in] num_bytes The number of bytes of data to read from the device.
+   *  \param[in|out] controller The \ref task_controller to report to while
+   *                 reading data.
+   *  
+   *  \returns The number of bytes written to \ref data output location.
+   *  
+   *  \see task_controller
+   */
   unsigned int            read_bytes(address_t address, data_t* data, unsigned int num_bytes, task_controller* controller = nullptr);
+  
+  /*! \brief Writes a sequence of bytes to the device.
+   *  
+   *  Writes a sequence of bytes to the device in order, starting at the
+   *  specified address.
+   *  
+   *  This function is a blocking function that can take several seconds to
+   *  complete. A \ref task_controller object may be optionally provided to
+   *  allow for mid-process communication and progress updates. If no controller
+   *  is supplied or **nullptr** is given, then this feature will be ignored.
+   *  
+   *  \param[in] address The starting address to begin writing data.
+   *  \param[in] data Array of data to write to the device.
+   *  \param[in] num_bytes The number of bytes of data to write to the device.
+   *  \param[in|out] controller The \ref task_controller to report to while
+   *                 writing data.
+   *  
+   *  \returns The number of bytes of data successfully written to the device.
+   *  
+   *  \see task_controller
+   */
   unsigned int            program_bytes(address_t address, const data_t* data, unsigned int num_bytes, task_controller* controller = nullptr);
   
 private:
+  /*! \brief A pointer to the \ref linkmasta_device used for communicating with
+   *         the chip.
+   *  
+   *  A constant pointer to the \ref linkmasta_device used for communicating
+   *  with the chip. The pointer to this device is const but the device itself
+   *  is not protected from modification. When this object is deallocated, this
+   *  pointer's target will not be deleted.
+   *  
+   *  \see linkmasta_device
+   */
   linkmasta_device* m_linkmasta;
+  
+  /*! \brief The index number of the chip on the cartridge.
+   *  
+   *  The index number of this device on the cartridge. Used for specifying the
+   *  hardware device to communicated with through the assigned \ref m_linkmasta
+   *  device.
+   *  
+   *  \see chip_index_t
+   */
   chip_index_t      m_chip_num;
 };
 
-#endif /* defined(__WS_SRAM_CHIP__) */
+#endif /* defined(__WS_SRAM_CHIP_H__) */
