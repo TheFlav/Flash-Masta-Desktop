@@ -1,7 +1,7 @@
 #include "ngp_lm_detail_widget.h"
 #include "ui_ngp_linkmasta_detail_widget.h"
 #include "../worker/ngp_lm_cartridge_polling_worker.h"
-#include "ngp_fm_cartridge_widget.h"
+#include "cartridge_widget.h"
 
 NgpLinkmastaDetailWidget::NgpLinkmastaDetailWidget(unsigned int device_id, QWidget *parent) :
   QWidget(parent),
@@ -87,7 +87,7 @@ void NgpLinkmastaDetailWidget::cartridgeInserted()
     delete m_cartridge_widget;
   }
   
-  m_cartridge_widget = new NgpFlashmastaCartridgeWidget(m_device_id, ui->verticalLayout->widget());
+  m_cartridge_widget = new CartridgeWidget(m_device_id, ui->verticalLayout->widget());
   ui->verticalLayout->addWidget(m_cartridge_widget, 1);
   m_cartridge_widget->show();
   m_default_widget->hide();

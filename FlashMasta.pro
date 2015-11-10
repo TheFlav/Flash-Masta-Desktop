@@ -62,8 +62,8 @@ SOURCES +=\
     src/ui/qt/detail/ngp_fm_cartridge_info_widget.cpp \
     src/ui/qt/detail/fm_cartridge_slot_widget.cpp \
     src/ui/qt/flash_masta_app.cpp \
-    src/ui/qt/detail/ngp_fm_cartridge_widget.cpp \
-    src/ui/qt/detail/ngp_lm_detail_widget.cpp
+    src/ui/qt/detail/ngp_lm_detail_widget.cpp \
+    src/ui/qt/detail/cartridge_widget.cpp
 
 HEADERS  +=\
     src/cartridge/cartridge.h \
@@ -115,14 +115,14 @@ HEADERS  +=\
     src/ui/qt/detail/fm_cartridge_slot_widget.h \
     src/ui/qt/flash_masta_app.h \
     src/ui/qt/detail/ngp_lm_detail_widget.h \
-    src/ui/qt/detail/ngp_fm_cartridge_widget.h
+    src/ui/qt/detail/cartridge_widget.h
 
 FORMS    +=\
     src/ui/qt/main_window.ui \
     src/ui/qt/detail/ngp_fm_cartridge_info_widget.ui \
     src/ui/qt/detail/fm_cartridge_slot_widget.ui \
-    src/ui/qt/detail/ngp_fm_cartridge_widget.ui \
-    src/ui/qt/detail/ngp_lm_detail_widget.ui
+    src/ui/qt/detail/ngp_lm_detail_widget.ui \
+    src/ui/qt/detail/cartridge_widget.ui
 
 DISTFILES += \
     README.md

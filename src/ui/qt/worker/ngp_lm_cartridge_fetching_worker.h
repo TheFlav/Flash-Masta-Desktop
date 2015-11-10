@@ -4,20 +4,20 @@
 #include <QObject>
 #include <QMutex>
 
-class ngp_cartridge;
+class cartridge;
 
-class NgpLmCartridgeFetchingWorker : public QObject
+class LmCartridgeFetchingWorker : public QObject
 {
   Q_OBJECT
 public:
-  explicit NgpLmCartridgeFetchingWorker(unsigned int device_id, QObject *parent = 0);
+  explicit LmCartridgeFetchingWorker(unsigned int device_id, QObject *parent = 0);
   
 public slots:
   void run();
   void cancel();
   
 signals:
-  void finished(ngp_cartridge* cart);
+  void finished(cartridge* cart);
   
 private:
   unsigned int m_device_id;

@@ -5,7 +5,7 @@
 #include "cartridge/ngp_cartridge.h"
 #include "linkmasta_device/linkmasta_device.h"
 
-NgpLmCartridgeFetchingWorker::NgpLmCartridgeFetchingWorker(unsigned int device_id, QObject *parent) :
+LmCartridgeFetchingWorker::LmCartridgeFetchingWorker(unsigned int device_id, QObject *parent) :
   QObject(parent), m_device_id(device_id), m_cancelled(false)
 {
   
@@ -13,7 +13,7 @@ NgpLmCartridgeFetchingWorker::NgpLmCartridgeFetchingWorker(unsigned int device_i
 
 
 
-void NgpLmCartridgeFetchingWorker::run()
+void LmCartridgeFetchingWorker::run()
 {
   bool cancel = false;
   ngp_cartridge* cart = nullptr;
@@ -60,10 +60,10 @@ void NgpLmCartridgeFetchingWorker::run()
     cart = nullptr;
   }
   
-  emit finished(cart);
+  emit finished((cartridge*) cart);
 }
 
-void NgpLmCartridgeFetchingWorker::cancel()
+void LmCartridgeFetchingWorker::cancel()
 {
   m_mutex.lock();
   m_cancelled = true;
