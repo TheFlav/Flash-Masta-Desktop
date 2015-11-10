@@ -1,4 +1,4 @@
-#include "ngp_flashmasta_cartridge_widget.h"
+#include "ngp_fm_cartridge_widget.h"
 #include "ui_ngp_flashmasta_cartridge_widget.h"
 #include "cartridge/ngp_cartridge.h"
 #include "../worker/ngp_lm_cartridge_fetching_worker.h"
@@ -20,8 +20,8 @@ NgpFlashmastaCartridgeWidget::NgpFlashmastaCartridgeWidget(unsigned int device_i
   m_default_widget = ui->defaultWidget;
   m_current_widget = m_default_widget;
   
-  connect(FlashMasta::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(device_selected(int,int)));
-  connect(FlashMasta::get_instance(), SIGNAL(selectedSlotChanged(int,int)), this, SLOT(slot_selected(int,int)));
+  connect(FlashMastaApp::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(device_selected(int,int)));
+  connect(FlashMastaApp::get_instance(), SIGNAL(selectedSlotChanged(int,int)), this, SLOT(slot_selected(int,int)));
   
   QThread* thread = new QThread();
   m_worker = new NgpLmCartridgeFetchingWorker(m_device_id);
@@ -88,20 +88,20 @@ void NgpFlashmastaCartridgeWidget::device_selected(int old_device_id, int new_de
 {
   (void) old_device_id;
   if (new_device_id != (int) m_device_id) return;
-  FlashMasta::get_instance()->setSelectedSlot(m_current_slot);
+  FlashMastaApp::get_instance()->setSelectedSlot(m_current_slot);
 }
 
 void NgpFlashmastaCartridgeWidget::slot_selected(int old_slot_id, int new_slot_id)
 {
   (void) old_slot_id;
   (void) new_slot_id;
-  if (FlashMasta::get_instance()->get_selected_device() != (int) m_device_id) return;
+  if (FlashMastaApp::get_instance()->get_selected_device() != (int) m_device_id) return;
   update_enabled_actions();
 }
 
 void NgpFlashmastaCartridgeWidget::update_enabled_actions()
 {
-  FlashMasta* app = FlashMasta::get_instance();
+  FlashMastaApp* app = FlashMastaApp::get_instance();
   if (m_cartridge == nullptr || m_slot_widgets.empty() || m_slot_widgets[0] == nullptr)
   {
     app->setGameBackupEnabled(false);
@@ -144,5 +144,5 @@ void NgpFlashmastaCartridgeWidget::on_slotsComboBox_currentIndexChanged(int inde
   }
   
   m_current_widget->show();
-  FlashMasta::get_instance()->setSelectedSlot(index - 1);
+  FlashMastaApp::get_instance()->setSelectedSlot(index - 1);
 }

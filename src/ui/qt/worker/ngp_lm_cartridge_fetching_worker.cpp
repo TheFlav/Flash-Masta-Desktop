@@ -1,6 +1,6 @@
 #include "ngp_lm_cartridge_fetching_worker.h"
 
-#include "../flash_masta.h"
+#include "../flash_masta_app.h"
 #include "../device_manager.h"
 #include "cartridge/ngp_cartridge.h"
 #include "linkmasta_device/linkmasta_device.h"
@@ -17,7 +17,7 @@ void NgpLmCartridgeFetchingWorker::run()
 {
   bool cancel = false;
   ngp_cartridge* cart = nullptr;
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(m_device_id));
+  while (!FlashMastaApp::get_instance()->get_device_manager()->claim_device(m_device_id));
   
   m_mutex.lock();
   if (m_cancelled) cancel = true;
@@ -27,7 +27,7 @@ void NgpLmCartridgeFetchingWorker::run()
   
   if (!cancel)
   {
-    linkmasta = FlashMasta::get_instance()->get_device_manager()->get_linkmasta_device(m_device_id);
+    linkmasta = FlashMastaApp::get_instance()->get_device_manager()->get_linkmasta_device(m_device_id);
     m_mutex.lock();
     if (m_cancelled) cancel = true;
     m_mutex.unlock();
@@ -49,7 +49,7 @@ void NgpLmCartridgeFetchingWorker::run()
     m_mutex.unlock();
   }
   
-  FlashMasta::get_instance()->get_device_manager()->release_device(m_device_id);
+  FlashMastaApp::get_instance()->get_device_manager()->release_device(m_device_id);
   m_mutex.lock();
   if (m_cancelled) cancel = true;
   m_mutex.unlock();

@@ -1,9 +1,9 @@
-#ifndef NGP_FLASHMASTA_CARTRIDGE_WIDGET_H
-#define NGP_FLASHMASTA_CARTRIDGE_WIDGET_H
+#ifndef __NGP_FLASHMASTA_CARTRIDGE_WIDGET_H__
+#define __NGP_FLASHMASTA_CARTRIDGE_WIDGET_H__
 
 #include <QWidget>
 
-#include "../flash_masta.h"
+#include "../flash_masta_app.h"
 #include <vector>
 
 namespace Ui {
@@ -44,4 +44,4 @@ private:
   std::vector<QWidget*> m_slot_widgets;
 };
 
-#endif // NGP_FLASHMASTA_CARTRIDGE_WIDGET_H
+#endif // __NGP_FLASHMASTA_CARTRIDGE_WIDGET_H__

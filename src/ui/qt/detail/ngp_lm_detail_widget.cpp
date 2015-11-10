@@ -1,7 +1,7 @@
-#include "ngp_linkmasta_detail_widget.h"
+#include "ngp_lm_detail_widget.h"
 #include "ui_ngp_linkmasta_detail_widget.h"
 #include "../worker/ngp_lm_cartridge_polling_worker.h"
-#include "ngp_flashmasta_cartridge_widget.h"
+#include "ngp_fm_cartridge_widget.h"
 
 NgpLinkmastaDetailWidget::NgpLinkmastaDetailWidget(unsigned int device_id, QWidget *parent) :
   QWidget(parent),
@@ -11,8 +11,8 @@ NgpLinkmastaDetailWidget::NgpLinkmastaDetailWidget(unsigned int device_id, QWidg
   ui->setupUi(this);
   m_default_widget = ui->contentWidget;
   
-  connect(FlashMasta::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(selected_device_changed(int,int)));
-  connect(FlashMasta::get_instance(), SIGNAL(selectedSlotChanged(int,int)), this, SLOT(selected_slot_changed(int,int)));
+  connect(FlashMastaApp::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(selected_device_changed(int,int)));
+  connect(FlashMastaApp::get_instance(), SIGNAL(selectedSlotChanged(int,int)), this, SLOT(selected_slot_changed(int,int)));
 }
 
 NgpLinkmastaDetailWidget::~NgpLinkmastaDetailWidget()
@@ -54,7 +54,7 @@ void NgpLinkmastaDetailWidget::stop_polling()
 
 void NgpLinkmastaDetailWidget::disable_actions()
 {
-  FlashMasta* app = FlashMasta::get_instance();
+  FlashMastaApp* app = FlashMastaApp::get_instance();
   app->setGameBackupEnabled(false);
   app->setGameFlashEnabled(false);
   app->setGameVerifyEnabled(false);
@@ -76,7 +76,7 @@ void NgpLinkmastaDetailWidget::cartridge_removed()
     m_cartridge_widget = nullptr;
   }
   
-  FlashMasta::get_instance()->setSelectedSlot(-1);
+  FlashMastaApp::get_instance()->setSelectedSlot(-1);
 }
 
 void NgpLinkmastaDetailWidget::cartridge_inserted()
@@ -106,7 +106,7 @@ void NgpLinkmastaDetailWidget::selected_slot_changed(int old_slot, int new_slot)
 {
   (void) old_slot;
   (void) new_slot;
-  if (FlashMasta::get_instance()->get_selected_device() == (int) m_device_id && m_cartridge_widget == nullptr)
+  if (FlashMastaApp::get_instance()->get_selected_device() == (int) m_device_id && m_cartridge_widget == nullptr)
   {
     disable_actions();
   }

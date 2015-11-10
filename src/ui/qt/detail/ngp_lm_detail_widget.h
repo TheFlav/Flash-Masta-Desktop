@@ -1,5 +1,5 @@
-#ifndef NGP_LINKMASTA_DETAIL_WIDGET_H
-#define NGP_LINKMASTA_DETAIL_WIDGET_H
+#ifndef __NGP_LINKMASTA_DETAIL_WIDGET_H__
+#define __NGP_LINKMASTA_DETAIL_WIDGET_H__
 
 #include <QWidget>
 #include <QThread>
@@ -37,4 +37,4 @@ private:
   QThread* m_pooling_thread;
 };
 
-#endif // NGP_LINKMASTA_DETAIL_WIDGET_H
+#endif // __NGP_LINKMASTA_DETAIL_WIDGET_H__

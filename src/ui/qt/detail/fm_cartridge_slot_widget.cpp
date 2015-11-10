@@ -3,7 +3,7 @@
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
 #include "cartridge/ws_cartridge.h"
-#include "../flash_masta.h"
+#include "../flash_masta_app.h"
 #include "../device_manager.h"
 #include "../main_window.h"
 
@@ -22,7 +22,7 @@ FmCartridgeSlotWidget::FmCartridgeSlotWidget(int device_id, cartridge* cart, int
     buildFromCartridge(cart, slot);
   }
   
-  FlashMasta* app = FlashMasta::get_instance();
+  FlashMastaApp* app = FlashMastaApp::get_instance();
   MainWindow* win = app->get_main_window();
   
   connect(app, SIGNAL(gameBackupEnabledChanged(bool)), this, SLOT(setGameBackupEnabled(bool)));
@@ -85,9 +85,9 @@ void FmCartridgeSlotWidget::buildFromNgpCartridge(ngp_cartridge* cart, int slot)
 {
   (void) slot;
   
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(m_device_id));
+  while (!FlashMastaApp::get_instance()->get_device_manager()->claim_device(m_device_id));
   std::string game_name = cart->fetch_game_name(m_slot);
-  FlashMasta::get_instance()->get_device_manager()->release_device(m_device_id);
+  FlashMastaApp::get_instance()->get_device_manager()->release_device(m_device_id);
   
   if (game_name.empty())
   {

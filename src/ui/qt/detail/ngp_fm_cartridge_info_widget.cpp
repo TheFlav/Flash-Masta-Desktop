@@ -1,7 +1,7 @@
 #include "ngp_fm_cartridge_info_widget.h"
 #include "ui_ngp_fm_cartridge_info_widget.h"
 #include "cartridge/ngp_cartridge.h"
-#include "../flash_masta.h"
+#include "../flash_masta_app.h"
 #include "../main_window.h"
 #include "../device_manager.h"
 #include <QString>
@@ -30,8 +30,8 @@ NgpFmCartridgeInfoWidget::NgpFmCartridgeInfoWidget(int device_id, ngp_cartridge*
     buildFromCartridge(cartridge);
   }
   
-  MainWindow* mw = FlashMasta::get_instance()->get_main_window();
-  connect(FlashMasta::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(onDeviceSelected(int,int)));
+  MainWindow* mw = FlashMastaApp::get_instance()->get_main_window();
+  connect(FlashMastaApp::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(onDeviceSelected(int,int)));
   connect(ui->cartActionBackupGameButton, SIGNAL(clicked(bool)), mw, SLOT(triggerActionBackupGame()));
   connect(ui->cartActionFlashGameButton, SIGNAL(clicked(bool)), mw, SLOT(triggerActionFlashGame()));
   connect(ui->cartActionVerifyGameButton, SIGNAL(clicked(bool)), mw, SLOT(triggerActionVerifyGame()));
@@ -49,7 +49,7 @@ NgpFmCartridgeInfoWidget::~NgpFmCartridgeInfoWidget()
 
 void NgpFmCartridgeInfoWidget::buildFromCartridge(ngp_cartridge* cartridge)
 {
-  while (!FlashMasta::get_instance()->get_device_manager()->claim_device(m_device_id));
+  while (!FlashMastaApp::get_instance()->get_device_manager()->claim_device(m_device_id));
   
   const cartridge_descriptor* descriptor = cartridge->descriptor();
   
@@ -93,7 +93,7 @@ void NgpFmCartridgeInfoWidget::buildFromCartridge(ngp_cartridge* cartridge)
     break;
   }
   
-  FlashMasta::get_instance()->get_device_manager()->release_device(m_device_id);
+  FlashMastaApp::get_instance()->get_device_manager()->release_device(m_device_id);
 }
 
 
@@ -359,7 +359,7 @@ void NgpFmCartridgeInfoWidget::onDeviceSelected(int old_device_id, int new_devic
   (void) old_device_id;
   if (new_device_id != m_device_id) return;
   
-  FlashMasta* app = FlashMasta::get_instance();
+  FlashMastaApp* app = FlashMastaApp::get_instance();
   app->setGameBackupEnabled(m_game_backup_enabled);
   app->setGameFlashEnabled(m_game_flash_enabled);
   app->setGameVerifyEnabled(m_game_verify_enabled);

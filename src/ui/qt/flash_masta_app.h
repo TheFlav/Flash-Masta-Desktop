@@ -1,17 +1,17 @@
-#ifndef FLASHMASTA_H
-#define FLASHMASTA_H
+#ifndef __FLASH_MASTA_APP_H__
+#define __FLASH_MASTA_APP_H__
 
 #include <QApplication>
 
 class DeviceManager;
 class MainWindow;
 
-class FlashMasta: public QApplication
+class FlashMastaApp: public QApplication
 {
   Q_OBJECT
 public:
-  FlashMasta(int argc, char** argv, int flags = ApplicationFlags);
-  ~FlashMasta();
+  FlashMastaApp(int argc, char** argv, int flags = ApplicationFlags);
+  ~FlashMastaApp();
   
   DeviceManager* get_device_manager() const;
   MainWindow* get_main_window() const;
@@ -42,10 +42,10 @@ signals:
   void selectedSlotChanged(int, int);
   
 public:
-  static FlashMasta* get_instance();
+  static FlashMastaApp* get_instance();
   
 private:
-  Q_DISABLE_COPY(FlashMasta)
+  Q_DISABLE_COPY(FlashMastaApp)
   
   MainWindow* m_main_window;
   DeviceManager* m_device_manager;
@@ -58,9 +58,9 @@ private:
   int m_selected_device;
   int m_selected_slot;
   
-  static FlashMasta* instance;
+  static FlashMastaApp* instance;
   static const int NO_DEVICE;
   static const int NO_SLOT;
 };
 
-#endif // FLASHMASTA_H
+#endif // __FLASH_MASTA_APP_H__
