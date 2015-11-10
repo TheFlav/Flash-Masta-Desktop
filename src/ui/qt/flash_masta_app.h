@@ -13,10 +13,10 @@ public:
   FlashMastaApp(int argc, char** argv, int flags = ApplicationFlags);
   ~FlashMastaApp();
   
-  DeviceManager* get_device_manager() const;
-  MainWindow* get_main_window() const;
-  int get_selected_device() const;
-  int get_selected_slot() const;
+  DeviceManager* getDeviceManager() const;
+  MainWindow* getMainWindow() const;
+  int getSelectedDevice() const;
+  int getSelectedSlot() const;
   
 public slots:
   void setGameBackupEnabled(bool enabled);
@@ -42,7 +42,7 @@ signals:
   void selectedSlotChanged(int, int);
   
 public:
-  static FlashMastaApp* get_instance();
+  static FlashMastaApp* getInstance();
   
 private:
   Q_DISABLE_COPY(FlashMastaApp)

@@ -19,28 +19,28 @@ public:
                                     DeviceManager();
   virtual                           ~DeviceManager();
   
-  virtual std::vector<unsigned int> get_connected_devices() = 0;
-  virtual bool                      try_get_connected_devices(std::vector<unsigned int>& devices) = 0;
-  virtual bool                      is_connected(unsigned int id) = 0;
-  virtual unsigned int              get_vendor_id(unsigned int id) = 0;
-  virtual unsigned int              get_product_id(unsigned int id) = 0;
-  virtual std::string               get_manufacturer_string(unsigned int id) = 0;
-  virtual std::string               get_product_string(unsigned int id) = 0;
-  virtual std::string               get_serial_number(unsigned int id) = 0;
-  virtual linkmasta_device*         get_linkmasta_device(unsigned int id) = 0;
-  virtual bool                      is_device_claimed(unsigned int id) = 0;
-  virtual bool                      claim_device(unsigned int id) = 0;
-  virtual void                      release_device(unsigned int id) = 0;
+  virtual std::vector<unsigned int> getConnectedDevices() = 0;
+  virtual bool                      tryGetConnectedDevices(std::vector<unsigned int>& devices) = 0;
+  virtual bool                      isConnected(unsigned int id) = 0;
+  virtual unsigned int              getVendorId(unsigned int id) = 0;
+  virtual unsigned int              getProductId(unsigned int id) = 0;
+  virtual std::string               getManufacturerString(unsigned int id) = 0;
+  virtual std::string               getProductString(unsigned int id) = 0;
+  virtual std::string               getSerialNumber(unsigned int id) = 0;
+  virtual linkmasta_device*         getLinkmastaDevice(unsigned int id) = 0;
+  virtual bool                      isDeviceClaimed(unsigned int id) = 0;
+  virtual bool                      tryClaimDevice(unsigned int id) = 0;
+  virtual void                      releaseDevice(unsigned int id) = 0;
   
 protected:
-  unsigned int                      generate_id();
-  void                              start_auto_refresh();
-  virtual void                      refresh_device_list() = 0;
-  static linkmasta_device*          build_linkmasta_device(usb::usb_device* device);
+  unsigned int                      generateId();
+  void                              startAutoRefresh();
+  virtual void                      refreshDeviceList() = 0;
+  static linkmasta_device*          buildLinkmastaDevice(usb::usb_device* device);
   
 private:
                                     DeviceManager(const DeviceManager& other) = delete;
-  void                              refresh_thread_function();
+  void                              refreshThreadFunction();
   
   
   //////////////// DATA ////////////////

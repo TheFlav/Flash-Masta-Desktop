@@ -17,7 +17,7 @@ void NgpLmCartridgeFetchingWorker::run()
 {
   bool cancel = false;
   ngp_cartridge* cart = nullptr;
-  while (!FlashMastaApp::get_instance()->get_device_manager()->claim_device(m_device_id));
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
   
   m_mutex.lock();
   if (m_cancelled) cancel = true;
@@ -27,7 +27,7 @@ void NgpLmCartridgeFetchingWorker::run()
   
   if (!cancel)
   {
-    linkmasta = FlashMastaApp::get_instance()->get_device_manager()->get_linkmasta_device(m_device_id);
+    linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(m_device_id);
     m_mutex.lock();
     if (m_cancelled) cancel = true;
     m_mutex.unlock();
@@ -49,7 +49,7 @@ void NgpLmCartridgeFetchingWorker::run()
     m_mutex.unlock();
   }
   
-  FlashMastaApp::get_instance()->get_device_manager()->release_device(m_device_id);
+  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
   m_mutex.lock();
   if (m_cancelled) cancel = true;
   m_mutex.unlock();

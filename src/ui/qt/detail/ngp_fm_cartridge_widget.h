@@ -20,13 +20,14 @@ class NgpFlashmastaCartridgeWidget : public QWidget
 public:
   explicit NgpFlashmastaCartridgeWidget(unsigned int device_id, QWidget *parent = 0);
   ~NgpFlashmastaCartridgeWidget();
-  void refresh_ui();
+  
+  void refreshUi();
   
 public slots:
-  void cartridge_loaded(ngp_cartridge* cartridge);
-  void device_selected(int old_device_id, int new_device_id);
-  void slot_selected(int old_slot_id, int new_slot_id);
-  void update_enabled_actions();
+  void cartridgeLoaded(ngp_cartridge* cartridge);
+  void deviceSelected(int old_device_id, int new_device_id);
+  void slotSelected(int old_slot_id, int new_slot_id);
+  void updateEnabledActions();
   
 private slots:
   void on_slotsComboBox_currentIndexChanged(int index);

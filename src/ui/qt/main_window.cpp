@@ -65,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
   ui->deviceListWidget->setAttribute(Qt::WA_MacShowFocusRect, false);
   
   // connect ui to actions
-  FlashMastaApp* app = FlashMastaApp::get_instance();
+  FlashMastaApp* app = FlashMastaApp::getInstance();
   connect(ui->actionBackupROM, SIGNAL(triggered(bool)), this, SLOT(triggerActionBackupGame()));
   connect(ui->actionRestoreROM, SIGNAL(triggered(bool)), this, SLOT(triggerActionFlashGame()));
   connect(ui->actionVerifyROM, SIGNAL(triggered(bool)), this, SLOT(triggerActionVerifyGame()));
@@ -80,8 +80,8 @@ MainWindow::MainWindow(QWidget *parent)
   connect(app, SIGNAL(saveVerifyEnabledChanged(bool)), this, SLOT(setSaveVerifyEnabled(bool)));
   
   // Refresh action states
-  app->setSelectedDevice(app->get_selected_device());
-  app->setSelectedSlot(app->get_selected_slot());
+  app->setSelectedDevice(app->getSelectedDevice());
+  app->setSelectedSlot(app->getSelectedSlot());
   
   // Hide toolbar if on windows
 #ifdef OS_WINDOWS
@@ -105,13 +105,13 @@ cartridge* MainWindow::build_cartridge_for_device(int id)
   linkmasta_device* linkmasta;
   cartridge* cart;
   
-  linkmasta = FlashMastaApp::get_instance()->get_device_manager()->get_linkmasta_device(id);
+  linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(id);
   if (linkmasta == nullptr)
   {
     return nullptr;
   }
   
-  switch (FlashMastaApp::get_instance()->get_device_manager()->get_product_id(id))
+  switch (FlashMastaApp::getInstance()->getDeviceManager()->getProductId(id))
   {
   case 0x4256:       // NGP (new flashmasta)
   case 0x4178:       // NGP (linkmasta)
@@ -123,9 +123,9 @@ cartridge* MainWindow::build_cartridge_for_device(int id)
     break;
   }
   
-  while (!FlashMastaApp::get_instance()->get_device_manager()->claim_device(id));
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(id));
   cart->init();
-  FlashMastaApp::get_instance()->get_device_manager()->release_device(id);
+  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(id);
   return cart;
 }
 
@@ -172,7 +172,7 @@ void MainWindow::triggerActionBackupGame()
     switch (cart->system())
     {
     case system_type::SYSTEM_NEO_GEO_POCKET:
-      NgpCartridgeBackupTask(this, cart, FlashMastaApp::get_instance()->get_selected_slot()).go();
+      NgpCartridgeBackupTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
@@ -203,7 +203,7 @@ void MainWindow::triggerActionFlashGame()
     switch (cart->system())
     {
     case system_type::SYSTEM_NEO_GEO_POCKET:
-      NgpCartridgeFlashTask(this, cart, FlashMastaApp::get_instance()->get_selected_slot()).go();
+      NgpCartridgeFlashTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
@@ -234,7 +234,7 @@ void MainWindow::triggerActionVerifyGame()
     switch (cart->system())
     {
     case system_type::SYSTEM_NEO_GEO_POCKET:
-      NgpCartridgeVerifyTask(this, cart, FlashMastaApp::get_instance()->get_selected_slot()).go();
+      NgpCartridgeVerifyTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
@@ -264,7 +264,7 @@ void MainWindow::triggerActionBackupSave()
     switch (cart->system())
     {
     case system_type::SYSTEM_NEO_GEO_POCKET:
-      NgpCartridgeBackupSaveTask(this, cart, FlashMastaApp::get_instance()->get_selected_slot()).go();
+      NgpCartridgeBackupSaveTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
@@ -294,7 +294,7 @@ void MainWindow::triggerActionRestoreSave()
     switch (cart->system())
     {
     case system_type::SYSTEM_NEO_GEO_POCKET:
-      NgpCartridgeRestoreSaveTask(this, cart, FlashMastaApp::get_instance()->get_selected_slot()).go();
+      NgpCartridgeRestoreSaveTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
@@ -329,7 +329,7 @@ void MainWindow::refreshDeviceList_timeout()
   set<unsigned int> new_devices;      // newly connected devices
   set<unsigned int> removed_devices;  // recently removed devices
   
-  if (FlashMastaApp::get_instance()->get_device_manager()->try_get_connected_devices(connected_devices))
+  if (FlashMastaApp::getInstance()->getDeviceManager()->tryGetConnectedDevices(connected_devices))
   {
     // new row selection after updating list
     int selection = -1;
@@ -383,7 +383,7 @@ void MainWindow::refreshDeviceList_timeout()
     for (auto device_id : new_devices)
     {
       // Instantiate a new item and append it to the list widget
-      QListWidgetItem *item = new QListWidgetItem(QString(FlashMastaApp::get_instance()->get_device_manager()->get_product_string(device_id).c_str()));
+      QListWidgetItem *item = new QListWidgetItem(QString(FlashMastaApp::getInstance()->getDeviceManager()->getProductString(device_id).c_str()));
       auto size = item->sizeHint();
       size.setHeight(40);
       item->setSizeHint(size);
@@ -397,7 +397,7 @@ void MainWindow::refreshDeviceList_timeout()
       m_device_detail_widgets[device_id] = widget;
       widget->hide();
       ui->scrollAreaWidgetContents->layout()->addWidget(widget);
-      widget->start_polling();
+      widget->startPolling();
     }
     
     // Update selection if selected device was disconnected
@@ -444,11 +444,11 @@ void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
   {
     m_current_widget = m_device_detail_widgets[m_device_ids[currentRow]];
     m_current_widget->show();
-    FlashMastaApp::get_instance()->setSelectedDevice(m_device_ids[currentRow]);
+    FlashMastaApp::getInstance()->setSelectedDevice(m_device_ids[currentRow]);
   }
   else
   {
-    FlashMastaApp::get_instance()->setSelectedDevice(-1);
+    FlashMastaApp::getInstance()->setSelectedDevice(-1);
   }
 }
 

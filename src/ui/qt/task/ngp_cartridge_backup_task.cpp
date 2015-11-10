@@ -41,11 +41,11 @@ void NgpCartridgeBackupTask::run_task()
   // Let user know what's happening
   if (m_slot == -1)
   {
-    set_progress_label("Backing up entire cartridge to file");
+    setProgressLabel("Backing up entire cartridge to file");
   }
   else
   {
-    set_progress_label(QString("Backing up slot " + QString::number(m_slot + 1) + QString(" to file")));
+    setProgressLabel(QString("Backing up slot " + QString::number(m_slot + 1) + QString(" to file")));
   }
   
   // Begin task

@@ -11,19 +11,19 @@ NgpLinkmastaDetailWidget::NgpLinkmastaDetailWidget(unsigned int device_id, QWidg
   ui->setupUi(this);
   m_default_widget = ui->contentWidget;
   
-  connect(FlashMastaApp::get_instance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(selected_device_changed(int,int)));
-  connect(FlashMastaApp::get_instance(), SIGNAL(selectedSlotChanged(int,int)), this, SLOT(selected_slot_changed(int,int)));
+  connect(FlashMastaApp::getInstance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(selectedDeviceChanged(int,int)));
+  connect(FlashMastaApp::getInstance(), SIGNAL(selectedSlotChanged(int,int)), this, SLOT(selectedSlotChanged(int,int)));
 }
 
 NgpLinkmastaDetailWidget::~NgpLinkmastaDetailWidget()
 {
-  stop_polling();
+  stopPolling();
   delete ui;
 }
 
 
 
-void NgpLinkmastaDetailWidget::start_polling()
+void NgpLinkmastaDetailWidget::startPolling()
 {
   if (m_pooling_thread != nullptr) return;
   
@@ -32,8 +32,8 @@ void NgpLinkmastaDetailWidget::start_polling()
   auto worker = new NgpLmCartridgePollingWorker(m_device_id);
   
   worker->moveToThread(m_pooling_thread);
-  connect(worker, SIGNAL(cartridge_removed()), this, SLOT(cartridge_removed()));
-  connect(worker, SIGNAL(cartridge_inserted()), this, SLOT(cartridge_inserted()));
+  connect(worker, SIGNAL(cartridgeRemoved()), this, SLOT(cartridgeRemoved()));
+  connect(worker, SIGNAL(cartridgeInserted()), this, SLOT(cartridgeInserted()));
   connect(m_pooling_thread, SIGNAL(started()), worker, SLOT(start()));
   connect(m_pooling_thread, SIGNAL(finished()), worker, SLOT(stop()));
   connect(m_pooling_thread, SIGNAL(finished()), worker, SLOT(deleteLater()));
@@ -41,7 +41,7 @@ void NgpLinkmastaDetailWidget::start_polling()
   m_pooling_thread->start();
 }
 
-void NgpLinkmastaDetailWidget::stop_polling()
+void NgpLinkmastaDetailWidget::stopPolling()
 {
   if (m_pooling_thread == nullptr) return;
   
@@ -52,9 +52,9 @@ void NgpLinkmastaDetailWidget::stop_polling()
 
 
 
-void NgpLinkmastaDetailWidget::disable_actions()
+void NgpLinkmastaDetailWidget::disableActions()
 {
-  FlashMastaApp* app = FlashMastaApp::get_instance();
+  FlashMastaApp* app = FlashMastaApp::getInstance();
   app->setGameBackupEnabled(false);
   app->setGameFlashEnabled(false);
   app->setGameVerifyEnabled(false);
@@ -65,7 +65,7 @@ void NgpLinkmastaDetailWidget::disable_actions()
 
 
 
-void NgpLinkmastaDetailWidget::cartridge_removed()
+void NgpLinkmastaDetailWidget::cartridgeRemoved()
 {
   m_default_widget->show();
   
@@ -76,10 +76,10 @@ void NgpLinkmastaDetailWidget::cartridge_removed()
     m_cartridge_widget = nullptr;
   }
   
-  FlashMastaApp::get_instance()->setSelectedSlot(-1);
+  FlashMastaApp::getInstance()->setSelectedSlot(-1);
 }
 
-void NgpLinkmastaDetailWidget::cartridge_inserted()
+void NgpLinkmastaDetailWidget::cartridgeInserted()
 {
   if (m_cartridge_widget != nullptr)
   {
@@ -93,22 +93,22 @@ void NgpLinkmastaDetailWidget::cartridge_inserted()
   m_default_widget->hide();
 }
 
-void NgpLinkmastaDetailWidget::selected_device_changed(int old_device, int new_device)
+void NgpLinkmastaDetailWidget::selectedDeviceChanged(int old_device, int new_device)
 {
   (void) old_device;
   if (new_device == (int) m_device_id && m_cartridge_widget == nullptr)
   {
-    disable_actions();
+    disableActions();
   }
 }
 
-void NgpLinkmastaDetailWidget::selected_slot_changed(int old_slot, int new_slot)
+void NgpLinkmastaDetailWidget::selectedSlotChanged(int old_slot, int new_slot)
 {
   (void) old_slot;
   (void) new_slot;
-  if (FlashMastaApp::get_instance()->get_selected_device() == (int) m_device_id && m_cartridge_widget == nullptr)
+  if (FlashMastaApp::getInstance()->getSelectedDevice() == (int) m_device_id && m_cartridge_widget == nullptr)
   {
-    disable_actions();
+    disableActions();
   }
 }
 

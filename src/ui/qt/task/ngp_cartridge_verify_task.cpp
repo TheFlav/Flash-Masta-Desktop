@@ -40,11 +40,11 @@ void NgpCartridgeVerifyTask::run_task()
   
   if (m_slot == -1)
   {
-    set_progress_label("Comparing cartridge data to file");
+    setProgressLabel("Comparing cartridge data to file");
   }
   else
   {
-    set_progress_label(QString("Comparing slot ") + QString::number(m_slot+1) + QString(" data to file"));
+    setProgressLabel(QString("Comparing slot ") + QString::number(m_slot+1) + QString(" data to file"));
   }
   
   // Begin task

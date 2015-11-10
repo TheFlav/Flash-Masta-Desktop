@@ -15,7 +15,7 @@ LibusbDeviceManager::LibusbDeviceManager()
   m_libusb_init = true;
   m_libusb_mutex.unlock();
   
-  start_auto_refresh();
+  startAutoRefresh();
 }
 
 LibusbDeviceManager::~LibusbDeviceManager()
@@ -34,7 +34,7 @@ LibusbDeviceManager::~LibusbDeviceManager()
 
 
 
-std::vector<unsigned int> LibusbDeviceManager::get_connected_devices()
+std::vector<unsigned int> LibusbDeviceManager::getConnectedDevices()
 {
   vector<unsigned int> list;
   
@@ -50,7 +50,7 @@ std::vector<unsigned int> LibusbDeviceManager::get_connected_devices()
   return list;
 }
 
-bool LibusbDeviceManager::try_get_connected_devices(std::vector<unsigned int>& devices)
+bool LibusbDeviceManager::tryGetConnectedDevices(std::vector<unsigned int>& devices)
 {
   // Only continue if background process isn't running
   if (m_connected_devices_mutex.try_lock())
@@ -72,7 +72,7 @@ bool LibusbDeviceManager::try_get_connected_devices(std::vector<unsigned int>& d
   }
 }
 
-bool LibusbDeviceManager::is_connected(unsigned int id)
+bool LibusbDeviceManager::isConnected(unsigned int id)
 {
   m_connected_devices_mutex.lock(); // LOCK m_connected_devices
   
@@ -83,7 +83,7 @@ bool LibusbDeviceManager::is_connected(unsigned int id)
   return r;
 }
 
-unsigned int LibusbDeviceManager::get_vendor_id(unsigned int id)
+unsigned int LibusbDeviceManager::getVendorId(unsigned int id)
 {
   m_connected_devices_mutex.lock(); // LOCK m_connected_devices
   
@@ -102,7 +102,7 @@ unsigned int LibusbDeviceManager::get_vendor_id(unsigned int id)
   return id;
 }
 
-unsigned int LibusbDeviceManager::get_product_id(unsigned int id)
+unsigned int LibusbDeviceManager::getProductId(unsigned int id)
 {
   m_connected_devices_mutex.lock(); // LOCK m_connected_devices
   
@@ -121,7 +121,7 @@ unsigned int LibusbDeviceManager::get_product_id(unsigned int id)
   return id;
 }
 
-string LibusbDeviceManager::get_manufacturer_string(unsigned int id)
+string LibusbDeviceManager::getManufacturerString(unsigned int id)
 {
   m_connected_devices_mutex.lock(); // LOCK m_connected_devices
   
@@ -140,7 +140,7 @@ string LibusbDeviceManager::get_manufacturer_string(unsigned int id)
   return r;
 }
 
-string LibusbDeviceManager::get_product_string(unsigned int id)
+string LibusbDeviceManager::getProductString(unsigned int id)
 {
   m_connected_devices_mutex.lock(); // LOCK m_connected_devices
   
@@ -159,7 +159,7 @@ string LibusbDeviceManager::get_product_string(unsigned int id)
   return r;
 }
 
-string LibusbDeviceManager::get_serial_number(unsigned int id)
+string LibusbDeviceManager::getSerialNumber(unsigned int id)
 {
   m_connected_devices_mutex.lock(); // LOCK m_connected_devices
   
@@ -178,7 +178,7 @@ string LibusbDeviceManager::get_serial_number(unsigned int id)
   return r;
 }
 
-linkmasta_device* LibusbDeviceManager::get_linkmasta_device(unsigned int id)
+linkmasta_device* LibusbDeviceManager::getLinkmastaDevice(unsigned int id)
 {
   m_connected_devices_mutex.lock();
   
@@ -197,7 +197,7 @@ linkmasta_device* LibusbDeviceManager::get_linkmasta_device(unsigned int id)
   return r;
 }
 
-bool LibusbDeviceManager::is_device_claimed(unsigned int id)
+bool LibusbDeviceManager::isDeviceClaimed(unsigned int id)
 {
   m_connected_devices_mutex.lock();
   
@@ -216,7 +216,7 @@ bool LibusbDeviceManager::is_device_claimed(unsigned int id)
   return r;
 }
 
-bool LibusbDeviceManager::claim_device(unsigned int id)
+bool LibusbDeviceManager::tryClaimDevice(unsigned int id)
 {
   m_connected_devices_mutex.lock();
   
@@ -236,7 +236,7 @@ bool LibusbDeviceManager::claim_device(unsigned int id)
   return !r;
 }
 
-void LibusbDeviceManager::release_device(unsigned int id)
+void LibusbDeviceManager::releaseDevice(unsigned int id)
 {
   m_connected_devices_mutex.lock();
   
@@ -255,7 +255,7 @@ void LibusbDeviceManager::release_device(unsigned int id)
 
 
 
-void LibusbDeviceManager::refresh_device_list()
+void LibusbDeviceManager::refreshDeviceList()
 {
   m_libusb_mutex.lock();
   if (!m_libusb_init)
@@ -283,7 +283,7 @@ void LibusbDeviceManager::refresh_device_list()
     libusb_get_device_descriptor(device_list[i], &desc);
     
     // Only deal with supported devices
-    if (!is_supported(desc.idVendor, desc.idProduct))
+    if (!isSupported(desc.idVendor, desc.idProduct))
     {
       continue;
     }
@@ -303,7 +303,7 @@ void LibusbDeviceManager::refresh_device_list()
     if (!found)
     {
       connected_device new_device;
-      new_device.id = generate_id();
+      new_device.id = generateId();
       new_device.vendor_id = desc.idVendor;
       new_device.product_id = desc.idProduct;
       new_device.device = device_list[i];
@@ -316,7 +316,7 @@ void LibusbDeviceManager::refresh_device_list()
       new_device.product_string = usb_device->get_product_string();
       new_device.serial_number = usb_device->get_serial_number();
       usb_device->close();
-      new_device.linkmasta = build_linkmasta_device(usb_device);
+      new_device.linkmasta = buildLinkmastaDevice(usb_device);
       
       m_connected_devices[new_device.id] = new_device;
       libusb_ref_device(device_list[i]);
@@ -347,7 +347,7 @@ void LibusbDeviceManager::refresh_device_list()
   m_libusb_mutex.unlock();
 }
 
-bool LibusbDeviceManager::is_supported(unsigned int vendor_id, unsigned int product_id)
+bool LibusbDeviceManager::isSupported(unsigned int vendor_id, unsigned int product_id)
 {
   return ((vendor_id == 0x20A0 && product_id == 0x4178)       // NGP (linkmasta)
           || (vendor_id == 0x20A0 && product_id == 0x4256)    // NGP (new flashmasta)

@@ -25,23 +25,23 @@ DeviceManager::~DeviceManager()
 
 
 
-unsigned int DeviceManager::generate_id()
+unsigned int DeviceManager::generateId()
 {
   return curr_id++;
 }
 
-void DeviceManager::start_auto_refresh()
+void DeviceManager::startAutoRefresh()
 {
   if (m_thread_dead)
   {
     m_thread_dead = false;
     m_thread_kill_flag = false;
-    m_refresh_thread = thread(&DeviceManager::refresh_thread_function, this);
+    m_refresh_thread = thread(&DeviceManager::refreshThreadFunction, this);
     m_refresh_thread.detach();
   }
 }
 
-linkmasta_device* DeviceManager::build_linkmasta_device(usb::usb_device* device)
+linkmasta_device* DeviceManager::buildLinkmastaDevice(usb::usb_device* device)
 {
   device->init();
   
@@ -69,7 +69,7 @@ linkmasta_device* DeviceManager::build_linkmasta_device(usb::usb_device* device)
 
 
 
-void DeviceManager::refresh_thread_function()
+void DeviceManager::refreshThreadFunction()
 {
   // Set target time to refresh
   auto target_time = chrono::steady_clock::now();
@@ -85,7 +85,7 @@ void DeviceManager::refresh_thread_function()
     }
     
     // Make call to child
-    refresh_device_list();
+    refreshDeviceList();
     
     // Update refresh timer
     target_time = target_time = chrono::steady_clock::now();

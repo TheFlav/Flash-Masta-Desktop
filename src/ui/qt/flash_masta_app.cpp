@@ -31,22 +31,22 @@ FlashMastaApp::~FlashMastaApp()
   // Nothing else to do
 }
 
-DeviceManager* FlashMastaApp::get_device_manager() const
+DeviceManager* FlashMastaApp::getDeviceManager() const
 {
   return m_device_manager;
 }
 
-MainWindow* FlashMastaApp::get_main_window() const
+MainWindow* FlashMastaApp::getMainWindow() const
 {
   return m_main_window;
 }
 
-int FlashMastaApp::get_selected_device() const
+int FlashMastaApp::getSelectedDevice() const
 {
   return m_selected_device;
 }
 
-int FlashMastaApp::get_selected_slot() const
+int FlashMastaApp::getSelectedSlot() const
 {
   return m_selected_slot;
 }
@@ -133,7 +133,7 @@ void FlashMastaApp::mainWindowDestroyed(QObject* object)
 
 
 
-FlashMastaApp* FlashMastaApp::get_instance()
+FlashMastaApp* FlashMastaApp::getInstance()
 {
   return FlashMastaApp::instance;
 }
