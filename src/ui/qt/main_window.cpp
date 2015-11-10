@@ -32,8 +32,8 @@ using namespace std;
 
 
 #define PRE_ACTION \
-  int device_index = FlashMastaApp::get_instance()->get_selected_device();\
-  cartridge* cart = (device_index != -1 ? build_cartridge_for_device(device_index) : nullptr);\
+  int device_index = FlashMastaApp::getInstance()->getSelectedDevice();\
+  cartridge* cart = (device_index != -1 ? buildCartridgeForDevice(device_index) : nullptr);\
   \
   if (cart == nullptr)\
   {\
@@ -43,10 +43,10 @@ using namespace std;
     return;\
   }\
   \
-  while (!FlashMastaApp::get_instance()->get_device_manager()->claim_device(device_index));
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(device_index));
 
 #define POST_ACTION \
-  FlashMastaApp::get_instance()->get_device_manager()->release_device(device_index);\
+  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(device_index);\
   delete cart;
 
 
@@ -100,7 +100,7 @@ MainWindow::~MainWindow()
 
 
 
-cartridge* MainWindow::build_cartridge_for_device(int id)
+cartridge* MainWindow::buildCartridgeForDevice(int id)
 {
   linkmasta_device* linkmasta;
   cartridge* cart;

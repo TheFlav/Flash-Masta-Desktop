@@ -119,10 +119,10 @@ HEADERS  +=\
 
 FORMS    +=\
     src/ui/qt/main_window.ui \
-    src/ui/qt/detail/ngp_linkmasta_detail_widget.ui \
-    src/ui/qt/detail/ngp_flashmasta_cartridge_widget.ui \
     src/ui/qt/detail/ngp_fm_cartridge_info_widget.ui \
-    src/ui/qt/detail/fm_cartridge_slot_widget.ui
+    src/ui/qt/detail/fm_cartridge_slot_widget.ui \
+    src/ui/qt/detail/ngp_fm_cartridge_widget.ui \
+    src/ui/qt/detail/ngp_lm_detail_widget.ui
 
 DISTFILES += \
     README.md
