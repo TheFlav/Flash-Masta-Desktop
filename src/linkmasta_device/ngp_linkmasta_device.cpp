@@ -39,7 +39,6 @@ using namespace ngpmsg;
 
 
 
-
 // CONSTRUCTORS, INITIALIZERS, AND DESTRUCTORS
 
 ngp_linkmasta_device::ngp_linkmasta_device(usb_device* usb_device)
@@ -132,6 +131,11 @@ version_t ngp_linkmasta_device::firmware_version()
   
   return std::to_string(m_firmware_major_version) + "."
          + std::to_string(m_firmware_minor_version);
+}
+
+bool ngp_linkmasta_device::is_integrated_with_cartridge() const
+{
+  return m_usb_device->get_device_description()->product_id == NGP_LINKMASTA_PRODUCT_ID_2;
 }
 
 
@@ -236,6 +240,25 @@ void ngp_linkmasta_device::write_word(chip_index chip, address_t address, word_t
   {
     throw std::runtime_error("ERROR"); // TODO
   }
+}
+
+bool ngp_linkmasta_device::test_for_cartridge()
+{
+  if (is_integrated_with_cartridge())
+  {
+    return true;
+  }
+  else
+  {
+    return ngp_cartridge::test_for_cartridge(this);
+  }
+}
+
+cartridge* ngp_linkmasta_device::build_cartridge()
+{
+  ngp_cartridge* cart = new ngp_cartridge(this);
+  cart->init();
+  return cart;
 }
 
 

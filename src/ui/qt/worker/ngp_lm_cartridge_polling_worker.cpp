@@ -3,6 +3,7 @@
 #include "../flash_masta_app.h"
 #include "../device_manager.h"
 #include "cartridge/ngp_cartridge.h"
+#include "linkmasta_device/linkmasta_device.h"
 
 const int NgpLmCartridgePollingWorker::INTERVAL = 2000; // 1k milliseconds = 1 second
 
@@ -47,7 +48,7 @@ void NgpLmCartridgePollingWorker::run()
   
   try
   {
-    device_connected = ngp_cartridge::test_for_cartridge(linkmasta);
+    device_connected = linkmasta->test_for_cartridge();
   }
   catch (std::runtime_error& e)
   {

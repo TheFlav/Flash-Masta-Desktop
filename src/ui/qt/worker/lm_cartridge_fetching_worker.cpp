@@ -37,20 +37,7 @@ void LmCartridgeFetchingWorker::run()
   
   if (!cancel)
   {
-    switch (linkmasta->type())
-    {
-    default:
-      cart = nullptr;
-      break;
-    
-    case LINKMASTA_NEO_GEO_POCKET:
-      cart = new ngp_cartridge(linkmasta);
-      break;
-      
-    case LINKMASTA_WONDERSWAN:
-      cart = new ws_cartridge(linkmasta);
-      break;
-    }
+    cart = linkmasta->build_cartridge();
     
     m_mutex.lock();
     if (m_cancelled) cancel = true;
