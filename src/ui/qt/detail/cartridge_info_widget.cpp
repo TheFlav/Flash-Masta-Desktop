@@ -1,5 +1,5 @@
-#include "ngp_fm_cartridge_info_widget.h"
-#include "ui_ngp_fm_cartridge_info_widget.h"
+#include "cartridge_info_widget.h"
+#include "ui_cartridge_info_widget.h"
 #include "cartridge/ngp_cartridge.h"
 #include "../flash_masta_app.h"
 #include "../main_window.h"
@@ -9,9 +9,9 @@
 
 
 
-NgpFmCartridgeInfoWidget::NgpFmCartridgeInfoWidget(int device_id, ngp_cartridge* cartridge, QWidget *parent) :
+CartridgeInfoWidget::CartridgeInfoWidget(int device_id, ngp_cartridge* cartridge, QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::NgpFmCartridgeInfoWidget), m_cart_chip_widgets(nullptr),
+  ui(new Ui::CartridgeInfoWidget), m_cart_chip_widgets(nullptr),
   m_device_id(device_id), m_cart_chip_sizes(nullptr)
 {
   ui->setupUi(this);
@@ -40,14 +40,14 @@ NgpFmCartridgeInfoWidget::NgpFmCartridgeInfoWidget(int device_id, ngp_cartridge*
   connect(ui->cartActionVerifySaveButton, SIGNAL(clicked(bool)), mw, SLOT(triggerActionVerifySave()));
 }
 
-NgpFmCartridgeInfoWidget::~NgpFmCartridgeInfoWidget()
+CartridgeInfoWidget::~CartridgeInfoWidget()
 {
   clearChipData();
   delete ui;
 }
 
 
-void NgpFmCartridgeInfoWidget::buildFromCartridge(ngp_cartridge* cartridge)
+void CartridgeInfoWidget::buildFromCartridge(ngp_cartridge* cartridge)
 {
   while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
   
@@ -97,52 +97,52 @@ void NgpFmCartridgeInfoWidget::buildFromCartridge(ngp_cartridge* cartridge)
 }
 
 
-unsigned int NgpFmCartridgeInfoWidget::cartridgeSize() const
+unsigned int CartridgeInfoWidget::cartridgeSize() const
 {
   return m_cart_num_bytes;
 }
 
-unsigned int NgpFmCartridgeInfoWidget::cartridgeNumSlots() const
+unsigned int CartridgeInfoWidget::cartridgeNumSlots() const
 {
   return m_cart_num_slots;
 }
 
-unsigned int NgpFmCartridgeInfoWidget::cartridgeNumChips() const
+unsigned int CartridgeInfoWidget::cartridgeNumChips() const
 {
   return m_cart_num_chips;
 }
 
-unsigned int NgpFmCartridgeInfoWidget::cartridgeChipSize(unsigned int chip_index) const
+unsigned int CartridgeInfoWidget::cartridgeChipSize(unsigned int chip_index) const
 {
   return (chip_index >= m_cart_num_slots ? 0 : m_cart_chip_sizes[chip_index]);
 }
 
-bool NgpFmCartridgeInfoWidget::gameBackupEnabled() const
+bool CartridgeInfoWidget::gameBackupEnabled() const
 {
   return m_game_backup_enabled;
 }
 
-bool NgpFmCartridgeInfoWidget::gameFlashEnabled() const
+bool CartridgeInfoWidget::gameFlashEnabled() const
 {
   return m_game_flash_enabled;
 }
 
-bool NgpFmCartridgeInfoWidget::gameVerifyEnabled() const
+bool CartridgeInfoWidget::gameVerifyEnabled() const
 {
   return m_game_verify_enabled;
 }
 
-bool NgpFmCartridgeInfoWidget::saveBackupEnabled() const
+bool CartridgeInfoWidget::saveBackupEnabled() const
 {
   return m_save_backup_enabled;
 }
 
-bool NgpFmCartridgeInfoWidget::saveRestoreEnabled() const
+bool CartridgeInfoWidget::saveRestoreEnabled() const
 {
   return m_save_restore_enabled;
 }
 
-bool NgpFmCartridgeInfoWidget::saveVerifyEnabled() const
+bool CartridgeInfoWidget::saveVerifyEnabled() const
 {
   return m_save_verify_enabled;
 }
@@ -151,7 +151,7 @@ bool NgpFmCartridgeInfoWidget::saveVerifyEnabled() const
 
 // private:
 
-void NgpFmCartridgeInfoWidget::clearChipData()
+void CartridgeInfoWidget::clearChipData()
 {
   // Delete existing widgets for chips
   if (m_cart_chip_widgets != nullptr)
@@ -176,7 +176,7 @@ void NgpFmCartridgeInfoWidget::clearChipData()
   }
 }
 
-QString NgpFmCartridgeInfoWidget::stringifyBytesToBits(unsigned int num_bytes, bool reduce)
+QString CartridgeInfoWidget::stringifyBytesToBits(unsigned int num_bytes, bool reduce)
 {
   QString text;
   if (reduce && (num_bytes & 0x7FFFFFF) == 0)
@@ -202,7 +202,7 @@ QString NgpFmCartridgeInfoWidget::stringifyBytesToBits(unsigned int num_bytes, b
 
 // public slots:
 
-void NgpFmCartridgeInfoWidget::setCartridgeSize(unsigned int num_bytes)
+void CartridgeInfoWidget::setCartridgeSize(unsigned int num_bytes)
 {
   m_cart_num_bytes = num_bytes;
   
@@ -211,13 +211,13 @@ void NgpFmCartridgeInfoWidget::setCartridgeSize(unsigned int num_bytes)
   ui->cartridgeSpecCapacityOutputLabel->setText(text);
 }
 
-void NgpFmCartridgeInfoWidget::setCartridgeNumSlots(unsigned int num_slots)
+void CartridgeInfoWidget::setCartridgeNumSlots(unsigned int num_slots)
 {
   m_cart_num_slots = num_slots;
   ui->cartridgeSpecNumSlotsOutputLabel->setText(QString::number(num_slots));
 }
 
-void NgpFmCartridgeInfoWidget::setCartridgeNumChips(unsigned int num_chips)
+void CartridgeInfoWidget::setCartridgeNumChips(unsigned int num_chips)
 {
   m_cart_num_chips = num_chips;
   
@@ -259,7 +259,7 @@ void NgpFmCartridgeInfoWidget::setCartridgeNumChips(unsigned int num_chips)
   ui->cartridgeSpecNumChipsOutputLabel->setText(QString::number(m_cart_num_chips));
 }
 
-void NgpFmCartridgeInfoWidget::setCartridgeChipSize(unsigned int chip_index, unsigned int num_bytes)
+void CartridgeInfoWidget::setCartridgeChipSize(unsigned int chip_index, unsigned int num_bytes)
 {
   if (chip_index >= m_cart_num_chips) return;
   
@@ -270,7 +270,7 @@ void NgpFmCartridgeInfoWidget::setCartridgeChipSize(unsigned int chip_index, uns
   ((QLabel*) m_cart_chip_widgets[chip_index][1])->setText(text);
 }
 
-void NgpFmCartridgeInfoWidget::setGameBackupEnabled(bool enabled)
+void CartridgeInfoWidget::setGameBackupEnabled(bool enabled)
 {
   m_game_backup_enabled = enabled;
   
@@ -287,7 +287,7 @@ void NgpFmCartridgeInfoWidget::setGameBackupEnabled(bool enabled)
   ui->cartActionBackupGameButton->setEnabled(m_game_backup_enabled);
 }
 
-void NgpFmCartridgeInfoWidget::setGameFlashEnabled(bool enabled)
+void CartridgeInfoWidget::setGameFlashEnabled(bool enabled)
 {
   m_game_flash_enabled = enabled;
   
@@ -304,13 +304,13 @@ void NgpFmCartridgeInfoWidget::setGameFlashEnabled(bool enabled)
   ui->cartActionFlashGameButton->setEnabled(enabled);
 }
 
-void NgpFmCartridgeInfoWidget::setGameVerifyEnabled(bool enabled)
+void CartridgeInfoWidget::setGameVerifyEnabled(bool enabled)
 {
   m_game_verify_enabled = enabled;
   ui->cartActionVerifyGameButton->setEnabled(enabled);
 }
 
-void NgpFmCartridgeInfoWidget::setSaveBackupEnabled(bool enabled)
+void CartridgeInfoWidget::setSaveBackupEnabled(bool enabled)
 {
   m_save_backup_enabled = enabled;
   
@@ -327,7 +327,7 @@ void NgpFmCartridgeInfoWidget::setSaveBackupEnabled(bool enabled)
   ui->cartActionBackupSaveButton->setEnabled(enabled);
 }
 
-void NgpFmCartridgeInfoWidget::setSaveRestoreEnabled(bool enabled)
+void CartridgeInfoWidget::setSaveRestoreEnabled(bool enabled)
 {
   m_save_restore_enabled = enabled;
   
@@ -344,7 +344,7 @@ void NgpFmCartridgeInfoWidget::setSaveRestoreEnabled(bool enabled)
   ui->cartActionRestoreSaveButton->setEnabled(enabled);
 }
 
-void NgpFmCartridgeInfoWidget::setSaveVerifyEnabled(bool enabled)
+void CartridgeInfoWidget::setSaveVerifyEnabled(bool enabled)
 {
   m_save_verify_enabled = enabled;
   ui->cartActionVerifySaveButton->setEnabled(enabled);
@@ -354,7 +354,7 @@ void NgpFmCartridgeInfoWidget::setSaveVerifyEnabled(bool enabled)
 
 // private slots:
 
-void NgpFmCartridgeInfoWidget::onDeviceSelected(int old_device_id, int new_device_id)
+void CartridgeInfoWidget::onDeviceSelected(int old_device_id, int new_device_id)
 {
   (void) old_device_id;
   if (new_device_id != m_device_id) return;

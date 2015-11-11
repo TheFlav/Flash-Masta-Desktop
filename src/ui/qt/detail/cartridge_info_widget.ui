@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NgpFmCartridgeInfoWidget</class>
- <widget class="QWidget" name="NgpFmCartridgeInfoWidget">
+ <class>CartridgeInfoWidget</class>
+ <widget class="QWidget" name="CartridgeInfoWidget">
   <property name="geometry">
    <rect>
     <x>0</x>

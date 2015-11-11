@@ -2,7 +2,7 @@
 #include "ui_cartridge_widget.h"
 #include "cartridge/cartridge.h"
 #include "../worker/lm_cartridge_fetching_worker.h"
-#include "ngp_fm_cartridge_info_widget.h"
+#include "cartridge_info_widget.h"
 #include "fm_cartridge_slot_widget.h"
 #include "../device_manager.h"
 #include "cartridge/ngp_cartridge.h"
@@ -67,7 +67,7 @@ void CartridgeWidget::refreshUi()
   m_slot_widgets.reserve(m_cartridge->num_slots() + 1);
   
   ui->slotsComboBox->insertItem(0, "Cartridge Info");
-  m_slot_widgets.push_back(new NgpFmCartridgeInfoWidget((int) m_device_id, (ngp_cartridge*) m_cartridge, ui->verticalLayout->widget()));
+  m_slot_widgets.push_back(new CartridgeInfoWidget((int) m_device_id, (ngp_cartridge*) m_cartridge, ui->verticalLayout->widget()));
   m_slot_widgets.back()->hide();
   ui->verticalLayout->addWidget(m_slot_widgets.back(), 1);
   
@@ -143,7 +143,7 @@ void CartridgeWidget::updateEnabledActions()
   }
   else
   {
-    NgpFmCartridgeInfoWidget* widget = (NgpFmCartridgeInfoWidget*) m_slot_widgets[0];
+    CartridgeInfoWidget* widget = (CartridgeInfoWidget*) m_slot_widgets[0];
     
     app->setGameBackupEnabled(widget->gameBackupEnabled());
     app->setGameFlashEnabled(widget->gameFlashEnabled());

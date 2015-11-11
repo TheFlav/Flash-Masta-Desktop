@@ -4,18 +4,18 @@
 #include <QWidget>
 
 namespace Ui {
-class NgpFmCartridgeInfoWidget;
+class CartridgeInfoWidget;
 }
 
 class ngp_cartridge;
 
-class NgpFmCartridgeInfoWidget : public QWidget
+class CartridgeInfoWidget : public QWidget
 {
   Q_OBJECT
   
 public:
-  explicit NgpFmCartridgeInfoWidget(int device_id, ngp_cartridge* cartridge = 0, QWidget *parent = 0);
-  ~NgpFmCartridgeInfoWidget();
+  explicit CartridgeInfoWidget(int device_id, ngp_cartridge* cartridge = 0, QWidget *parent = 0);
+  ~CartridgeInfoWidget();
   
   void buildFromCartridge(ngp_cartridge* cartridge);
   
@@ -50,7 +50,7 @@ private slots:
   void onDeviceSelected(int old_device_id, int new_device_id);
   
 private:
-  Ui::NgpFmCartridgeInfoWidget *ui;
+  Ui::CartridgeInfoWidget *ui;
   QWidget*** m_cart_chip_widgets;
   int m_device_id;
   
