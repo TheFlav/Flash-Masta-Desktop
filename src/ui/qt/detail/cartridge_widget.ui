@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NgpFlashmastaCartridgeWidget</class>
- <widget class="QWidget" name="NgpFlashmastaCartridgeWidget">
+ <class>CartridgeWidget</class>
+ <widget class="QWidget" name="CartridgeWidget">
   <property name="geometry">
    <rect>
     <x>0</x>

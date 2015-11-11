@@ -5,16 +5,16 @@
 #include <QThread>
 
 namespace Ui {
-class NgpLinkmastaDetailWidget;
+class LmDetailWidget;
 }
 
-class NgpLinkmastaDetailWidget : public QWidget
+class LmDetailWidget : public QWidget
 {
   Q_OBJECT
   
 public:
-  explicit NgpLinkmastaDetailWidget(unsigned int device_id, QWidget *parent = 0);
-  ~NgpLinkmastaDetailWidget();
+  explicit LmDetailWidget(unsigned int device_id, QWidget *parent = 0);
+  ~LmDetailWidget();
   
   void startPolling();
   void stopPolling();
@@ -29,7 +29,7 @@ public slots:
   void selectedSlotChanged(int old_slot, int new_slot);
   
 private:
-  Ui::NgpLinkmastaDetailWidget *ui;
+  Ui::LmDetailWidget *ui;
   const unsigned int m_device_id;
   
   QWidget* m_default_widget;

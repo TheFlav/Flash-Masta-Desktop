@@ -1,5 +1,5 @@
 #include "cartridge_widget.h"
-#include "ui_ngp_flashmasta_cartridge_widget.h"
+#include "ui_cartridge_widget.h"
 #include "cartridge/cartridge.h"
 #include "../worker/lm_cartridge_fetching_worker.h"
 #include "ngp_fm_cartridge_info_widget.h"
