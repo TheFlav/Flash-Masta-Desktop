@@ -12,6 +12,7 @@ class CartridgeWidget;
 
 class cartridge;
 class LmCartridgeFetchingWorker;
+class QLayoutItem;
 
 class CartridgeWidget : public QWidget
 {
@@ -24,8 +25,7 @@ public:
   void refreshUi();
   
 private:
-  void showSlotSelection();
-  void hideSlotSelection();
+  void setSlotsComboBoxVisible(bool visible);
   
 public slots:
   void cartridgeLoaded(cartridge* cartridge);
@@ -47,6 +47,8 @@ private:
   LmCartridgeFetchingWorker* m_worker;
   cartridge* m_cartridge;
   std::vector<QWidget*> m_slot_widgets;
+  
+  QLayoutItem* m_slotsComboBoxHorizontalLayout;
 };
 
 #endif // __NGP_FLASHMASTA_CARTRIDGE_WIDGET_H__

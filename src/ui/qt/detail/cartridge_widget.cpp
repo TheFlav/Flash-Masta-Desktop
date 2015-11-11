@@ -14,10 +14,11 @@
 CartridgeWidget::CartridgeWidget(unsigned int device_id, QWidget *parent) :
   QWidget(parent),
   ui(new Ui::CartridgeWidget), m_current_slot(-1),
-  m_device_id(device_id), m_cartridge(nullptr)
+  m_device_id(device_id), m_cartridge(nullptr),
+  m_slotsComboBoxHorizontalLayout(nullptr)
 {
   ui->setupUi(this);
-  hideSlotSelection();
+  setSlotsComboBoxVisible(false);
   
   m_default_widget = ui->defaultWidget;
   m_current_widget = m_default_widget;
@@ -48,14 +49,7 @@ CartridgeWidget::~CartridgeWidget()
 
 void CartridgeWidget::refreshUi()
 {
-  if (m_cartridge->type() == cartridge_type::CARTRIDGE_FLASHMASTA)
-  {
-    showSlotSelection();
-  }
-  else
-  {
-    hideSlotSelection();
-  }
+  setSlotsComboBoxVisible(m_cartridge->type() == cartridge_type::CARTRIDGE_FLASHMASTA);
   
   // Reset everything and erase cached data
   ui->slotsComboBox->clear();
@@ -92,14 +86,20 @@ void CartridgeWidget::refreshUi()
 
 // private:
 
-void CartridgeWidget::showSlotSelection()
+void CartridgeWidget::setSlotsComboBoxVisible(bool visible)
 {
-  ui->slotsComboBox->show();
-}
-
-void CartridgeWidget::hideSlotSelection()
-{
-  ui->slotsComboBox->hide();
+  ui->slotsComboBox->setVisible(visible);
+  if (visible)
+  {
+    if (m_slotsComboBoxHorizontalLayout == nullptr) return; // already visible
+    ui->verticalLayout->insertItem(0, m_slotsComboBoxHorizontalLayout);
+    m_slotsComboBoxHorizontalLayout = nullptr;
+  }
+  else
+  {
+    if (m_slotsComboBoxHorizontalLayout != nullptr) return; // already invisible
+    m_slotsComboBoxHorizontalLayout = ui->verticalLayout->takeAt(0);
+  }
 }
 
 

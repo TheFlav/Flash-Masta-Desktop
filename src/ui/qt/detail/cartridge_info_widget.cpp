@@ -1,6 +1,6 @@
 #include "cartridge_info_widget.h"
 #include "ui_cartridge_info_widget.h"
-#include "cartridge/ngp_cartridge.h"
+#include "cartridge/cartridge.h"
 #include "../flash_masta_app.h"
 #include "../main_window.h"
 #include "../device_manager.h"
@@ -9,14 +9,14 @@
 
 
 
-CartridgeInfoWidget::CartridgeInfoWidget(int device_id, ngp_cartridge* cartridge, QWidget *parent) :
+CartridgeInfoWidget::CartridgeInfoWidget(int device_id, cartridge* cart, QWidget *parent) :
   QWidget(parent),
   ui(new Ui::CartridgeInfoWidget), m_cart_chip_widgets(nullptr),
   m_device_id(device_id), m_cart_chip_sizes(nullptr)
 {
   ui->setupUi(this);
   
-  if (cartridge == nullptr)
+  if (cart == nullptr)
   {
     setGameBackupEnabled(false);
     setGameFlashEnabled(false);
@@ -27,7 +27,7 @@ CartridgeInfoWidget::CartridgeInfoWidget(int device_id, ngp_cartridge* cartridge
   }
   else
   {
-    buildFromCartridge(cartridge);
+    buildFromCartridge(cart);
   }
   
   MainWindow* mw = FlashMastaApp::getInstance()->getMainWindow();
@@ -47,14 +47,14 @@ CartridgeInfoWidget::~CartridgeInfoWidget()
 }
 
 
-void CartridgeInfoWidget::buildFromCartridge(ngp_cartridge* cartridge)
+void CartridgeInfoWidget::buildFromCartridge(cartridge* cart)
 {
   while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
   
-  const cartridge_descriptor* descriptor = cartridge->descriptor();
+  const cartridge_descriptor* descriptor = cart->descriptor();
   
   setCartridgeSize(descriptor->num_bytes);
-  setCartridgeNumSlots(cartridge->num_slots());
+  setCartridgeNumSlots(cart->num_slots());
   setCartridgeNumChips(descriptor->num_chips);
   for (unsigned int chip_i = 0; chip_i < descriptor->num_chips; chip_i++)
   {
@@ -62,10 +62,10 @@ void CartridgeInfoWidget::buildFromCartridge(ngp_cartridge* cartridge)
   }
   
   // Decide cartridge capabilities based on the cartridge's chip's identifiers
-  switch (descriptor->type)
+  switch (descriptor->system)
   {
   default:
-  case CARTRIDGE_UNKNOWN:
+  case SYSTEM_UNKNOWN:
     setGameBackupEnabled(false);
     setGameFlashEnabled(false);
     setGameVerifyEnabled(false);
@@ -74,27 +74,57 @@ void CartridgeInfoWidget::buildFromCartridge(ngp_cartridge* cartridge)
     setSaveVerifyEnabled(false);
     break;
     
-  case CARTRIDGE_OFFICIAL:
+  case SYSTEM_NEO_GEO_POCKET:    
+    switch (descriptor->type)
+    {
+    default:
+    case CARTRIDGE_UNKNOWN:
+      setGameBackupEnabled(false);
+      setGameFlashEnabled(false);
+      setGameVerifyEnabled(false);
+      setSaveBackupEnabled(false);
+      setSaveRestoreEnabled(false);
+      setSaveVerifyEnabled(false);
+      break;
+      
+    case CARTRIDGE_OFFICIAL:
+      setGameBackupEnabled(true);
+      setGameFlashEnabled(false);
+      setGameVerifyEnabled(true);
+      setSaveBackupEnabled(true);
+      setSaveRestoreEnabled(true);
+      setSaveVerifyEnabled(true);
+      break;
+      
+    case CARTRIDGE_FLASHMASTA:
+      setGameBackupEnabled(true);
+      setGameFlashEnabled(true);
+      setGameVerifyEnabled(true);
+      setSaveBackupEnabled(false);
+      setSaveRestoreEnabled(true);
+      setSaveVerifyEnabled(true);
+      break;
+    }
+    break;
+    
+  case SYSTEM_WONDERSWAN:
     setGameBackupEnabled(true);
-    setGameFlashEnabled(false);
+    setGameFlashEnabled(true);
     setGameVerifyEnabled(true);
     setSaveBackupEnabled(true);
     setSaveRestoreEnabled(true);
     setSaveVerifyEnabled(true);
     break;
-    
-  case CARTRIDGE_FLASHMASTA:
-    setGameBackupEnabled(true);
-    setGameFlashEnabled(true);
-    setGameVerifyEnabled(true);
-    setSaveBackupEnabled(false);
-    setSaveRestoreEnabled(true);
-    setSaveVerifyEnabled(true);
-    break;
   }
+  
+  // Show/hide IU elements based on cartridge type
+  bool is_flashmasta = cart->type() == cartridge_type::CARTRIDGE_FLASHMASTA;
+  setPromptLabelVisible(is_flashmasta);
+  setCartridgeSpecNumSlotsVisible(is_flashmasta);
   
   FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
 }
+
 
 
 unsigned int CartridgeInfoWidget::cartridgeSize() const
@@ -150,6 +180,17 @@ bool CartridgeInfoWidget::saveVerifyEnabled() const
 
 
 // private:
+
+void CartridgeInfoWidget::setPromptLabelVisible(bool visible)
+{
+  ui->promptLabel->setVisible(visible);
+}
+
+void CartridgeInfoWidget::setCartridgeSpecNumSlotsVisible(bool visible)
+{
+  ui->cartridgeSpecNumSlotsLabel->setVisible(visible);
+  ui->cartridgeSpecNumSlotsOutputLabel->setVisible(visible);
+}
 
 void CartridgeInfoWidget::clearChipData()
 {
@@ -367,3 +408,5 @@ void CartridgeInfoWidget::onDeviceSelected(int old_device_id, int new_device_id)
   app->setSaveRestoreEnabled(m_save_restore_enabled);
   app->setSaveVerifyEnabled(m_save_verify_enabled);
 }
+
+

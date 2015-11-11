@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>311</height>
+    <height>323</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -152,7 +152,7 @@
      <item row="0" column="0">
       <layout class="QHBoxLayout" name="gameBackupHorizontalLayout">
        <property name="spacing">
-        <number>0</number>
+        <number>4</number>
        </property>
        <item>
         <spacer name="gameBackupLeftHorizontalSpacer">
@@ -251,7 +251,7 @@
      <item row="1" column="0">
       <layout class="QHBoxLayout" name="gameFlashHorizontalLayout">
        <property name="spacing">
-        <number>0</number>
+        <number>4</number>
        </property>
        <item>
         <spacer name="gameFlashLeftHorizontalSpacer">
@@ -345,7 +345,7 @@
      <item row="0" column="1">
       <layout class="QHBoxLayout" name="saveBackupHorizontalLayout">
        <property name="spacing">
-        <number>0</number>
+        <number>4</number>
        </property>
        <item>
         <spacer name="saveBackupLeftHorizontalSpacer">
@@ -439,7 +439,7 @@
      <item row="1" column="1">
       <layout class="QHBoxLayout" name="saveRestoreHorizontalLayout">
        <property name="spacing">
-        <number>0</number>
+        <number>4</number>
        </property>
        <item>
         <spacer name="saveRestoreLeftHorizontalSpacer">
