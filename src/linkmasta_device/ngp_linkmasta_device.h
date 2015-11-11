@@ -36,6 +36,7 @@ public:
   word_t           read_word(chip_index chip, address_t address);
   void             write_word(chip_index chip, address_t address, word_t data);
   
+  linkmasta_type   type() const;
   bool             supports_read_bytes() const;
   bool             supports_program_bytes() const;
   

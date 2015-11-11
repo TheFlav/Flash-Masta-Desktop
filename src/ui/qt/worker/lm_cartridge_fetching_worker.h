@@ -1,5 +1,5 @@
-#ifndef __NGP_LM_OFFICIAL_CARTRIDGE_INFO_WORKER_H__
-#define __NGP_LM_OFFICIAL_CARTRIDGE_INFO_WORKER_H__
+#ifndef __LM_OFFICIAL_CARTRIDGE_INFO_WORKER_H__
+#define __LM_OFFICIAL_CARTRIDGE_INFO_WORKER_H__
 
 #include <QObject>
 #include <QMutex>
@@ -25,4 +25,4 @@ private:
   bool m_cancelled;
 };
 
-#endif // __NGP_LM_OFFICIAL_CARTRIDGE_INFO_WORKER_H__
+#endif // __LM_OFFICIAL_CARTRIDGE_INFO_WORKER_H__

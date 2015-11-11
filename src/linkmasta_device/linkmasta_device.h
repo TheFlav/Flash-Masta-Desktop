@@ -15,6 +15,13 @@
 class cartridge;
 class task_controller;
 
+enum linkmasta_type
+{
+  LINKMASTA_UNKNOWN,
+  LINKMASTA_NEO_GEO_POCKET,
+  LINKMASTA_WONDERSWAN
+};
+
 class linkmasta_device
 {
 public:
@@ -38,6 +45,7 @@ public:
   virtual word_t           read_word(chip_index chip, address_t address) = 0;
   virtual void             write_word(chip_index chip, address_t address, word_t data) = 0;
   
+  virtual linkmasta_type   type() const;
   virtual bool             supports_read_bytes() const;
   virtual bool             supports_program_bytes() const;
   virtual bool             supports_erase_chip() const;

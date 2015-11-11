@@ -240,6 +240,11 @@ void ngp_linkmasta_device::write_word(chip_index chip, address_t address, word_t
 
 
 
+linkmasta_type ngp_linkmasta_device::type() const
+{
+  return linkmasta_type::LINKMASTA_NEO_GEO_POCKET;
+}
+
 bool ngp_linkmasta_device::supports_read_bytes() const
 {
   return true;

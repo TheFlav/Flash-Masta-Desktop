@@ -227,6 +227,11 @@ void ws_linkmasta_device::write_word(chip_index chip, address_t address, word_t 
 
 
 
+linkmasta_type ws_linkmasta_device::type() const
+{
+  return linkmasta_type::LINKMASTA_WONDERSWAN;
+}
+
 bool ws_linkmasta_device::supports_read_bytes() const
 {
   return true;
