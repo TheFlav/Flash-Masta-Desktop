@@ -38,15 +38,6 @@ void LmCartridgeFetchingWorker::run()
   if (!cancel)
   {
     cart = linkmasta->build_cartridge();
-    
-    m_mutex.lock();
-    if (m_cancelled) cancel = true;
-    m_mutex.unlock();
-  }
-  
-  if (!cancel)
-  {
-    cart->init();
     m_mutex.lock();
     if (m_cancelled) cancel = true;
     m_mutex.unlock();

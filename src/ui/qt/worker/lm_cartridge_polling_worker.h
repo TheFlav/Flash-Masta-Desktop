@@ -1,14 +1,14 @@
-#ifndef __NGP_LM_CARTRIDGE_POLLING_WORKER_H__
-#define __NGP_LM_CARTRIDGE_POLLING_WORKER_H__
+#ifndef __LM_CARTRIDGE_POLLING_WORKER_H__
+#define __LM_CARTRIDGE_POLLING_WORKER_H__
 
 #include <QObject>
 #include <QTimer>
 
-class NgpLmCartridgePollingWorker : public QObject
+class LmCartridgePollingWorker : public QObject
 {
   Q_OBJECT
 public:
-  explicit NgpLmCartridgePollingWorker(unsigned int id, QObject *parent = 0);
+  explicit LmCartridgePollingWorker(unsigned int id, QObject *parent = 0);
   
 private:
   static const int INTERVAL;
@@ -30,4 +30,4 @@ private:
   QTimer m_timer;
 };
 
-#endif // __NGP_LM_CARTRIDGE_POLLING_WORKER_H__
+#endif // __LM_CARTRIDGE_POLLING_WORKER_H__

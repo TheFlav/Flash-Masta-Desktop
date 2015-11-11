@@ -57,13 +57,13 @@ SOURCES +=\
     src/ui/qt/task/ws_cartridge_verify_task.cpp \
     src/ui/qt/device_manager.cpp \
     src/ui/qt/libusb_device_manager.cpp \
-    src/ui/qt/worker/ngp_lm_cartridge_polling_worker.cpp \
     src/ui/qt/detail/ngp_fm_cartridge_info_widget.cpp \
     src/ui/qt/detail/fm_cartridge_slot_widget.cpp \
     src/ui/qt/flash_masta_app.cpp \
     src/ui/qt/detail/ngp_lm_detail_widget.cpp \
     src/ui/qt/detail/cartridge_widget.cpp \
-    src/ui/qt/worker/lm_cartridge_fetching_worker.cpp
+    src/ui/qt/worker/lm_cartridge_fetching_worker.cpp \
+    src/ui/qt/worker/lm_cartridge_polling_worker.cpp
 
 HEADERS  +=\
     src/cartridge/cartridge.h \
@@ -109,13 +109,13 @@ HEADERS  +=\
     src/ui/qt/task/ws_cartridge_verify_task.h \
     src/ui/qt/device_manager.h \
     src/ui/qt/libusb_device_manager.h \
-    src/ui/qt/worker/ngp_lm_cartridge_polling_worker.h \
     src/ui/qt/detail/ngp_fm_cartridge_info_widget.h \
     src/ui/qt/detail/fm_cartridge_slot_widget.h \
     src/ui/qt/flash_masta_app.h \
     src/ui/qt/detail/ngp_lm_detail_widget.h \
     src/ui/qt/detail/cartridge_widget.h \
-    src/ui/qt/worker/lm_cartridge_fetching_worker.h
+    src/ui/qt/worker/lm_cartridge_fetching_worker.h \
+    src/ui/qt/worker/lm_cartridge_polling_worker.h
 
 FORMS    +=\
     src/ui/qt/main_window.ui \
