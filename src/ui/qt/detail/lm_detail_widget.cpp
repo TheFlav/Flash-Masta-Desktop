@@ -28,6 +28,32 @@ LmDetailWidget::LmDetailWidget(unsigned int device_id, QWidget *parent) :
   {
     startPolling();
   }
+  
+  // Update header label with name of device
+  QString device_name = "";
+  switch (linkmasta->system())
+  {
+  default:
+  case LINKMASTA_UNKNOWN:
+    device_name = "Unknown Device";
+    break;
+    
+  case LINKMASTA_NEO_GEO_POCKET:
+    if (linkmasta->is_integrated_with_cartridge())
+    {
+      device_name = "Neo Geo Flash Masta";
+    }
+    else
+    {
+      device_name = "Neo Geo Link Masta";
+    }
+    break;
+    
+  case LINKMASTA_WONDERSWAN:
+    device_name = "Wonderswan Flash Masta";
+    break;
+  }
+  ui->deviceNameLabel->setText(device_name);
 }
 
 LmDetailWidget::~LmDetailWidget()

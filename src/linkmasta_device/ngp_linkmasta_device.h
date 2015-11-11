@@ -39,7 +39,7 @@ public:
   bool             test_for_cartridge();
   cartridge*       build_cartridge();
   
-  linkmasta_type   type() const;
+  linkmasta_system   system() const;
   bool             supports_read_bytes() const;
   bool             supports_program_bytes() const;
   

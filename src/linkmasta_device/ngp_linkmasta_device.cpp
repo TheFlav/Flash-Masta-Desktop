@@ -263,9 +263,9 @@ cartridge* ngp_linkmasta_device::build_cartridge()
 
 
 
-linkmasta_type ngp_linkmasta_device::type() const
+linkmasta_system ngp_linkmasta_device::system() const
 {
-  return linkmasta_type::LINKMASTA_NEO_GEO_POCKET;
+  return linkmasta_system::LINKMASTA_NEO_GEO_POCKET;
 }
 
 bool ngp_linkmasta_device::supports_read_bytes() const

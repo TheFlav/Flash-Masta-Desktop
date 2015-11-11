@@ -245,9 +245,9 @@ cartridge* ws_linkmasta_device::build_cartridge()
 
 
 
-linkmasta_type ws_linkmasta_device::type() const
+linkmasta_system ws_linkmasta_device::system() const
 {
-  return linkmasta_type::LINKMASTA_WONDERSWAN;
+  return linkmasta_system::LINKMASTA_WONDERSWAN;
 }
 
 bool ws_linkmasta_device::supports_read_bytes() const

@@ -15,7 +15,7 @@
 class cartridge;
 class task_controller;
 
-enum linkmasta_type
+enum linkmasta_system
 {
   LINKMASTA_UNKNOWN,
   LINKMASTA_NEO_GEO_POCKET,
@@ -48,7 +48,7 @@ public:
   virtual bool             test_for_cartridge() = 0;
   virtual cartridge*       build_cartridge() = 0;
   
-  virtual linkmasta_type   type() const;
+  virtual linkmasta_system   system() const;
   virtual bool             supports_read_bytes() const;
   virtual bool             supports_program_bytes() const;
   virtual bool             supports_erase_chip() const;

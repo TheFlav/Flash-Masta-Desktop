@@ -9,9 +9,9 @@
 #include "linkmasta_device.h"
 #include <stdexcept>
 
-linkmasta_type linkmasta_device::type() const
+linkmasta_system linkmasta_device::system() const
 {
-  return linkmasta_type::LINKMASTA_UNKNOWN;
+  return linkmasta_system::LINKMASTA_UNKNOWN;
 }
 
 bool linkmasta_device::supports_read_bytes() const
