@@ -17,7 +17,7 @@ public slots:
   void cancel();
   
 signals:
-  void finished(cartridge* cart);
+  void finished(cartridge* cart, QString cartridge_game_name);
   
 private:
   unsigned int m_device_id;

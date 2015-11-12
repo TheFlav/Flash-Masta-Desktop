@@ -19,6 +19,7 @@ void LmCartridgeFetchingWorker::run()
 {
   bool cancel = false;
   cartridge* cart = nullptr;
+  QString game_name = "";
   while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
   
   m_mutex.lock();
@@ -43,6 +44,14 @@ void LmCartridgeFetchingWorker::run()
     m_mutex.unlock();
   }
   
+  if (!cancel)
+  {
+    game_name = cart->fetch_game_name(0).c_str();
+    m_mutex.lock();
+    if (m_cancelled) cancel = true;
+    m_mutex.unlock();
+  }
+  
   FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
   m_mutex.lock();
   if (m_cancelled) cancel = true;
@@ -54,7 +63,7 @@ void LmCartridgeFetchingWorker::run()
     cart = nullptr;
   }
   
-  emit finished(cart);
+  emit finished(cart, game_name);
 }
 
 void LmCartridgeFetchingWorker::cancel()

@@ -1425,7 +1425,12 @@ std::string ngp_cartridge::fetch_game_name(int slot)
     throw;
   }
   
-  return std::string(name);
+  std::string s = "";
+  for (unsigned int i = 0; i < 13 && name[i] != '\0'; i++)
+  {
+    s += name[i];
+  }
+  return s;
 }
 
 
