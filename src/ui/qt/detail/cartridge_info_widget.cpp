@@ -61,6 +61,12 @@ void CartridgeInfoWidget::buildFromCartridge(cartridge* cart)
     setCartridgeChipSize(chip_i, descriptor->chips[chip_i]->num_bytes);
   }
   
+  if (descriptor->system == system_type::SYSTEM_WONDERSWAN)
+  {
+    ((QLabel*) m_cart_chip_widgets[0][0])->setText("Flash chip size:");
+    ((QLabel*) m_cart_chip_widgets[1][0])->setText("SRAM chip size:");
+  }
+  
   // Decide cartridge capabilities based on the cartridge's chip's identifiers
   switch (descriptor->system)
   {
@@ -277,8 +283,19 @@ void CartridgeInfoWidget::setCartridgeNumChips(unsigned int num_chips)
       m_cart_chip_widgets[chip_i][widget_i] = nullptr;
     }
     
+    // Build label text
+    QString label_text;
+    if (m_cart_num_chips == 1)
+    {
+      label_text = "Flash chip size:";
+    }
+    else
+    {
+      label_text = "Flash chip " + QString::number(chip_i + 1) + " size:";
+    }
+    
     // Create widgets for chip
-    QWidget* chip_size_label = new QLabel(QString("Chip ") + QString::number(chip_i + 1) + QString(" size:"), ui->cartridgeSpecsFormLayout->widget());
+    QWidget* chip_size_label = new QLabel(label_text, ui->cartridgeSpecsFormLayout->widget());
     QWidget* chip_size_field = new QLabel(QString(""), ui->cartridgeSpecsFormLayout->widget());
     QFont font = QFont(chip_size_field->font());
     font.setBold(true);
@@ -296,8 +313,6 @@ void CartridgeInfoWidget::setCartridgeNumChips(unsigned int num_chips)
   {
     setCartridgeChipSize(chip_i, 0);
   }
-  
-  ui->cartridgeSpecNumChipsOutputLabel->setText(QString::number(m_cart_num_chips));
 }
 
 void CartridgeInfoWidget::setCartridgeChipSize(unsigned int chip_index, unsigned int num_bytes)

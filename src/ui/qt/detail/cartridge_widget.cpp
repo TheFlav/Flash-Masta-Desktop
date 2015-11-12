@@ -5,7 +5,6 @@
 #include "cartridge_info_widget.h"
 #include "fm_cartridge_slot_widget.h"
 #include "../device_manager.h"
-#include "cartridge/ngp_cartridge.h"
 
 #include <QString>
 #include <string>
@@ -61,7 +60,7 @@ void CartridgeWidget::refreshUi()
   m_slot_widgets.reserve(m_cartridge->num_slots() + 1);
   
   ui->slotsComboBox->insertItem(0, "Cartridge Info");
-  m_slot_widgets.push_back(new CartridgeInfoWidget((int) m_device_id, (ngp_cartridge*) m_cartridge, ui->verticalLayout->widget()));
+  m_slot_widgets.push_back(new CartridgeInfoWidget((int) m_device_id, m_cartridge, ui->verticalLayout->widget()));
   m_slot_widgets.back()->hide();
   ui->verticalLayout->addWidget(m_slot_widgets.back(), 1);
   
