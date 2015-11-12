@@ -1,12 +1,13 @@
-#include "ngp_lm_cartridge_polling_worker.h"
+#include "lm_cartridge_polling_worker.h"
 
 #include "../flash_masta_app.h"
 #include "../device_manager.h"
 #include "cartridge/ngp_cartridge.h"
+#include "linkmasta_device/linkmasta_device.h"
 
-const int NgpLmCartridgePollingWorker::INTERVAL = 2000; // 1k milliseconds = 1 second
+const int LmCartridgePollingWorker::INTERVAL = 2000; // 1k milliseconds = 1 second
 
-NgpLmCartridgePollingWorker::NgpLmCartridgePollingWorker(unsigned int id, QObject *parent) :
+LmCartridgePollingWorker::LmCartridgePollingWorker(unsigned int id, QObject *parent) :
   QObject(parent),
   m_id(id), m_device_connected(false), m_running(false), m_timer(this)
 {
@@ -15,7 +16,7 @@ NgpLmCartridgePollingWorker::NgpLmCartridgePollingWorker(unsigned int id, QObjec
 
 
 
-void NgpLmCartridgePollingWorker::start()
+void LmCartridgePollingWorker::start()
 {
   // Configure the timer to trigger periodically
   m_timer.setInterval(INTERVAL);
@@ -28,12 +29,12 @@ void NgpLmCartridgePollingWorker::start()
   m_timer.start();
 }
 
-void NgpLmCartridgePollingWorker::stop()
+void LmCartridgePollingWorker::stop()
 {
   m_timer.stop();
 }
 
-void NgpLmCartridgePollingWorker::run()
+void LmCartridgePollingWorker::run()
 {
   if (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_id))
   {
@@ -47,7 +48,7 @@ void NgpLmCartridgePollingWorker::run()
   
   try
   {
-    device_connected = ngp_cartridge::test_for_cartridge(linkmasta);
+    device_connected = linkmasta->test_for_cartridge();
   }
   catch (std::runtime_error& e)
   {

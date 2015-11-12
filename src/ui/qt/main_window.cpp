@@ -11,7 +11,7 @@
 #include <QMessageBox>
 #include "flash_masta_app.h"
 #include "device_manager.h"
-#include "detail/ngp_lm_detail_widget.h"
+#include "detail/lm_detail_widget.h"
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
 #include "cartridge/ws_cartridge.h"
@@ -393,11 +393,10 @@ void MainWindow::refreshDeviceList_timeout()
       m_device_ids.push_back(device_id);
       
       // Instantiate widget object for connected device
-      auto widget = new NgpLinkmastaDetailWidget(device_id, ui->scrollAreaWidgetContents);
+      auto widget = new LmDetailWidget(device_id, ui->scrollAreaWidgetContents);
       m_device_detail_widgets[device_id] = widget;
       widget->hide();
       ui->scrollAreaWidgetContents->layout()->addWidget(widget);
-      widget->startPolling();
     }
     
     // Update selection if selected device was disconnected

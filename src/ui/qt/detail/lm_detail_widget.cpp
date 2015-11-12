@@ -1,11 +1,13 @@
-#include "ngp_lm_detail_widget.h"
-#include "ui_ngp_linkmasta_detail_widget.h"
-#include "../worker/ngp_lm_cartridge_polling_worker.h"
-#include "ngp_fm_cartridge_widget.h"
+#include "lm_detail_widget.h"
+#include "ui_lm_detail_widget.h"
+#include "../worker/lm_cartridge_polling_worker.h"
+#include "cartridge_widget.h"
+#include "../device_manager.h"
+#include "linkmasta_device/linkmasta_device.h"
 
-NgpLinkmastaDetailWidget::NgpLinkmastaDetailWidget(unsigned int device_id, QWidget *parent) :
+LmDetailWidget::LmDetailWidget(unsigned int device_id, QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::NgpLinkmastaDetailWidget), m_device_id(device_id), m_cartridge_widget(nullptr),
+  ui(new Ui::LmDetailWidget), m_device_id(device_id), m_cartridge_widget(nullptr),
   m_pooling_thread(nullptr)
 {
   ui->setupUi(this);
@@ -13,9 +15,48 @@ NgpLinkmastaDetailWidget::NgpLinkmastaDetailWidget(unsigned int device_id, QWidg
   
   connect(FlashMastaApp::getInstance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(selectedDeviceChanged(int,int)));
   connect(FlashMastaApp::getInstance(), SIGNAL(selectedSlotChanged(int,int)), this, SLOT(selectedSlotChanged(int,int)));
+  
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(device_id));
+  linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(device_id);
+  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(device_id);
+  
+  if (linkmasta->is_integrated_with_cartridge())
+  {
+    cartridgeInserted();
+  }
+  else
+  {
+    startPolling();
+  }
+  
+  // Update header label with name of device
+  QString device_name = "";
+  switch (linkmasta->system())
+  {
+  default:
+  case LINKMASTA_UNKNOWN:
+    device_name = "Unknown Device";
+    break;
+    
+  case LINKMASTA_NEO_GEO_POCKET:
+    if (linkmasta->is_integrated_with_cartridge())
+    {
+      device_name = "Neo Geo Flash Masta";
+    }
+    else
+    {
+      device_name = "Neo Geo Link Masta";
+    }
+    break;
+    
+  case LINKMASTA_WONDERSWAN:
+    device_name = "Wonderswan Flash Masta";
+    break;
+  }
+  ui->deviceNameLabel->setText(device_name);
 }
 
-NgpLinkmastaDetailWidget::~NgpLinkmastaDetailWidget()
+LmDetailWidget::~LmDetailWidget()
 {
   stopPolling();
   delete ui;
@@ -23,13 +64,13 @@ NgpLinkmastaDetailWidget::~NgpLinkmastaDetailWidget()
 
 
 
-void NgpLinkmastaDetailWidget::startPolling()
+void LmDetailWidget::startPolling()
 {
   if (m_pooling_thread != nullptr) return;
   
   // Spin up a new thread with a worker to periodically pool linkmasta for cartridge
   m_pooling_thread = new QThread();
-  auto worker = new NgpLmCartridgePollingWorker(m_device_id);
+  auto worker = new LmCartridgePollingWorker(m_device_id);
   
   worker->moveToThread(m_pooling_thread);
   connect(worker, SIGNAL(cartridgeRemoved()), this, SLOT(cartridgeRemoved()));
@@ -41,7 +82,7 @@ void NgpLinkmastaDetailWidget::startPolling()
   m_pooling_thread->start();
 }
 
-void NgpLinkmastaDetailWidget::stopPolling()
+void LmDetailWidget::stopPolling()
 {
   if (m_pooling_thread == nullptr) return;
   
@@ -52,7 +93,7 @@ void NgpLinkmastaDetailWidget::stopPolling()
 
 
 
-void NgpLinkmastaDetailWidget::disableActions()
+void LmDetailWidget::disableActions()
 {
   FlashMastaApp* app = FlashMastaApp::getInstance();
   app->setGameBackupEnabled(false);
@@ -65,7 +106,7 @@ void NgpLinkmastaDetailWidget::disableActions()
 
 
 
-void NgpLinkmastaDetailWidget::cartridgeRemoved()
+void LmDetailWidget::cartridgeRemoved()
 {
   m_default_widget->show();
   
@@ -79,7 +120,7 @@ void NgpLinkmastaDetailWidget::cartridgeRemoved()
   FlashMastaApp::getInstance()->setSelectedSlot(-1);
 }
 
-void NgpLinkmastaDetailWidget::cartridgeInserted()
+void LmDetailWidget::cartridgeInserted()
 {
   if (m_cartridge_widget != nullptr)
   {
@@ -87,13 +128,13 @@ void NgpLinkmastaDetailWidget::cartridgeInserted()
     delete m_cartridge_widget;
   }
   
-  m_cartridge_widget = new NgpFlashmastaCartridgeWidget(m_device_id, ui->verticalLayout->widget());
+  m_cartridge_widget = new CartridgeWidget(m_device_id, ui->verticalLayout->widget());
   ui->verticalLayout->addWidget(m_cartridge_widget, 1);
   m_cartridge_widget->show();
   m_default_widget->hide();
 }
 
-void NgpLinkmastaDetailWidget::selectedDeviceChanged(int old_device, int new_device)
+void LmDetailWidget::selectedDeviceChanged(int old_device, int new_device)
 {
   (void) old_device;
   if (new_device == (int) m_device_id && m_cartridge_widget == nullptr)
@@ -102,7 +143,7 @@ void NgpLinkmastaDetailWidget::selectedDeviceChanged(int old_device, int new_dev
   }
 }
 
-void NgpLinkmastaDetailWidget::selectedSlotChanged(int old_slot, int new_slot)
+void LmDetailWidget::selectedSlotChanged(int old_slot, int new_slot)
 {
   (void) old_slot;
   (void) new_slot;

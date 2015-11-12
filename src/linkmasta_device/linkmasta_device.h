@@ -15,6 +15,13 @@
 class cartridge;
 class task_controller;
 
+enum linkmasta_system
+{
+  LINKMASTA_UNKNOWN,
+  LINKMASTA_NEO_GEO_POCKET,
+  LINKMASTA_WONDERSWAN
+};
+
 class linkmasta_device
 {
 public:
@@ -30,6 +37,7 @@ public:
   virtual bool             is_open() const = 0;
   virtual timeout_t        timeout() const = 0;
   virtual version_t        firmware_version() = 0;
+  virtual bool             is_integrated_with_cartridge() const = 0;
   
   virtual void             set_timeout(timeout_t timeout) = 0;
   
@@ -37,7 +45,10 @@ public:
   virtual void             close() = 0;
   virtual word_t           read_word(chip_index chip, address_t address) = 0;
   virtual void             write_word(chip_index chip, address_t address, word_t data) = 0;
+  virtual bool             test_for_cartridge() = 0;
+  virtual cartridge*       build_cartridge() = 0;
   
+  virtual linkmasta_system   system() const;
   virtual bool             supports_read_bytes() const;
   virtual bool             supports_program_bytes() const;
   virtual bool             supports_erase_chip() const;

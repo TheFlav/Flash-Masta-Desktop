@@ -10,6 +10,7 @@
 #include "usb/usb_device.h"
 #include "ws_linkmasta_messages.h"
 #include "tasks/task_controller.h"
+#include "cartridge/ws_cartridge.h"
 #include <limits>
 
 using namespace usb;
@@ -121,6 +122,11 @@ version_t ws_linkmasta_device::firmware_version()
   + std::to_string(m_firmware_minor_version);
 }
 
+bool ws_linkmasta_device::is_integrated_with_cartridge() const
+{
+  return true;
+}
+
 
 
 void ws_linkmasta_device::set_timeout(timeout_t timeout)
@@ -225,7 +231,24 @@ void ws_linkmasta_device::write_word(chip_index chip, address_t address, word_t 
   }
 }
 
+bool ws_linkmasta_device::test_for_cartridge()
+{
+  return true;
+}
 
+cartridge* ws_linkmasta_device::build_cartridge()
+{
+  ws_cartridge* cart = new ws_cartridge(this);
+  cart->init();
+  return cart;
+}
+
+
+
+linkmasta_system ws_linkmasta_device::system() const
+{
+  return linkmasta_system::LINKMASTA_WONDERSWAN;
+}
 
 bool ws_linkmasta_device::supports_read_bytes() const
 {
