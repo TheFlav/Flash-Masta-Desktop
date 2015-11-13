@@ -1,9 +1,11 @@
 #include "lm_detail_widget.h"
 #include "ui_lm_detail_widget.h"
-#include "../worker/lm_cartridge_polling_worker.h"
+
+#include "linkmasta_device/linkmasta_device.h"
+
 #include "cartridge_widget.h"
 #include "../device_manager.h"
-#include "linkmasta_device/linkmasta_device.h"
+#include "../worker/lm_cartridge_polling_worker.h"
 
 LmDetailWidget::LmDetailWidget(unsigned int device_id, QWidget *parent) :
   QWidget(parent),

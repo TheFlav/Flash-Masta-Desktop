@@ -2,6 +2,7 @@
 #define __LIBUSB_DEVICE_MANAGER_H__
 
 #include "device_manager.h"
+
 #include <map>
 #include <string>
 

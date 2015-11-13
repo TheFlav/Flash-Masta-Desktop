@@ -1,8 +1,10 @@
 #include "device_manager.h"
+
 #include <chrono>
-#include "usb/usb_device.h"
+
 #include "linkmasta_device/ngp_linkmasta_device.h"
 #include "linkmasta_device/ws_linkmasta_device.h"
+#include "usb/usb_device.h"
 
 using namespace std;
 using namespace usb;

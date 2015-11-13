@@ -2,6 +2,7 @@
 #define __NGP_LINKMASTA_DETAIL_WIDGET_H__
 
 #include <QWidget>
+
 #include <QThread>
 
 namespace Ui {

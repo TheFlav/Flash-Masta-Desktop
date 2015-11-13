@@ -1,7 +1,8 @@
 #include "libusb_device_manager.h"
+
 #include "libusb-1.0/libusb.h"
-#include "usb/libusb_usb_device.h"
 #include "linkmasta_device/linkmasta_device.h"
+#include "usb/libusb_usb_device.h"
 
 using namespace std;
 

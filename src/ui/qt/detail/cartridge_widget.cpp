@@ -1,15 +1,18 @@
 #include "cartridge_widget.h"
 #include "ui_cartridge_widget.h"
+
+#include <string>
+
+#include <QString>
+#include <QThread>
+
 #include "cartridge/cartridge.h"
-#include "../worker/lm_cartridge_fetching_worker.h"
+#include "linkmasta_device/linkmasta_device.h"
+
 #include "cartridge_info_widget.h"
 #include "fm_cartridge_slot_widget.h"
 #include "../device_manager.h"
-#include "linkmasta_device/linkmasta_device.h"
-
-#include <QString>
-#include <string>
-#include <QThread>
+#include "../worker/lm_cartridge_fetching_worker.h"
 
 CartridgeWidget::CartridgeWidget(unsigned int device_id, QWidget *parent) :
   QWidget(parent),

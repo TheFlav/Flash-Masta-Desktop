@@ -1,32 +1,34 @@
 #include "main_window.h"
 #include "ui_main_window.h"
 
-#include <vector>
-#include <set>
 #include <algorithm>
 #include <iterator>
-#include <QString>
-#include <QLayout>
+#include <set>
 #include <string>
+#include <vector>
+
+#include <QLayout>
 #include <QMessageBox>
-#include "flash_masta_app.h"
-#include "device_manager.h"
+#include <QString>
+
 #include "detail/lm_detail_widget.h"
+#include "device_manager.h"
+#include "flash_masta_app.h"
+#include "task/ngp_cartridge_backup_task.h"
+#include "task/ngp_cartridge_backup_save_task.h"
+#include "task/ngp_cartridge_flash_task.h"
+#include "task/ngp_cartridge_restore_save_task.h"
+#include "task/ngp_cartridge_verify_task.h"
+#include "task/ws_cartridge_backup_task.h"
+#include "task/ws_cartridge_backup_save_task.h"
+#include "task/ws_cartridge_flash_task.h"
+#include "task/ws_cartridge_restore_save_task.h"
+#include "task/ws_cartridge_verify_task.h"
+
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
 #include "cartridge/ws_cartridge.h"
 #include "linkmasta_device/linkmasta_device.h"
-#include "task/ngp_cartridge_backup_task.h"
-#include "task/ngp_cartridge_verify_task.h"
-#include "task/ngp_cartridge_flash_task.h"
-#include "task/ngp_cartridge_backup_save_task.h"
-#include "task/ngp_cartridge_restore_save_task.h"
-#include "task/ws_cartridge_backup_task.h"
-#include "task/ws_cartridge_verify_task.h"
-#include "task/ws_cartridge_flash_task.h"
-#include "task/ws_cartridge_backup_save_task.h"
-#include "task/ws_cartridge_restore_save_task.h"
-#include "libusb-1.0/libusb.h"
 
 using namespace std;
 
