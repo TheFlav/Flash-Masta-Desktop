@@ -1,10 +1,17 @@
-//
-//  ws_rom_chip.cpp
-//  FlashMasta
-//
-//  Created by Dan on 8/17/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing the implementation of \ref ws_rom_chip.
+ *  
+ *  File containing the implementation of \ref ws_com_chip.
+ *  
+ *  See corrensponding header file to view documentation for class, its
+ *  methods, and its member variables.
+ *  
+ *  \see ws_rom_chip
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-08-17
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #include "ws_rom_chip.h"
 #include "linkmasta_device/linkmasta_device.h"

@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 
-typedef uint32_t address_t;    //<! Data type representing a storage address
+/*! \brief Data type representing a storage address. */
+typedef uint32_t address_t;
 
-#endif // __TYPES_H__
+#endif // defined(__TYPES_H__)
 

@@ -1,10 +1,17 @@
-//
-//  ngp_chip.cpp
-//  FlashMasta
-//
-//  Created by Dan on 7/29/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing the implementation of \ref ngp_chip.
+ *  
+ *  File containing the implementation of \ref ngp_chip.
+ *  
+ *  See corrensponding header file to view documentation for class, its
+ *  methods, and its member variables.
+ *  
+ *  \see ngp_chip
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-07-29
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #include "ngp_chip.h"
 #include "linkmasta_device/linkmasta_device.h"

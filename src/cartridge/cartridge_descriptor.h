@@ -4,8 +4,8 @@
  *  
  *  File containing the delcaration of the \ref cartridge_descriptor struct and
  *  any required components, such as \ref cartridge_descriptor::chip_descriptor,
- *  \ref cartridge_descriptor::chip_descriptor::block_descriptor, and
- *  \ref system_type.
+ *  \ref cartridge_descriptor::chip_descriptor::block_descriptor,
+ *  \ref system_type, and \ref cartridge_type.
  *  
  *  \author Daniel Andrus
  *  \date 2015-07-28
@@ -34,7 +34,6 @@ enum system_type
   /*! \brief Wonderswan or Wonderswan Color */
   SYSTEM_WONDERSWAN
 };
-
 
 /** \enum cartridge_type
  *  \brief Enumeration representing the type of cartridge, such as official
