@@ -383,7 +383,31 @@ void MainWindow::refreshDeviceList_timeout()
     for (auto device_id : new_devices)
     {
       // Instantiate a new item and append it to the list widget
-      QListWidgetItem *item = new QListWidgetItem(QString(FlashMastaApp::getInstance()->getDeviceManager()->getProductString(device_id).c_str()));
+      QString device_name = "";
+      linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(device_id);
+      switch (linkmasta->system())
+      {
+      default:
+      case LINKMASTA_UNKNOWN:
+        device_name = "Unknown Device";
+        break;
+        
+      case LINKMASTA_NEO_GEO_POCKET:
+        if (linkmasta->is_integrated_with_cartridge())
+        {
+          device_name = "Neo Geo USB Flash Masta";
+        }
+        else
+        {
+          device_name = "Neo Geo Link Masta";
+        }
+        break;
+        
+      case LINKMASTA_WONDERSWAN:
+        device_name = "Wonderswan Flash Masta";
+        break;
+      }
+      QListWidgetItem *item = new QListWidgetItem(QString(device_name));
       auto size = item->sizeHint();
       size.setHeight(40);
       item->setSizeHint(size);

@@ -41,7 +41,7 @@ LmDetailWidget::LmDetailWidget(unsigned int device_id, QWidget *parent) :
   case LINKMASTA_NEO_GEO_POCKET:
     if (linkmasta->is_integrated_with_cartridge())
     {
-      device_name = "Neo Geo Flash Masta";
+      device_name = "Neo Geo USB Flash Masta";
     }
     else
     {
