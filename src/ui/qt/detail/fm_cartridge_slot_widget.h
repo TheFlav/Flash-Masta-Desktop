@@ -2,6 +2,7 @@
 #define __FM_CARTRIDGE_SLOT_WIDGET_H__
 
 #include <QWidget>
+
 #include <QString>
 
 namespace Ui {

@@ -1,10 +1,12 @@
 #include "fm_cartridge_slot_widget.h"
 #include "ui_fm_cartridge_slot_widget.h"
+
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
 #include "cartridge/ws_cartridge.h"
-#include "../flash_masta_app.h"
+
 #include "../device_manager.h"
+#include "../flash_masta_app.h"
 #include "../main_window.h"
 
 

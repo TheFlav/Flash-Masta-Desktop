@@ -1,4 +1,5 @@
 #include "flash_masta_app.h"
+
 #include "libusb_device_manager.h"
 #include "main_window.h"
 

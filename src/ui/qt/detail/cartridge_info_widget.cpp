@@ -1,11 +1,14 @@
 #include "cartridge_info_widget.h"
 #include "ui_cartridge_info_widget.h"
+
+#include <QLabel>
+#include <QString>
+
 #include "cartridge/cartridge.h"
+
+#include "../device_manager.h"
 #include "../flash_masta_app.h"
 #include "../main_window.h"
-#include "../device_manager.h"
-#include <QString>
-#include <QLabel>
 
 
 

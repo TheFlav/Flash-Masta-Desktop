@@ -1,8 +1,8 @@
 #ifndef __DEVICE_MANAGER_H__
 #define __DEVICE_MANAGER_H__
 
-#include <thread>
 #include <mutex>
+#include <thread>
 #include <vector>
 
 namespace usb {

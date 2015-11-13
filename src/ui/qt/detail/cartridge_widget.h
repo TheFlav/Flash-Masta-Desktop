@@ -3,9 +3,10 @@
 
 #include <QWidget>
 
-#include "../flash_masta_app.h"
 #include <vector>
 #include <string>
+
+#include "../flash_masta_app.h"
 
 namespace Ui {
 class CartridgeWidget;

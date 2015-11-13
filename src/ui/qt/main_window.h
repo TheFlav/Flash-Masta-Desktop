@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+
 #include "cartridge/cartridge.h"
 
 namespace Ui {
