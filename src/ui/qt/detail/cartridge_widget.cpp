@@ -80,7 +80,7 @@ void CartridgeWidget::refreshUi()
       }
       break;
     case CARTRIDGE_OFFICIAL:
-      cartridgeName = m_cartridge_game_name + " Official Cartridge";
+      cartridgeName = "\"" + m_cartridge_game_name + "\" Official Cartridge";
       break;
     }
     setCartridgeNameVisible(!linkmasta->is_integrated_with_cartridge());
