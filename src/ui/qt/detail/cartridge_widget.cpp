@@ -5,6 +5,7 @@
 #include "cartridge_info_widget.h"
 #include "fm_cartridge_slot_widget.h"
 #include "../device_manager.h"
+#include "linkmasta_device/linkmasta_device.h"
 
 #include <QString>
 #include <string>
@@ -17,6 +18,7 @@ CartridgeWidget::CartridgeWidget(unsigned int device_id, QWidget *parent) :
   m_slotsComboBoxHorizontalLayout(nullptr)
 {
   ui->setupUi(this);
+  setCartridgeNameVisible(false);
   setSlotsComboBoxVisible(false);
   
   m_default_widget = ui->defaultWidget;
@@ -29,9 +31,9 @@ CartridgeWidget::CartridgeWidget(unsigned int device_id, QWidget *parent) :
   m_worker = new LmCartridgeFetchingWorker(m_device_id);
   m_worker->moveToThread(thread);
   connect(thread, SIGNAL(started()), m_worker, SLOT(run()));
-  connect(m_worker, SIGNAL(finished(cartridge*)), this, SLOT(cartridgeLoaded(cartridge*)));
-  connect(m_worker, SIGNAL(finished(cartridge*)), thread, SLOT(quit()));
-  connect(m_worker, SIGNAL(finished(cartridge*)), m_worker, SLOT(deleteLater()));
+  connect(m_worker, SIGNAL(finished(cartridge*,std::string)), this, SLOT(cartridgeLoaded(cartridge*,std::string)));
+  connect(m_worker, SIGNAL(finished(cartridge*,std::string)), thread, SLOT(quit()));
+  connect(m_worker, SIGNAL(finished(cartridge*,std::string)), m_worker, SLOT(deleteLater()));
   connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
   thread->start();
 }
@@ -49,6 +51,42 @@ CartridgeWidget::~CartridgeWidget()
 void CartridgeWidget::refreshUi()
 {
   setSlotsComboBoxVisible(m_cartridge->type() == cartridge_type::CARTRIDGE_FLASHMASTA);
+  
+  // Generate and display a name for the connected cartridge
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
+  linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(m_device_id);
+  if (!linkmasta->is_integrated_with_cartridge())
+  {
+    std::string cartridgeName;
+    switch (m_cartridge->type())
+    {
+    default:
+    case CARTRIDGE_UNKNOWN:
+      cartridgeName = "Unrecognized Cartridge";
+      break;
+    case CARTRIDGE_FLASHMASTA:
+      switch (m_cartridge->system())
+      {
+      default:
+      case SYSTEM_UNKNOWN:
+        cartridgeName = "Flash Masta";
+        break;
+      case SYSTEM_NEO_GEO_POCKET:
+        cartridgeName = "Neo Geo Pocket Flash Masta";
+        break;
+      case SYSTEM_WONDERSWAN:
+        cartridgeName = "WonderSwan Flash Masta";
+        break;
+      }
+      break;
+    case CARTRIDGE_OFFICIAL:
+      cartridgeName = m_cartridge_game_name + " Official Cartridge";
+      break;
+    }
+    setCartridgeNameVisible(!linkmasta->is_integrated_with_cartridge());
+    setCartridgeName(cartridgeName);
+  }
+  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
   
   // Reset everything and erase cached data
   ui->slotsComboBox->clear();
@@ -81,6 +119,17 @@ void CartridgeWidget::refreshUi()
   on_slotsComboBox_currentIndexChanged(0);
 }
 
+void CartridgeWidget::setCartridgeName(std::string label)
+{
+  ui->cartridgeNameLabel->setText(label.c_str());
+  ui->cartridgeNameLabel->adjustSize();
+}
+
+void CartridgeWidget::setCartridgeNameVisible(bool visible)
+{
+  ui->cartridgeNameLabel->setVisible(visible);
+}
+
 
 
 // private:
@@ -105,10 +154,11 @@ void CartridgeWidget::setSlotsComboBoxVisible(bool visible)
 
 // public slots:
 
-void CartridgeWidget::cartridgeLoaded(cartridge* cartridge)
+void CartridgeWidget::cartridgeLoaded(cartridge* cartridge, std::string cartridge_game_name)
 {
   if (m_cartridge != nullptr) delete m_cartridge;
   m_cartridge = cartridge;
+  m_cartridge_game_name = cartridge_game_name;
   m_worker = nullptr;
   refreshUi();
 }
