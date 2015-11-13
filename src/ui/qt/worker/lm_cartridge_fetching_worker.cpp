@@ -19,7 +19,7 @@ void LmCartridgeFetchingWorker::run()
 {
   bool cancel = false;
   cartridge* cart = nullptr;
-  QString game_name = "";
+  std::string game_name = "";
   while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
   
   m_mutex.lock();
@@ -46,7 +46,7 @@ void LmCartridgeFetchingWorker::run()
   
   if (!cancel)
   {
-    game_name = cart->fetch_game_name(0).c_str();
+    game_name = cart->fetch_game_name(0);
     m_mutex.lock();
     if (m_cancelled) cancel = true;
     m_mutex.unlock();

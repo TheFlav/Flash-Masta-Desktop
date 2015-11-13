@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMutex>
+#include <string>
 
 class cartridge;
 
@@ -17,7 +18,7 @@ public slots:
   void cancel();
   
 signals:
-  void finished(cartridge* cart, QString cartridge_game_name);
+  void finished(cartridge* cart, std::string cartridge_game_name);
   
 private:
   unsigned int m_device_id;

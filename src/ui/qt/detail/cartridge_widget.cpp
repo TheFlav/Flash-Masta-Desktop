@@ -31,9 +31,9 @@ CartridgeWidget::CartridgeWidget(unsigned int device_id, QWidget *parent) :
   m_worker = new LmCartridgeFetchingWorker(m_device_id);
   m_worker->moveToThread(thread);
   connect(thread, SIGNAL(started()), m_worker, SLOT(run()));
-  connect(m_worker, SIGNAL(finished(cartridge*,QString)), this, SLOT(cartridgeLoaded(cartridge*,QString)));
-  connect(m_worker, SIGNAL(finished(cartridge*,QString)), thread, SLOT(quit()));
-  connect(m_worker, SIGNAL(finished(cartridge*,QString)), m_worker, SLOT(deleteLater()));
+  connect(m_worker, SIGNAL(finished(cartridge*,std::string)), this, SLOT(cartridgeLoaded(cartridge*,std::string)));
+  connect(m_worker, SIGNAL(finished(cartridge*,std::string)), thread, SLOT(quit()));
+  connect(m_worker, SIGNAL(finished(cartridge*,std::string)), m_worker, SLOT(deleteLater()));
   connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
   thread->start();
 }
@@ -57,7 +57,7 @@ void CartridgeWidget::refreshUi()
   linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(m_device_id);
   if (!linkmasta->is_integrated_with_cartridge())
   {
-    QString cartridgeName;
+    std::string cartridgeName;
     switch (m_cartridge->type())
     {
     default:
@@ -80,11 +80,11 @@ void CartridgeWidget::refreshUi()
       }
       break;
     case CARTRIDGE_OFFICIAL:
-      cartridgeName = m_cartridge_game_name + QString(" Official Cartridge");
+      cartridgeName = m_cartridge_game_name + " Official Cartridge";
       break;
     }
-    setCartridgeName(cartridgeName);
     setCartridgeNameVisible(!linkmasta->is_integrated_with_cartridge());
+    setCartridgeName(cartridgeName);
   }
   FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
   
@@ -119,9 +119,10 @@ void CartridgeWidget::refreshUi()
   on_slotsComboBox_currentIndexChanged(0);
 }
 
-void CartridgeWidget::setCartridgeName(QString label)
+void CartridgeWidget::setCartridgeName(std::string label)
 {
-  ui->cartridgeNameLabel->setText(label);
+  ui->cartridgeNameLabel->setText(label.c_str());
+  ui->cartridgeNameLabel->adjustSize();
 }
 
 void CartridgeWidget::setCartridgeNameVisible(bool visible)
@@ -153,7 +154,7 @@ void CartridgeWidget::setSlotsComboBoxVisible(bool visible)
 
 // public slots:
 
-void CartridgeWidget::cartridgeLoaded(cartridge* cartridge, QString cartridge_game_name)
+void CartridgeWidget::cartridgeLoaded(cartridge* cartridge, std::string cartridge_game_name)
 {
   if (m_cartridge != nullptr) delete m_cartridge;
   m_cartridge = cartridge;

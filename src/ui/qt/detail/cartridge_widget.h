@@ -5,6 +5,7 @@
 
 #include "../flash_masta_app.h"
 #include <vector>
+#include <string>
 
 namespace Ui {
 class CartridgeWidget;
@@ -23,14 +24,14 @@ public:
   ~CartridgeWidget();
   
   void refreshUi();
-  void setCartridgeName(QString label);
+  void setCartridgeName(std::string label);
   void setCartridgeNameVisible(bool visible);
   
 private:
   void setSlotsComboBoxVisible(bool visible);
   
 public slots:
-  void cartridgeLoaded(cartridge* cartridge, QString cartridge_game_name);
+  void cartridgeLoaded(cartridge* cartridge, std::string cartridge_game_name);
   void deviceSelected(int old_device_id, int new_device_id);
   void slotSelected(int old_slot_id, int new_slot_id);
   void updateEnabledActions();
@@ -48,7 +49,7 @@ private:
   unsigned int m_device_id;
   LmCartridgeFetchingWorker* m_worker;
   cartridge* m_cartridge;
-  QString m_cartridge_game_name;
+  std::string m_cartridge_game_name;
   std::vector<QWidget*> m_slot_widgets;
   
   QLayoutItem* m_slotsComboBoxHorizontalLayout;

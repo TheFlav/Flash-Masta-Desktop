@@ -28,6 +28,12 @@
    </property>
    <item>
     <widget class="QLabel" name="cartridgeNameLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="font">
       <font>
        <pointsize>16</pointsize>
@@ -38,6 +44,9 @@
      </property>
      <property name="text">
       <string>Game Cartridge</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
     </widget>
    </item>
