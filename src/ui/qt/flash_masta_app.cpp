@@ -1,12 +1,13 @@
-#include "flash_masta.h"
+#include "flash_masta_app.h"
+
 #include "libusb_device_manager.h"
 #include "main_window.h"
 
-FlashMasta* FlashMasta::instance = nullptr;
-const int FlashMasta::NO_DEVICE = -1;
-const int FlashMasta::NO_SLOT = -1;
+FlashMastaApp* FlashMastaApp::instance = nullptr;
+const int FlashMastaApp::NO_DEVICE = -1;
+const int FlashMastaApp::NO_SLOT = -1;
 
-FlashMasta::FlashMasta(int argc, char **argv, int flags)
+FlashMastaApp::FlashMastaApp(int argc, char **argv, int flags)
   : QApplication(argc, argv, flags),
     m_main_window(nullptr), m_device_manager(nullptr),
     m_game_backup_enabled(false), m_game_flash_enabled(false),
@@ -14,39 +15,41 @@ FlashMasta::FlashMasta(int argc, char **argv, int flags)
     m_save_restore_enabled(false), m_save_verify_enabled(false),
     m_selected_device(NO_DEVICE), m_selected_slot(NO_SLOT)
 {
-  if (FlashMasta::instance == nullptr)
+  if (FlashMastaApp::instance == nullptr)
   {
-    FlashMasta::instance = this;
+    FlashMastaApp::instance = this;
   }
   
   m_device_manager = new LibusbDeviceManager();
   m_main_window = new MainWindow();
   
+  qRegisterMetaType<std::string>("std::string");
+  
   connect(m_main_window, SIGNAL(destroyed(QObject*)), this, SLOT(mainWindowDestroyed(QObject*)));
   m_main_window->show();
 }
 
-FlashMasta::~FlashMasta()
+FlashMastaApp::~FlashMastaApp()
 {
   // Nothing else to do
 }
 
-DeviceManager* FlashMasta::get_device_manager() const
+DeviceManager* FlashMastaApp::getDeviceManager() const
 {
   return m_device_manager;
 }
 
-MainWindow* FlashMasta::get_main_window() const
+MainWindow* FlashMastaApp::getMainWindow() const
 {
   return m_main_window;
 }
 
-int FlashMasta::get_selected_device() const
+int FlashMastaApp::getSelectedDevice() const
 {
   return m_selected_device;
 }
 
-int FlashMasta::get_selected_slot() const
+int FlashMastaApp::getSelectedSlot() const
 {
   return m_selected_slot;
 }
@@ -55,37 +58,37 @@ int FlashMasta::get_selected_slot() const
 
 // public slots:
 
-void FlashMasta::setGameBackupEnabled(bool enabled)
+void FlashMastaApp::setGameBackupEnabled(bool enabled)
 {
   emit gameBackupEnabledChanged(enabled);
 }
 
-void FlashMasta::setGameFlashEnabled(bool enabled)
+void FlashMastaApp::setGameFlashEnabled(bool enabled)
 {
   emit gameFlashEnabledChanged(enabled);
 }
 
-void FlashMasta::setGameVerifyEnabled(bool enabled)
+void FlashMastaApp::setGameVerifyEnabled(bool enabled)
 {
   emit gameVerifyEnabledChanged(enabled);
 }
 
-void FlashMasta::setSaveBackupEnabled(bool enabled)
+void FlashMastaApp::setSaveBackupEnabled(bool enabled)
 {
   emit saveBackupEnabledChanged(enabled);
 }
 
-void FlashMasta::setSaveRestoreEnabled(bool enabled)
+void FlashMastaApp::setSaveRestoreEnabled(bool enabled)
 {
   emit saveRestoreEnabledChanged(enabled);
 }
 
-void FlashMasta::setSaveVerifyEnabled(bool enabled)
+void FlashMastaApp::setSaveVerifyEnabled(bool enabled)
 {
   emit saveVerifyEnabledChanged(enabled);
 }
 
-void FlashMasta::setSelectedDevice(int device_id)
+void FlashMastaApp::setSelectedDevice(int device_id)
 {
   int old_id = m_selected_device;
   m_selected_device = device_id;
@@ -102,7 +105,7 @@ void FlashMasta::setSelectedDevice(int device_id)
   }
 }
 
-void FlashMasta::setSelectedSlot(int slot_id)
+void FlashMastaApp::setSelectedSlot(int slot_id)
 {
   int old_id = m_selected_slot;
   m_selected_slot = slot_id;
@@ -123,7 +126,7 @@ void FlashMasta::setSelectedSlot(int slot_id)
 
 // private slots:
 
-void FlashMasta::mainWindowDestroyed(QObject* object)
+void FlashMastaApp::mainWindowDestroyed(QObject* object)
 {
   if (object == m_main_window)
   {
@@ -133,9 +136,9 @@ void FlashMasta::mainWindowDestroyed(QObject* object)
 
 
 
-FlashMasta* FlashMasta::get_instance()
+FlashMastaApp* FlashMastaApp::getInstance()
 {
-  return FlashMasta::instance;
+  return FlashMastaApp::instance;
 }
 
 

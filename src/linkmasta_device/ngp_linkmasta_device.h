@@ -26,6 +26,7 @@ public:
   bool             is_open() const;
   timeout_t        timeout() const;
   version_t        firmware_version();
+  bool             is_integrated_with_cartridge() const;
   
   // Setters
   void             set_timeout(timeout_t timeout);
@@ -35,7 +36,10 @@ public:
   void             close();
   word_t           read_word(chip_index chip, address_t address);
   void             write_word(chip_index chip, address_t address, word_t data);
+  bool             test_for_cartridge();
+  cartridge*       build_cartridge();
   
+  linkmasta_system   system() const;
   bool             supports_read_bytes() const;
   bool             supports_program_bytes() const;
   

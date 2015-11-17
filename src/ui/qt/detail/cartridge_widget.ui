@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NgpFlashmastaCartridgeWidget</class>
- <widget class="QWidget" name="NgpFlashmastaCartridgeWidget">
+ <class>CartridgeWidget</class>
+ <widget class="QWidget" name="CartridgeWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,21 +13,45 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
    <property name="leftMargin">
-    <number>0</number>
+    <number>12</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>12</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>12</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>12</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0">
+    <widget class="QLabel" name="cartridgeNameLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(96, 96, 96);</string>
+     </property>
+     <property name="text">
+      <string>Game Cartridge</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="slotsComboBoxHorizontalLayout" stretch="0,1,0">
      <property name="spacing">
       <number>0</number>
      </property>
@@ -44,14 +68,14 @@
       <number>0</number>
      </property>
      <item>
-      <spacer name="horizontalSpacer">
+      <spacer name="slotsComboBoxLeftHorizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
          <width>0</width>
-         <height>20</height>
+         <height>0</height>
         </size>
        </property>
       </spacer>
@@ -67,14 +91,14 @@
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_2">
+      <spacer name="slotsComboBoxRightHorizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
          <width>0</width>
-         <height>20</height>
+         <height>0</height>
         </size>
        </property>
       </spacer>

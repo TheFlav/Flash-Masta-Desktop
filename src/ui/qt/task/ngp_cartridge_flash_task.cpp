@@ -111,11 +111,11 @@ void NgpCartridgeFlashTask::run_task()
   
   if (m_slot == -1)
   {
-    set_progress_label(QString("Flashing data from file to entire cartridge"));
+    setProgressLabel(QString("Flashing data from file to entire cartridge"));
   }
   else
   {
-    set_progress_label(QString("Flashing data from file to slot ") + QString::number(m_slot+1));
+    setProgressLabel(QString("Flashing data from file to slot ") + QString::number(m_slot+1));
   }
   
   // Begin task

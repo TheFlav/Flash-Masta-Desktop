@@ -1,3 +1,20 @@
+/*! \file
+ *  \brief File containing the implementation of \ref ngp_cartridge.
+ *  
+ *  File containing the implementation of \ref ngp_cartridge. Also contains
+ *  the declaration of helper structs \ref NGFheader and \ref NGFblock, which
+ *  are used in backing up and restoring saev data.
+ *  
+ *  See corrensponding header file to view documentation for class, its methods,
+ *  and its member variables.
+ *  
+ *  \see ngp_cartridge
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-07-28
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
+
 #include "ngp_cartridge.h"
 #include "linkmasta_device/linkmasta_device.h"
 #include "ngp_chip.h"
@@ -1425,7 +1442,12 @@ std::string ngp_cartridge::fetch_game_name(int slot)
     throw;
   }
   
-  return std::string(name);
+  std::string s = "";
+  for (unsigned int i = 0; i < 13 && name[i] != '\0'; i++)
+  {
+    s += name[i];
+  }
+  return s;
 }
 
 

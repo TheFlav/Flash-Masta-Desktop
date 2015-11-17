@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NgpLinkmastaDetailWidget</class>
- <widget class="QWidget" name="NgpLinkmastaDetailWidget">
+ <class>LmDetailWidget</class>
+ <widget class="QWidget" name="LmDetailWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -78,11 +78,16 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
         <property name="acceptDrops">
          <bool>true</bool>
         </property>
         <property name="text">
-         <string>No cartridge detected</string>
+         <string>No cartridge connected</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>

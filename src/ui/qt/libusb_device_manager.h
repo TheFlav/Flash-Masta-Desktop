@@ -2,6 +2,7 @@
 #define __LIBUSB_DEVICE_MANAGER_H__
 
 #include "device_manager.h"
+
 #include <map>
 #include <string>
 
@@ -17,24 +18,24 @@ public:
   LibusbDeviceManager();
   ~LibusbDeviceManager();
   
-  std::vector<unsigned int> get_connected_devices();
-  bool                      try_get_connected_devices(std::vector<unsigned int>& devices);
-  bool                      is_connected(unsigned int id);
-  unsigned int              get_vendor_id(unsigned int id);
-  unsigned int              get_product_id(unsigned int id);
-  std::string               get_manufacturer_string(unsigned int id);
-  std::string               get_product_string(unsigned int id);
-  std::string               get_serial_number(unsigned int id);
-  linkmasta_device*         get_linkmasta_device(unsigned int id);
-  bool                      is_device_claimed(unsigned int id);
-  bool                      claim_device(unsigned int id);
-  void                      release_device(unsigned int id);
+  std::vector<unsigned int> getConnectedDevices();
+  bool                      tryGetConnectedDevices(std::vector<unsigned int>& devices);
+  bool                      isConnected(unsigned int id);
+  unsigned int              getVendorId(unsigned int id);
+  unsigned int              getProductId(unsigned int id);
+  std::string               getManufacturerString(unsigned int id);
+  std::string               getProductString(unsigned int id);
+  std::string               getSerialNumber(unsigned int id);
+  linkmasta_device*         getLinkmastaDevice(unsigned int id);
+  bool                      isDeviceClaimed(unsigned int id);
+  bool                      tryClaimDevice(unsigned int id);
+  void                      releaseDevice(unsigned int id);
   
 protected:
-  void refresh_device_list();
+  void refreshDeviceList();
   
 private:
-  static bool is_supported(unsigned int vendor_id, unsigned int product_id);
+  static bool isSupported(unsigned int vendor_id, unsigned int product_id);
   
   //////////////// DATA ////////////////
 private:

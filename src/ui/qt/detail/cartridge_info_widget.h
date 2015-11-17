@@ -1,23 +1,24 @@
-#ifndef NGP_FM_CARTRIDGE_INFO_WIDGET_H
-#define NGP_FM_CARTRIDGE_INFO_WIDGET_H
+#ifndef __CARTRIDGE_INFO_WIDGET_H__
+#define __CARTRIDGE_INFO_WIDGET_H__
 
 #include <QWidget>
 
 namespace Ui {
-class NgpFmCartridgeInfoWidget;
+class CartridgeInfoWidget;
 }
 
-class ngp_cartridge;
+class cartridge;
+class QLayoutItem;
 
-class NgpFmCartridgeInfoWidget : public QWidget
+class CartridgeInfoWidget : public QWidget
 {
   Q_OBJECT
   
 public:
-  explicit NgpFmCartridgeInfoWidget(int device_id, ngp_cartridge* cartridge = 0, QWidget *parent = 0);
-  ~NgpFmCartridgeInfoWidget();
+  explicit CartridgeInfoWidget(int device_id, cartridge* cart = 0, QWidget *parent = 0);
+  ~CartridgeInfoWidget();
   
-  void buildFromCartridge(ngp_cartridge* cartridge);
+  void buildFromCartridge(cartridge* cart);
   
   unsigned int cartridgeSize() const;
   unsigned int cartridgeNumSlots() const;
@@ -31,6 +32,8 @@ public:
   bool saveVerifyEnabled() const;
   
 private:
+  void setPromptLabelVisible(bool visible);
+  void setCartridgeSpecNumSlotsVisible(bool visible);
   void clearChipData();
   QString stringifyBytesToBits(unsigned int num_bytes, bool reduce = true);
   
@@ -50,7 +53,7 @@ private slots:
   void onDeviceSelected(int old_device_id, int new_device_id);
   
 private:
-  Ui::NgpFmCartridgeInfoWidget *ui;
+  Ui::CartridgeInfoWidget *ui;
   QWidget*** m_cart_chip_widgets;
   int m_device_id;
   
@@ -66,5 +69,4 @@ private:
   bool m_save_verify_enabled;
 };
 
-#endif // NGP_FM_CARTRIDGE_INFO_WIDGET_H
-
+#endif // __CARTRIDGE_INFO_WIDGET_H__

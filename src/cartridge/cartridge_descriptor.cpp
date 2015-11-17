@@ -1,13 +1,26 @@
-//
-//  cartridge_descriptor.cpp
-//  FlashMasta
-//
-//  Created by Dan on 7/29/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing the implementation of \ref cartridge_descriptor.
+ *  
+ *  File containing the implementation of \ref cartridge_descriptor and any
+ *  required components, such as \ref cartridge_descriptor::chip_descriptor and
+ *  \ref cartridge_descriptor::chip_descriptor::block_descriptor.
+ *  
+ *  See corrensponding header file to view documentation for struct, its
+ *  methods, and its member variables.
+ *  
+ *  \see cartridge_descriptor
+ *  \see cartridge_descriptor::chip_descriptor
+ *  \see cartridge_descriptor::chip_descriptor::block_descriptor
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-07-29
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #include "types.h"
 #include "cartridge_descriptor.h"
+
+
 
 cartridge_descriptor::cartridge_descriptor(unsigned int num_chips)
   : num_chips(num_chips),

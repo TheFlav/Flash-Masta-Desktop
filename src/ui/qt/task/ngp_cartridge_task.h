@@ -29,8 +29,10 @@ public:
   
 protected:
   virtual void          run_task() = 0;
-  virtual QString       get_progress_label() const;
-  virtual void          set_progress_label(QString label);
+  virtual QString       getProgressLabel() const;
+  virtual void          setProgressLabel(QString label);
+  
+protected:
   cartridge*            m_cartridge;
   int                   m_slot;
   
