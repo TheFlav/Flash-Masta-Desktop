@@ -6,7 +6,7 @@
  *  necessary to use any instance of the \ref ws_cartridge class.
  *  
  *  \author Daniel Andrus
- *  \date 2015-07-28
+ *  \date 2015-08-17
  *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
  */
 
