@@ -63,7 +63,9 @@ SOURCES +=\
     src/ui/qt/worker/lm_cartridge_fetching_worker.cpp \
     src/ui/qt/worker/lm_cartridge_polling_worker.cpp \
     src/ui/qt/detail/lm_detail_widget.cpp \
-    src/ui/qt/detail/cartridge_info_widget.cpp
+    src/ui/qt/detail/cartridge_info_widget.cpp \
+    src/games/game_descriptor.cpp \
+    src/sqlite/sqlite3.c
 
 HEADERS  +=\
     src/cartridge/cartridge.h \
@@ -115,7 +117,11 @@ HEADERS  +=\
     src/ui/qt/worker/lm_cartridge_fetching_worker.h \
     src/ui/qt/worker/lm_cartridge_polling_worker.h \
     src/ui/qt/detail/lm_detail_widget.h \
-    src/ui/qt/detail/cartridge_info_widget.h
+    src/ui/qt/detail/cartridge_info_widget.h \
+    src/games/game_catalog.h \
+    src/games/game_descriptor.h \
+    src/sqlite/sqlite3.h \
+    src/sqlite/sqlite3ext.h
 
 FORMS    +=\
     src/ui/qt/main_window.ui \
