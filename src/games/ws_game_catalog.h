@@ -14,6 +14,8 @@ public:
   const game_descriptor identify_game(cartridge* cart, int slot_num = -1);
   
 private:
+  bool verify_database_schema();
+  
   sqlite3* m_sqlite;
 };
 
