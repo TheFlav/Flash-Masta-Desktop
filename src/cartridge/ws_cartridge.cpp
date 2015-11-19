@@ -96,6 +96,7 @@ void ws_cartridge::init()
   m_linkmasta->open();
   build_cartridge_destriptor();
   build_slots_layout();
+  build_game_metadata();
   m_linkmasta->close();
   
   m_was_init = true;
@@ -1341,10 +1342,8 @@ void ws_cartridge::build_game_metadata(int slot)
   {
     unsigned char* buffer = new unsigned char[10];
     
-    m_linkmasta->open();
     m_linkmasta->switch_slot(slot);
     m_linkmasta->read_bytes(0, 0, buffer, 10);
-    m_linkmasta->close();
     
     m_metadata[slot].read_from_data_array(buffer);
     delete [] buffer;
