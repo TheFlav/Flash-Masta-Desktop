@@ -1317,11 +1317,67 @@ void ws_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int bloc
 void ws_cartridge::build_slots_layout()
 {
   m_slots.resize(m_linkmasta->read_num_slots());
+  m_metadata.clear();
+  m_metadata.resize(m_slots.size());
   
   for (unsigned int i = 0; i < m_slots.size(); ++i)
   {
     m_slots[i] = m_linkmasta->read_slot_size(i);
   }
+}
+
+void ws_cartridge::build_game_metadata(int slot)
+{
+  if (m_metadata.empty()) return;
+  
+  if (slot == -1)
+  {
+    for (unsigned int i = 0; i < m_metadata.size(); i++)
+    {
+      build_game_metadata(i);
+    }
+  }
+  else if (slot >= 0 && slot < (int) m_metadata.size())
+  {
+    unsigned char* buffer = new unsigned char[10];
+    
+    m_linkmasta->open();
+    m_linkmasta->switch_slot(slot);
+    m_linkmasta->read_bytes(0, 0, buffer, 10);
+    m_linkmasta->close();
+    
+    m_metadata[slot].read_from_data_array(buffer);
+    delete [] buffer;
+  }
+}
+
+
+
+void ws_cartridge::game_metadata::read_from_data_array(const unsigned char* data)
+{
+  developer_id = data[0];
+  minimum_system = data[1];
+  game_id = data[2];
+  mapper_version = data[3];
+  rom_size = data[4];
+  save_size = data[5];
+  flags = data[6];
+  RTC_present = data[7];
+  checksum = (data[8] << 8) | data[9];
+}
+
+void ws_cartridge::game_metadata::write_to_data_array(unsigned char* data)
+{
+  data[0] = developer_id;
+  data[1] = minimum_system;
+  data[2] = game_id;
+  data[3] = mapper_version;
+  data[4] = rom_size;
+  data[5] = save_size;
+  data[6] = flags;
+  data[7] = RTC_present;
+  data[8] = checksum >> 8;
+  data[9] = checksum & 0xFF;
 }
 
 

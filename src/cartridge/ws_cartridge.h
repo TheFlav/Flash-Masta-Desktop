@@ -220,6 +220,16 @@ protected:
    */
   void                  build_slots_layout();
   
+  /*! \brief Reads game metadata from the cartridge and caches it for later use.
+   * 
+   *  Reads data from the cartridge to get game metadata from all game slots on
+   *  the cartridge, caching the results to avoid future cartridge queries.
+   *  
+   *  \param [in] slot Target game slot to fetch metadata for. -1 will fetch
+   *                   metadata from all available slots on the cartridge.
+   */
+  void                  build_game_metadata(int slot = -1);
+  
 private:
   
   /*! \brief Disabled copy constructor.
@@ -247,6 +257,25 @@ private:
   ws_cartridge&         operator=(const ws_cartridge& other) = delete;
   
   
+  
+  /*! \brief A struct for representing and storing the metadata of a Wonderswan
+   * game.
+   */
+  struct game_metadata
+  {
+    void read_from_data_array(const unsigned char* data);
+    void write_to_data_array(unsigned char* data);
+    
+    unsigned char developer_id;
+    unsigned char minimum_system;
+    unsigned char game_id;
+    unsigned char mapper_version;
+    unsigned char rom_size;
+    unsigned char save_size;
+    unsigned char flags;
+    unsigned char RTC_present;
+    unsigned short checksum;
+  };
   
   /*! \brief Flag indicating that \ref init() has been previously called on this
    *         instance.
@@ -324,6 +353,18 @@ private:
    *  \ref build_slots_layout() function.
    */
   std::vector<unsigned int> m_slots;
+  
+  /*! \brief The vector used for cachingm game metadata for each slot.
+   *  
+   *  The vector used for caching the game metdata for each slot on the
+   *  cartridge.
+   *  
+   *  This member is initialized and filled with values when calling the
+   *  \ref build_game_metadata() function.
+   *  
+   *  \see game_metadata
+   */
+  std::vector<game_metadata> m_metadata;
 };
 
 #endif /* defined(__WS_CARTRIDGE_H__) */
