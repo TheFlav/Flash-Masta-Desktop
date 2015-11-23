@@ -12,9 +12,7 @@ TARGET = FlashMasta
 TEMPLATE = app
 
 CONFIG +=\
-    c++11 \
-    static \
-    staticlib
+    c++11
 
 SOURCES +=\
     src/ui/qt/main.cpp \
@@ -160,8 +158,7 @@ win32 {
         includes/win
 
     LIBS     +=\
-        "$$PWD/libs/win32/libusb-1.0.a"
-		#-L"$$PWD/libs/win32" -l"usb-1.0"
+        -L"$$PWD/libs/win32" -l"libusb-1.0"
 		
 
     DEFINES  +=\
