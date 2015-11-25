@@ -93,12 +93,14 @@ struct table {
 };
 
 struct foreign_key {
-  foreign_key(): on_update_cascade(false), on_delete_cascade(false) {}
+  foreign_key(): referencing_table(nullptr), referenced_table(nullptr),
+    referencing_column(nullptr), referenced_column(nullptr),
+    on_update_cascade(false), on_delete_cascade(false) {}
+  string name;
   table* referencing_table;
   table* referenced_table;
   table_column* referencing_column;
   table_column* referenced_column;
-
   bool on_update_cascade;
   bool on_delete_cascade;
 };
@@ -122,6 +124,11 @@ template<typename T> inline bool contains_gaps(const vector<T>& list)
   for (auto item : list) if (item == nullptr) return true; return false;
 }
 
+inline table_column* find_column_in_table(string c, const table* t)
+{
+  for (table_column* col : t->columns) if (col->name == c) return col; return nullptr;
+}
+
 /*!
  *  \brief Parses and validates a 'column' property of an index or key, printing
  *         an error to the console and returning -1 if a symantic error is
@@ -135,7 +142,7 @@ inline int parse_column_index_and_validate(const node_t* n, const table* t, vect
   bool cancel = false;
   
   // Process index attribute if it exists, otherwise choose first available spot
-  if (!cancel && n->first_attribute("index") != nullptr)
+  if (!cancel) if (n->first_attribute("index") != nullptr)
   {
     xml_attribute<>* attribute = n->first_attribute("index");
 
@@ -160,14 +167,7 @@ inline int parse_column_index_and_validate(const node_t* n, const table* t, vect
   else for (target_index = 0; target_index < l.size() && l[target_index] != nullptr; target_index++);
 
   // Search for column with matching name in table
-  if (!cancel) for (table_column* col : t->columns)
-  {
-    if (col->name == n->value())
-    {
-      target_column = col;
-      break;
-    }
-  }
+  if (!cancel) target_column = find_column_in_table(string(n->value()), t);
 
   if (!cancel) if (target_column == nullptr)
   {
@@ -310,7 +310,7 @@ table* build_table_from_xml(const node_t* table_node)
  *  \returns A pointer to a valid \ref table_column struct if the operation
  *           was successful or nullptr if the operation failed for any reason.
  */
-table_column* build_column_from_xml(const node_t* column_node)
+table_column* build_column_from_xml(const node_t* column_node, const table* parent)
 {
   table_column* column = new table_column;
   bool cancel = false;
@@ -337,7 +337,14 @@ table_column* build_column_from_xml(const node_t* column_node)
         cerr << "Column property 'name' cannot contain whitespace" << endl;
         cancel = true;
       }
-      else
+      else for (table_column* col : parent->columns) if (col->name == string(subnode->value()))
+      {
+        cerr << "Column with name '" << subnode->value()
+             << "' already declared" << endl;
+        cancel = true;
+      }
+      
+      if (!cancel)
       {
         column->name = string(subnode->value());
       }
@@ -593,7 +600,239 @@ table_key* build_key_from_xml(const node_t* key_node, const table* parent)
   return key;
 }
 
-foreign_key* build_fk_from_xml(const node_t* fk_node, const vector<table*>& tables)
+foreign_key* build_fk_from_xml(const node_t* fk_node, const vector<table*>& tables, const vector<foreign_key*>& foreign_keys)
 {
+  foreign_key* fk = new foreign_key;
+  bool cancel = false;
   
+  fk->referencing_table = nullptr;
+  fk->referenced_table = nullptr;
+  fk->referencing_column = nullptr;
+  fk->referenced_column = nullptr;
+  
+  // Process each subnode individually, checking for errors along the way
+  for (node_t* subnode = fk_node->first_node();
+       !cancel && subnode != nullptr;
+       subnode = subnode->next_sibling())
+  {
+    if (strcmp(subnode->name(), "name") == 0)
+    {
+      if (!fk->name.empty())
+      {
+        cerr << "Foregin key property 'name' already defined" << endl;
+        cancel = true;
+      }
+      else if (strcmp(subnode->value(), "") == 0)
+      {
+        cerr << "Foreign key property 'name' cannot be empty" << endl;
+        cancel = true;
+      }
+      else if (contains_whitespace(subnode->value()))
+      {
+        cerr << "Foreign key property 'name' cannot contain whitespace" << endl;
+        cancel = true;
+      }
+      else for (foreign_key* fkey : foreign_keys) if (fkey->name == string(subnode->value()))
+      {
+        cerr << "Foreign key with name '" << subnode->value()
+             << "' already declared" << endl;
+        cancel = true;
+      }
+        
+      if (!cancel)
+      {
+        fk->name = string(subnode->value());
+      }
+    }
+    else if (strcmp(subnode->name(), "referencing_table") == 0)
+    {
+      table* target_table = nullptr;
+      
+      if (fk->referencing_table != nullptr)
+      {
+        cerr << "Foreign key property 'referencing_table' already defined" << endl;
+        cancel = true;
+      }
+      
+      // Find table with matching name
+      if (!cancel) for (table* t : tables) if (t->name == string(subnode->value()))
+      {
+        target_table = t;
+        break;
+      }
+      
+      if (!cancel) if (target_table == nullptr)
+      {
+        cerr << "Undefined table '" << subnode->value()
+             << "' referenced by foreign key" << endl;
+        cancel = true;
+      }
+      else
+      {
+        fk->referencing_table = target_table;
+      }
+    }
+    else if (strcmp(subnode->name(), "referenced_table") == 0)
+    {
+      table* target_table = nullptr;
+      
+      if (fk->referenced_table != nullptr)
+      {
+        cerr << "Foreign key property 'referenced_table' already defined" << endl;
+        cancel = true;
+      }
+      
+      // Find table with matching name
+      if (!cancel) for (table* t : tables) if (t->name == string(subnode->value()))
+      {
+        target_table = t;
+        break;
+      }
+      
+      if (!cancel) if (target_table == nullptr)
+      {
+        cerr << "Undefined table '" << subnode->value()
+             << "' referenced by foreign key" << endl;
+        cancel = true;
+      }
+      else
+      {
+        fk->referenced_table = target_table;
+      }
+    }
+    else if (strcmp(subnode->name(), "referencing_column") == 0)
+    {
+      table_column* target_column;
+      
+      if (fk->referencing_column != nullptr)
+      {
+        cerr << "Foreign key property 'referencing_column' already defined" << endl;
+        cancel = true;
+      }
+      else if (fk->referencing_table == nullptr)
+      {
+        cerr << "Foreign key property 'referencing_column' declared before 'referencing_table' defined" << endl;
+        cancel = true;
+      }
+      
+      // Find column with matching name
+      if (!cancel) target_column = find_column_in_table(string(subnode->value()), fk->referencing_table);
+      
+      if (!cancel) if (target_column == nullptr)
+      {
+        cerr << "Reference to undefined column '" << subnode->value()
+             << "' in foreign key" << endl;
+        cancel = true;
+      }
+      else
+      {
+        fk->referencing_column = target_column;
+      }
+    }
+    else if (strcmp(subnode->name(), "referenced_column") == 0)
+    {
+      table_column* target_column;
+      
+      if (fk->referenced_column != nullptr)
+      {
+        cerr << "Foreign key property 'referenced_column' already defined" << endl;
+        cancel = true;
+      }
+      else if (fk->referenced_table == nullptr)
+      {
+        cerr << "Foreign key property 'referenced_column' declared before 'referenced_table' defined" << endl;
+        cancel = true;
+      }
+      
+      // Find column with matching name
+      if (!cancel) target_column = find_column_in_table(string(subnode->value()), fk->referenced_table);
+      
+      if (!cancel) if (target_column == nullptr)
+      {
+        cerr << "Reference to undefined column '" << subnode->value()
+             << "' in foreign key" << endl;
+        cancel = true;
+      }
+      else
+      {
+        fk->referenced_column = target_column;
+      }
+    }
+    else if (strcmp(subnode->name(), "update_cascade") == 0)
+    {
+      if (fk->on_update_cascade)
+      {
+        cerr << "Foreign key property 'update_cascade' already defined" << endl;
+        cancel = true;
+      }
+      else
+      {
+        fk->on_update_cascade = true;
+      }
+    }
+    else if (strcmp(subnode->name(), "delete_cascade") == 0)
+    {
+      if (fk->on_delete_cascade)
+      {
+        cerr << "Foreign key property 'delete_cascade' already defined" << endl;
+        cancel = true;
+      }
+      else
+      {
+        fk->on_delete_cascade = true;
+      }
+    }
+    else
+    {
+      cerr << "Unknown foreign key property '" << subnode->name() << "'" << endl;
+      cancel = true;
+    }
+  }
+  
+  // Ensure all required fields have been defined
+  if (!cancel)
+  {
+    if (fk->name.empty())
+    {
+      cerr << "Foreign key property 'name' undefined" << endl;
+      cancel = true;
+    }
+    if (fk->referencing_table == nullptr)
+    {
+      cerr << "Foreign key property 'referencing_table' undefined" << endl;
+      cancel = true;
+    }
+    if (fk->referenced_table == nullptr)
+    {
+      cerr << "Foreign key property 'referenced_table' undefined" << endl;
+      cancel = true;
+    }
+    if (fk->referencing_column == nullptr)
+    {
+      cerr << "Foreign key property 'referencing_column' undefined" << endl;
+      cancel = true;
+    }
+    if (fk->referenced_column == nullptr)
+    {
+      cerr << "Foreign key property 'referenced_column' undefined" << endl;
+      cancel = true;
+    }
+    if (fk->referencing_table  != nullptr && fk->referenced_table  != nullptr &&
+        fk->referencing_column != nullptr && fk->referenced_column != nullptr &&
+        fk->referencing_table  == fk->referenced_table &&
+        fk->referencing_column == fk->referenced_column)
+    {
+      cerr << "Foreign key cannot cause column to reference itself" << endl;
+      cancel = true;
+    }
+  }
+  
+  // Clean up in case of error
+  if (cancel)
+  {
+    delete fk;
+    fk = nullptr;
+  }
+  
+  return fk;
 }
