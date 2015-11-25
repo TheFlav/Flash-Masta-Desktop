@@ -2,12 +2,11 @@
 <schema>
   <table>
     <name>Games</name>
+    
     <column index="0">
       <name>ID</name>
       <type>INT</type>
-      <key />
     </column>
-    
     <column index="1">
       <name>Hash</name>
       <type>INT</type>
@@ -53,21 +52,18 @@
       <type>INT</type>
     </column>
 
+    <key type="primary">
+      <column index="0">ID</column>
+    </key>
+    
     <index>
-      <column>Hash</column>
+      <column index="0">Hash</column>
       <order>ASC</order>
     </index>
     <index>
-      <column>Developer</column>
+      <column index="0">Developer</column>
       <order>ASC</order>
     </index>
-
-    <foreign_key>
-      <local_column>Developer</local_column>
-      <other_table>Developer</other_table>
-      <other_column>ID</other_column>
-      <update_cascade />
-    </foreign_key>
   </table>
 
   <table>
@@ -76,7 +72,6 @@
     <column index="0">
       <name>ID</name>
       <type>INT</type>
-      <key />
     </column>
     <column index="1">
       <name>DeveloperID</name>
@@ -87,9 +82,22 @@
       <type>TEXT</type>
     </column>
     
+    <key type="primary">
+      <column index="0">ID</column>
+    </key>
+    
     <index>
-      <column>DeveloperID</column>
+      <column index="0">DeveloperID</column>
       <order>ASC</order>
     </index>
   </table>
+
+  <foreign_key>
+    <name>fk_games_developer_developer_id</name>
+    <referencing_table>Games</referencing_table>
+    <referencing_column>Developer</referencing_column>
+    <referenced_table>Developer</referenced_table>
+    <referenced_column>ID</referenced_column>
+    <update_cascade />
+  </foreign_key>
 </schema>

@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -72,7 +73,9 @@ struct table_index {
 };
 
 struct table_key {
+  table_key(): primary(false) {}
   vector<table_column*> columns;
+  bool primary;
 };
 
 struct table {
@@ -102,6 +105,8 @@ struct foreign_key {
 
 
 
+// HELPER FUNCTIONS //
+
 inline bool contains_whitespace(const char* str)
 {
   for (int i = 0; str[i] != '\0'; i++)
@@ -110,6 +115,98 @@ inline bool contains_whitespace(const char* str)
   }
   return false;
 }
+
+template<typename T> inline bool contains_gaps(const vector<T>& list)
+{
+  static_assert(std::is_pointer<T>::value, "Template function contains_gaps() only applicable to pointer types");
+  for (auto item : list) if (item == nullptr) return true; return false;
+}
+
+/*!
+ *  \brief Parses and validates a 'column' property of an index or key, printing
+ *         an error to the console and returning -1 if a symantic error is
+ *         encountered, otherwise returns the index that the current column is
+ *         intended to be stored and adds the new column refernce to the vector.
+ */
+inline int parse_column_index_and_validate(const node_t* n, const table* t, vector<table_column*>& l)
+{
+  table_column* target_column = nullptr;
+  int target_index;
+  bool cancel = false;
+  
+  // Process index attribute if it exists, otherwise choose first available spot
+  if (!cancel && n->first_attribute("index") != nullptr)
+  {
+    xml_attribute<>* attribute = n->first_attribute("index");
+
+    // Parse as int
+    char* c;
+    target_index = strtol(attribute->value(), &c, 10);
+
+    // Check if parse worked for whole string
+    if (!cancel) if (*c != 0 || target_index < 0)
+    {
+      cerr << "Value of 'index' attribute must be a positive integer" << endl;
+      cancel = true;
+    }
+
+    // Make sure column at given index is not already defined
+    if (!cancel) if (target_index < l.size() && l[target_index] != nullptr)
+    {
+      cerr << "Index column number " << target_index << " already defined" << endl;
+      cancel = true;
+    }
+  }
+  else for (target_index = 0; target_index < l.size() && l[target_index] != nullptr; target_index++);
+
+  // Search for column with matching name in table
+  if (!cancel) for (table_column* col : t->columns)
+  {
+    if (col->name == n->value())
+    {
+      target_column = col;
+      break;
+    }
+  }
+
+  if (!cancel) if (target_column == nullptr)
+  {
+    cerr << "Reference to undefined column '" << n->value()
+         << "' table '" << t->name << "'" << endl;
+    cancel = true;
+  }
+
+  // Check if column already included in index
+  if (!cancel) for (table_column* col : l)
+  {
+    if (col == target_column)
+    {
+      cerr << "Duplicate reference to column '" << target_column->name
+           << "' in table '" << t->name << "'" << endl;
+      cancel = true;
+      break;
+    }
+  }
+  
+  // Insert into vector
+  if (!cancel) if (target_index >= l.size())
+  {
+    l.resize(target_index + 1, nullptr);
+    l[target_index] = target_column;
+  }
+  
+  // Clean up in case of error
+  if (cancel)
+  {
+    target_index = -1;
+  }
+  
+  return target_index;
+}
+
+//////////////////////
+
+
 
 // Function to build sqlite tables from schema xml
 bool build_tables_from_schema(sqlite3* db, xml_document<>& schema_xml)
@@ -202,11 +299,11 @@ table* build_table_from_xml(const node_t* table_node)
 }
 
 /*!
- *  \brief Constructs a \ref table_column object from an XML node
+ *  \brief Constructs a \ref table_column struct from an XML node.
  *  
  *  Allocates and fills a new instance of \ref table_column with values
  *  parsed from an XML node. If any symantic errors are encountered, prints
- *  an error to \ref cerr.
+ *  an error to \ref std::cerr.
  *  
  *  \param [in] column_node XML element from which to construct the struct.
  *  
@@ -357,6 +454,24 @@ table_column* build_column_from_xml(const node_t* column_node)
   return column;
 }
 
+/*!
+ *  \brief Constructs a \ref table_index struct from an XML node.
+ *  
+ *  Allocates and fills a new instance of \ref table_index with values parsed
+ *  from an XML node. If any symantic errors are encountered, prints an error to
+ *  \ref std::cerr.
+ *  
+ *  Even though this function takes a \ref table struct as an argument, it does
+ *  insert itself into the table. It is the responsibility of the caller to do
+ *  what is necessary to add the created struct to the table.
+ *  
+ *  \param [in] index_node XML element from which to build the struct.
+ *  \param [in] parent Parent table to which this index belongs. Used for
+ *              validation and linking to other objects in the table.
+ *  
+ *  \returns A pointer to a valid \ref table_index struct if the operation was
+ *           successful or nullptr if the operation failed for any reason.
+ */
 table_index* build_index_from_xml(const node_t* index_node, const table* parent)
 {
   table_index* index = new table_index;
@@ -370,67 +485,10 @@ table_index* build_index_from_xml(const node_t* index_node, const table* parent)
     if (strcmp(subnode->name(), "column") == 0)
     {
       // Properly handle the index attribute
-      int target_index;
-      if (!cancel) if (subnode->first_attribute("index") != nullptr)
+      if (parse_column_index_and_validate(subnode, parent, index->columns) == -1)
       {
-        xml_attribute<>* attribute = subnode->first_attribute("index");
-        
-        // Parse as int
-        char* c;
-        target_index = strtol(attribute->value(), &c, 10);
-        
-        // Check if parse worked for whole string
-        if (*c != 0 || target_index < 0)
-        {
-          cerr << "Value of 'index' attribute must be a positive integer" << endl;
-          cancel = true;
-        }
-        
-        // Resize columns vector in index
-        if (!cancel) if (index->columns.size() <= target_index)
-        {
-          index->columns.resize(target_index+1, nullptr);
-        }
-        
-        // Make sure column at given index is not already defined
-        if (!cancel) if (index->columns[target_index] != nullptr)
-        {
-          cerr << "Index column number " << target_index << " already defined" << endl;
-          cancel = true;
-        }
-      }
-      
-      // Search for column with matching name in table
-      table_column* target_column = nullptr;
-      if (!cancel) for (table_column* col : parent->columns)
-      {
-        if (col->name == subnode->value())
-        {
-          target_column = col;
-          break;
-        }
-      }
-      
-      if (!cancel) if (target_column == nullptr)
-      {
-        cerr << "Undefined column '" << subnode->value()
-             << "' referenced by index in table '" << parent->name << "'" << endl;
         cancel = true;
       }
-      
-      // Check if column already included in index
-      if (!cancel) for (table_column* col : index->columns)
-      {
-        if (col->name == target_column->name)
-        {
-          cerr << "Duplicate column '" << target_column->name
-               << "' declared in index for table '" << parent->name << "'" << endl;
-          cancel = true;
-          break;
-        }
-      }
-      
-      if (!cancel) index->columns[target_index] = target_column;
     }
     else if (strcmp(subnode->name(), "order") == 0)
     {
@@ -444,16 +502,18 @@ table_index* build_index_from_xml(const node_t* index_node, const table* parent)
         index->order = string(subnode->value());
       }
     }
+    else
+    {
+      cerr << "Unknown index property '" << subnode->name() << "'" << endl;
+      cancel = true;
+    }
   }
   
   // Verify that all column spaces have been filled (no gaps)
-  if (!cancel) for (table_column* col : index->columns)
+  if (!cancel) if (contains_gaps<table_column*>(index->columns))
   {
-    if (col == nullptr)
-    {
-      cerr << "Gaps exist in index definition in table '" << parent->name << "'" << endl;
-      cancel = true;
-    }
+    cerr << "Gaps exist in index definition in table '" << parent->name << "'" << endl;
+    cancel = true;
   }
   
   // Clean up in case of errors
@@ -468,7 +528,69 @@ table_index* build_index_from_xml(const node_t* index_node, const table* parent)
 
 table_key* build_key_from_xml(const node_t* key_node, const table* parent)
 {
+  table_key* key = new table_key;
+  bool cancel = false;
   
+  // First handle "type" attribute
+  xml_attribute<>* attr_type = key_node->first_attribute("type");
+  if (!cancel) if (attr_type != nullptr)
+  {
+    // Process primary keys
+    if (strcmp(attr_type->value(), "primary") == 0)
+    {
+      // Make sure a primary key doesn't already exist in the table
+      if (parent->primary_key != nullptr)
+      {
+        cerr << "Primary key for table " << parent->name
+             << " already exists" << endl;
+        cancel = true;
+      }
+      else
+      {
+        key->primary = true;
+      }
+    }
+    else
+    {
+      cerr << "Unknown value '" << attr_type->value() << "' for key type" << endl;
+      cancel = true;
+    }
+  }
+  
+  // Process each subnode individually, checking for errors along the way
+  for (node_t* subnode = key_node->first_node();
+       !cancel && subnode != nullptr;
+       subnode = subnode->next_sibling())
+  {
+    if (strcmp(subnode->name(), "column") == 0)
+    {
+      if (parse_column_index_and_validate(subnode, parent, key->columns) == -1)
+      {
+        cancel = true;
+      }
+    }
+    else
+    {
+      cerr << "Unknown key property '" << subnode->name() << "'" << endl;
+      cancel = true;
+    }
+  }
+  
+  // Verify that all column spaces have been filled (no gaps)
+  if (!cancel) if (contains_gaps<table_column*>(key->columns))
+  {
+    cerr << "Gaps exist in key definition in table '" << parent->name << "'" << endl;
+    cancel = true;
+  }
+  
+  // Clean up in case of errors
+  if (cancel)
+  {
+    delete key;
+    key = nullptr;
+  }
+  
+  return key;
 }
 
 foreign_key* build_fk_from_xml(const node_t* fk_node, const vector<table*>& tables)
