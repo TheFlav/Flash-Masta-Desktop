@@ -58,16 +58,37 @@ void CartridgeInfoWidget::buildFromCartridge(cartridge* cart)
   
   setCartridgeSize(descriptor->num_bytes);
   setCartridgeNumSlots(cart->num_slots());
-  setCartridgeNumChips(descriptor->num_chips);
+  
+  // Special case the number of chips based on cartridge system
+  if (descriptor->system == system_type::SYSTEM_WONDERSWAN)
+  {
+    setCartridgeNumChips(descriptor->num_chips + 1);
+  }
+  else
+  {
+    setCartridgeNumChips(descriptor->num_chips);
+  }
+  
   for (unsigned int chip_i = 0; chip_i < descriptor->num_chips; chip_i++)
   {
     setCartridgeChipSize(chip_i, descriptor->chips[chip_i]->num_bytes);
+    
+    // Special case chip label if Wonderswan
+    if (descriptor->num_chips > 1 && descriptor->system == system_type::SYSTEM_WONDERSWAN)
+    {
+      ((QLabel*) m_cart_chip_widgets[chip_i][0])->setText(QString("Flash chip ") + QString::number(chip_i+1) + QString(" size:"));
+    }
   }
   
   if (descriptor->system == system_type::SYSTEM_WONDERSWAN)
   {
-    ((QLabel*) m_cart_chip_widgets[0][0])->setText("Flash chip size:");
-    ((QLabel*) m_cart_chip_widgets[1][0])->setText("SRAM chip size:");
+    if (descriptor->num_chips == 1)
+    {
+      ((QLabel*) m_cart_chip_widgets[0][0])->setText("Flash chip size:");
+    }
+    
+    ((QLabel*) m_cart_chip_widgets[descriptor->num_chips][0])->setText("SRAM chip size:");
+    setCartridgeChipSize(descriptor->num_chips, 524288); // SRAM is always 4 MiB
   }
   
   // Decide cartridge capabilities based on the cartridge's chip's identifiers
@@ -229,15 +250,15 @@ void CartridgeInfoWidget::clearChipData()
 QString CartridgeInfoWidget::stringifyBytesToBits(unsigned int num_bytes, bool reduce)
 {
   QString text;
-  if (reduce && (num_bytes & 0x7FFFFFF) == 0)
+  if (reduce && (num_bytes & 0b111111111111111111111111111) == 0)
   {
     text = QString::number(num_bytes >> 27) + QString(" Gib");
   }
-  else if (reduce && (num_bytes & 0x1FFFF) == 0)
+  else if (reduce && (num_bytes & 0b11111111111111111) == 0)
   {
     text = QString::number(num_bytes >> 17) + QString(" Mib");
   }
-  else if (reduce && (num_bytes & 0x7F) == 0)
+  else if (reduce && (num_bytes & 0xb1111111) == 0)
   {
     text = QString::number(num_bytes >> 7) + QString(" Kib");
   }
