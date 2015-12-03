@@ -52,9 +52,9 @@
       <type>INT</type>
     </column>
 
-    <key type="primary">
-      <column index="0">ID</column>
-    </key>
+    <primary_key>
+      <column>ID</column>
+    </primary_key>
     
     <index>
       <column index="0">Hash</column>
@@ -82,9 +82,9 @@
       <type>TEXT</type>
     </column>
     
-    <key type="primary">
-      <column index="0">ID</column>
-    </key>
+    <primary_key>
+      <column>ID</column>
+    </primary_key>
     
     <index>
       <column index="0">DeveloperID</column>
