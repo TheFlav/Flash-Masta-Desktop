@@ -4,7 +4,6 @@
 build/*
 bin/*
 
-
 # Xcode
 *.xcodeproj
 *.xcodeproj/*
@@ -28,4 +27,6 @@ ipch/
 # Miscellaneous
 .DS_Store
 *.autosave
+build-database
+*.db
 
