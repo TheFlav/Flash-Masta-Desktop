@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <vector>
 #include <string>
@@ -111,6 +112,7 @@ games_row* games_row::from_xml(const node_t* node)
   // Metadata and hash
   if (success)
   {
+    row->Hash = 0;
     node = node->first_node("METADATA");
     if (node == nullptr)
     {
@@ -522,6 +524,12 @@ bool add_games_to_db(sqlite3* db, const doc_t* games_xml)
     {
       cerr << "An error occured while parsing XML" << endl;
       success = false;
+    }
+    else
+    {
+      ios::fmtflags f(cout.flags());
+      cout << "0x" << hex << setfill('0') << setw(16) << row->Hash << endl;
+      cout.flags(f);
     }
     
     // Reset statement status so we can rebind parameters
