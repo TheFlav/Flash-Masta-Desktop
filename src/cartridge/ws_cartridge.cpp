@@ -1279,7 +1279,7 @@ void ws_cartridge::build_chip_descriptor(unsigned int chip_i)
   
   // At the time of this code writing, cartridges contain a single chip
   // with a constant size and block size.
-  num_bytes = 0x10000000;
+  num_bytes = 0x8000000;
   
   // Calculate number of blocks. (1 block per 64 Kib (8 KiB))
   num_blocks = num_bytes / DEFAULT_BLOCK_SIZE;
