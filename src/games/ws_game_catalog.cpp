@@ -12,7 +12,11 @@ using namespace std;
 ws_game_catalog::ws_game_catalog(const char* db_file_name)
   : m_sqlite(nullptr)
 {
-  sqlite3_open_v2(db_file_name, &m_sqlite, SQLITE_OPEN_READONLY, "");
+  if (sqlite3_open_v2(db_file_name, &m_sqlite, SQLITE_OPEN_READONLY, nullptr) != SQLITE_OK)
+  {
+    sqlite3_close_v2(m_sqlite);
+    throw std::runtime_error("Unable to open database");
+  }
 }
 
 ws_game_catalog::~ws_game_catalog()
@@ -58,7 +62,7 @@ const game_descriptor* ws_game_catalog::identify_game(cartridge* cart, int slot_
     return nullptr;
   }
   
-  if (sqlite3_bind_int64(stmt, sqlite3_bind_parameter_index(stmt, "hash"), hash) != SQLITE_OK
+  if (sqlite3_bind_int64(stmt, sqlite3_bind_parameter_index(stmt, ":hash"), hash) != SQLITE_OK
       || sqlite3_step(stmt) != SQLITE_ROW)
   {
     sqlite3_finalize(stmt);
