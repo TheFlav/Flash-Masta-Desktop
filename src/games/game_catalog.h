@@ -9,7 +9,7 @@ class game_catalog
 {
 public:
   virtual ~game_catalog() {}
-  virtual const game_descriptor identify_game(cartridge* cart, int slot_num = -1) = 0;
+  virtual const game_descriptor* identify_game(cartridge* cart, int slot_num = -1) = 0;
 };
 
 #endif // defined(__GAME_CATALOG_H__)

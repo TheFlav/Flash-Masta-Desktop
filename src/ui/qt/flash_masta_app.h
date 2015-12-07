@@ -5,6 +5,7 @@
 
 class DeviceManager;
 class MainWindow;
+class game_catalog;
 
 class FlashMastaApp: public QApplication
 {
@@ -15,6 +16,7 @@ public:
   
   DeviceManager* getDeviceManager() const;
   MainWindow* getMainWindow() const;
+  game_catalog* getWonderswanGameCatalog() const;
   int getSelectedDevice() const;
   int getSelectedSlot() const;
   
@@ -49,6 +51,7 @@ private:
   
   MainWindow* m_main_window;
   DeviceManager* m_device_manager;
+  game_catalog* m_ws_game_catalog;
   bool m_game_backup_enabled;
   bool m_game_flash_enabled;
   bool m_game_verify_enabled;

@@ -36,6 +36,27 @@ class ws_sram_chip;
 class ws_cartridge: public cartridge
 {
 public:
+  /*! \brief A struct for representing and storing the metadata of a Wonderswan
+   * game.
+   */
+  struct game_metadata
+  {
+    void read_from_data_array(const unsigned char* data);
+    void write_to_data_array(unsigned char* data);
+    
+    unsigned char developer_id;
+    unsigned char minimum_system;
+    unsigned char game_id;
+    unsigned char mapper_version;
+    unsigned char rom_size;
+    unsigned char save_size;
+    unsigned char flags;
+    unsigned char RTC_present;
+    unsigned short checksum;
+  };
+  
+  
+  
   /*! \ brief Class constructor
    *  
    *  Main constructor for the class. Initializes members with default values
@@ -124,6 +145,26 @@ public:
    *  \see cartridge::fetch_game_name(int slot)
    */
   std::string           fetch_game_name(int slot);
+  
+  /*!
+   * \brief Gets the parsed metadata of the game in the given slot.
+   * 
+   * Gets a pointer to a struct containing the parsed metadata for the game
+   * stored in the given slot. If something went wrong while parsing the metadata
+   * or no metadata has been cached for the given slot, then this function returns
+   * a nullptr.
+   * 
+   * This is a non-blocking function as it merely returns a cached value. This cached
+   * value is constructed when \ref init() is called on this cartridge.
+   * 
+   * \param slot The slot of the game to get the metadata for.
+   * 
+   * \return Pointer to a const \ref game_metadata struct or nullptr something
+   *         went wrong.
+   * 
+   * \see game_metadata
+   */
+  const game_metadata*  get_game_metadata(int slot);
   
 
 protected:
@@ -257,25 +298,6 @@ private:
   ws_cartridge&         operator=(const ws_cartridge& other) = delete;
   
   
-  
-  /*! \brief A struct for representing and storing the metadata of a Wonderswan
-   * game.
-   */
-  struct game_metadata
-  {
-    void read_from_data_array(const unsigned char* data);
-    void write_to_data_array(unsigned char* data);
-    
-    unsigned char developer_id;
-    unsigned char minimum_system;
-    unsigned char game_id;
-    unsigned char mapper_version;
-    unsigned char rom_size;
-    unsigned char save_size;
-    unsigned char flags;
-    unsigned char RTC_present;
-    unsigned short checksum;
-  };
   
   /*! \brief Flag indicating that \ref init() has been previously called on this
    *         instance.

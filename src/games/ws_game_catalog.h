@@ -11,11 +11,9 @@ public:
   ws_game_catalog(const char* db_file_name);
   ~ws_game_catalog();
   
-  const game_descriptor identify_game(cartridge* cart, int slot_num = -1);
+  const game_descriptor* identify_game(cartridge* cart, int slot_num = -1);
   
 private:
-  bool verify_database_schema();
-  
   sqlite3* m_sqlite;
 };
 

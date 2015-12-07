@@ -4,6 +4,8 @@
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
 #include "cartridge/ws_cartridge.h"
+#include "games/game_catalog.h"
+#include "games/game_descriptor.h"
 
 #include "../device_manager.h"
 #include "../flash_masta_app.h"
@@ -81,14 +83,14 @@ void FmCartridgeSlotWidget::buildFromCartridge(cartridge* cart, int slot)
   setSaveVerifyEnabled(false);
 }
 
+
+
 // private:
 
 void FmCartridgeSlotWidget::buildFromNgpCartridge(ngp_cartridge* cart, int slot)
 {
-  (void) slot;
-  
   while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
-  std::string game_name = cart->fetch_game_name(m_slot);
+  std::string game_name = cart->fetch_game_name(slot);
   FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
   
   if (game_name.empty())
@@ -100,11 +102,16 @@ void FmCartridgeSlotWidget::buildFromNgpCartridge(ngp_cartridge* cart, int slot)
 
 void FmCartridgeSlotWidget::buildFromWsCartridge(ws_cartridge* cart, int slot)
 {
-  (void) cart;
-  (void) slot;
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
+  const game_descriptor* descriptor = FlashMastaApp::getInstance()->getWonderswanGameCatalog()->identify_game(cart, slot);
+  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
   
-  std::string game_name = "";
-  setSlotGameName(QString(game_name.c_str()));
+  setSlotGameName(QString(descriptor != nullptr ? descriptor->name : "Unknown"));
+  
+  if (descriptor != nullptr)
+  {
+    delete descriptor;
+  }
 }
 
 

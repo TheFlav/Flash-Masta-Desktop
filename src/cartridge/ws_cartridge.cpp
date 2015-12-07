@@ -1218,6 +1218,13 @@ std::string ws_cartridge::fetch_game_name(int slot)
   return std::string(r.str());
 }
 
+const ws_cartridge::game_metadata* ws_cartridge::get_game_metadata(int slot)
+{
+  if (slot < 0 || slot >= (int) m_metadata.size()) return nullptr;
+  
+  return &m_metadata[slot];
+}
+
 
 
 void ws_cartridge::build_cartridge_destriptor()
