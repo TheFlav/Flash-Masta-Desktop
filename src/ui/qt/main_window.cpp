@@ -178,7 +178,7 @@ void MainWindow::triggerActionBackupGame()
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
-      WsCartridgeBackupTask(this, cart).go();
+      WsCartridgeBackupTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     default:
@@ -209,7 +209,7 @@ void MainWindow::triggerActionFlashGame()
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
-      WsCartridgeFlashTask(this, cart).go();
+      WsCartridgeFlashTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     default:
@@ -240,7 +240,7 @@ void MainWindow::triggerActionVerifyGame()
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
-      WsCartridgeVerifyTask(this, cart).go();
+      WsCartridgeVerifyTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     default:
@@ -270,7 +270,7 @@ void MainWindow::triggerActionBackupSave()
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
-      WsCartridgeBackupSaveTask(this, cart).go();
+      WsCartridgeBackupSaveTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     default:
@@ -300,7 +300,7 @@ void MainWindow::triggerActionRestoreSave()
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
-      WsCartridgeRestoreSaveTask(this, cart).go();
+      WsCartridgeRestoreSaveTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     default:

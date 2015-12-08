@@ -91,14 +91,13 @@ void ws_cartridge::init()
   {
     return;
   }
+  m_was_init = true;
   
   m_linkmasta->init();
   m_linkmasta->open();
   build_cartridge_destriptor();
   build_slots_layout();
   m_linkmasta->close();
-  
-  m_was_init = true;
 }
 
 void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task_controller* controller)
@@ -120,71 +119,85 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
   m_linkmasta->open();
   
   // Validate arguments
-  if ((slot < 0 || slot >= (int) m_slots.size()) && slot != SLOT_ALL)
+  if (slot != SLOT_ALL && (slot < 0 || slot >= (int) m_slots.size()))
   {
     throw std::invalid_argument("invalid slot number: " + std::to_string(slot));
   }
-  else if (slot != SLOT_ALL)
+  else if (!m_linkmasta->switch_slot(slot == SLOT_ALL ? 0 : (unsigned int) slot))
   {
-    if (!m_linkmasta->switch_slot((unsigned int) slot))
-    {
-      throw std::runtime_error("ERROR"); // TODO
-    }
+    throw std::runtime_error("ERROR"); // TODO
   }
-  unsigned int slot_size = (slot == SLOT_ALL ? descriptor()->num_bytes : m_linkmasta->read_slot_size(slot));
+  
+  unsigned int curr_slot = (slot == SLOT_ALL ? 0 : (unsigned int) slot);
+  unsigned int slot_size = this->slot_size(curr_slot);
   
   // Determine the total number of bytes to write
   unsigned int bytes_written = 0;
   unsigned int bytes_total = 0;
-  switch (m_linkmasta->read_word(0, slot_size - 0x0004))
+  
+  // Special case full-cartridge backup
+  if (slot == SLOT_ALL)
   {
-    case 0x0002:
-      bytes_total = 0x80000; // 4Mbit (512KB)
-      break;
-      
-    case 0x0003:
-      bytes_total = 0x100000; // 8Mbit (1MB)
-      break;
-      
-    case 0x0004:
-      bytes_total = 0x200000; // 16Mbit (2MB)
-      break;
-      
-    case 0x0006:
-      bytes_total = 0x400000; // 32Mbit (4MB)
-      break;
-      
-    case 0x0008:
-      bytes_total = 0x800000; // 64Mbit (8MB)
-      break;
-      
-    case 0x0009:
-      bytes_total = 0x1000000; // 128Mbit (16MB)
-      break;
-      
-    default:
-      bytes_total = slot_size;
-      break;
+    bytes_total = descriptor()->num_bytes;
+  }
+  else
+  {
+    switch (m_linkmasta->read_word(0, slot_size - 0x0004))
+    {
+      case 0x0002:
+        bytes_total = 0x80000; // 4Mbit (512KB)
+        break;
+        
+      case 0x0003:
+        bytes_total = 0x100000; // 8Mbit (1MB)
+        break;
+        
+      case 0x0004:
+        bytes_total = 0x200000; // 16Mbit (2MB)
+        break;
+        
+      case 0x0006:
+        bytes_total = 0x400000; // 32Mbit (4MB)
+        break;
+        
+      case 0x0008:
+        bytes_total = 0x800000; // 64Mbit (8MB)
+        break;
+        
+      case 0x0009:
+        bytes_total = 0x1000000; // 128Mbit (16MB)
+        break;
+        
+      default:
+        bytes_total = slot_size;
+        break;
+    }
   }
   
   // Initialize markers
   unsigned int curr_chip = 0;
-  unsigned int curr_offset = slot_size - bytes_total;
+  unsigned int curr_offset = (slot == SLOT_ALL ? 0 : slot_size - bytes_total);
   unsigned int curr_block = 0;
+  unsigned int curr_slot_offset = 0;
   
-  unsigned int slot_offset = 0;
-  for (unsigned int i = 0; i < (unsigned int) slot; ++i)
+  if (slot != SLOT_ALL)
   {
-    slot_offset += m_linkmasta->read_slot_size(i);
-  }
-  for (unsigned int i = 0; i < descriptor()->chips[0]->num_blocks; ++i)
-  {
-    if (descriptor()->chips[0]->blocks[i]->base_address <= slot_offset
-        && descriptor()->chips[0]->blocks[i]->base_address
-        + descriptor()->chips[0]->blocks[i]->num_bytes > slot_offset)
+    // Calculate current slot's offset
+    for (unsigned int i = 0; i < curr_slot; i++)
     {
-      curr_block = i;
-      break;
+      curr_slot_offset += this->slot_size(i);
+    }
+    
+    // Figure out the current block
+    for (unsigned int i = 0; i < descriptor()->chips[0]->num_blocks; ++i)
+    {
+      if (descriptor()->chips[0]->blocks[i]->base_address <= (curr_slot_offset + curr_offset)
+          && descriptor()->chips[0]->blocks[i]->base_address
+          + descriptor()->chips[0]->blocks[i]->num_bytes > (curr_slot_offset + curr_offset))
+      {
+        curr_block = i;
+        break;
+      }
     }
   }
   
@@ -219,11 +232,22 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
       chip = descriptor()->chips[curr_chip];
       block = chip->blocks[curr_block];
       
-      // Calcualte number of expected bytes
-      unsigned int bytes_expected = block->num_bytes - (slot_offset + curr_offset - block->base_address);
+      // Calculate number of expected bytes
+      unsigned int bytes_expected = (block->base_address + block->num_bytes) - (curr_slot_offset + curr_offset);
       if (bytes_expected > bytes_total - bytes_written)
       {
+        // Make sure we don't write more bytes than we initially expected
         bytes_expected = bytes_total - bytes_written;
+      }
+      if (bytes_expected + curr_offset > slot_size)
+      {
+        // Make sure we don't overstep the slot bounds
+        bytes_expected = slot_size - curr_offset;
+      }
+      if (bytes_expected > BUFFER_MAX_SIZE)
+      {
+        // Make sure we don't write too many bytes
+        bytes_expected = BUFFER_MAX_SIZE;
       }
       
       // Attempt to read bytes from cartridge
@@ -271,11 +295,25 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
       // Update markers
       bytes_written += buffer_size;
       curr_offset += buffer_size;
-      curr_block++;
+      if (curr_slot_offset + curr_offset >= block->base_address + block->num_bytes)
+      {
+        curr_block++;
+      }
       if (curr_block >= chip->num_blocks)
       {
         curr_block = 0;
         curr_chip++;
+      }
+      if (curr_offset >= slot_size)
+      {
+        curr_slot_offset += slot_size;
+        curr_offset -= slot_size;
+        if (curr_slot < num_slots() - 1)
+        {
+          curr_slot++;
+          m_linkmasta->switch_slot(curr_slot);
+        }
+        slot_size = this->slot_size(curr_slot);
       }
     }
     
@@ -1182,6 +1220,12 @@ std::string ws_cartridge::fetch_game_name(int slot)
   // Get game ID from chip
   // Check developer ID and game ID against database and get game name
   
+  // Ensure class was initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
   static const unsigned int high_addr = 0x00FFFFFF;
   static const unsigned int foot_addr = high_addr - 0x0000000A;
   
@@ -1323,5 +1367,3 @@ void ws_cartridge::build_slots_layout()
     m_slots[i] = m_linkmasta->read_slot_size(i);
   }
 }
-
-

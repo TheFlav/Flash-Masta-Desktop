@@ -7,7 +7,7 @@
 class WsCartridgeFlashTask: public WsCartridgeTask
 {
 public:
-  explicit WsCartridgeFlashTask(QWidget* parent, cartridge* cart);
+  explicit WsCartridgeFlashTask(QWidget* parent, cartridge* cart, int slot = -1);
   ~WsCartridgeFlashTask();
   
 protected:
