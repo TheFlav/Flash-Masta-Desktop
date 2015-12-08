@@ -296,7 +296,7 @@ unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_ad
   }
   
   // Get as many bytes of data as possible in packets of 64
-  while ((offset - num_bytes) / WS_LINKMASTA_USB_RXTX_SIZE >= 1
+  while ((num_bytes - offset) / WS_LINKMASTA_USB_RXTX_SIZE >= 1
          && (controller == nullptr || !controller->is_task_cancelled()))
   {
     // Calculate number of packets. Don't go over packet limit
