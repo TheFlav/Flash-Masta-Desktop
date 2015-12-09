@@ -37,7 +37,7 @@ using namespace std;
 
 ws_cartridge::ws_cartridge(linkmasta_device* linkmasta)
   : m_was_init(false), m_linkmasta(linkmasta), m_descriptor(nullptr),
-    m_rom_chip(nullptr), m_sram_chip(nullptr)
+    m_rom_chip(new ws_rom_chip(m_linkmasta)), m_sram_chip(new ws_sram_chip(m_linkmasta))
 {
   // Nothing else to do
 }
@@ -95,6 +95,8 @@ void ws_cartridge::init()
   
   m_linkmasta->init();
   m_linkmasta->open();
+  m_rom_chip->reset();
+  m_rom_chip->select_slot(0);
   build_cartridge_destriptor();
   build_slots_layout();
   build_game_metadata();
@@ -124,10 +126,12 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
   {
     throw std::invalid_argument("invalid slot number: " + std::to_string(slot));
   }
-  else if (!m_linkmasta->switch_slot(slot == SLOT_ALL ? 0 : (unsigned int) slot))
+  else if (!m_rom_chip->select_slot(slot == SLOT_ALL ? 0 : (unsigned int) slot))
   {
     throw std::runtime_error("ERROR"); // TODO
   }
+  
+  m_linkmasta->close();
   
   unsigned int curr_slot = (slot == SLOT_ALL ? 0 : (unsigned int) slot);
   unsigned int slot_size = this->slot_size(curr_slot);
@@ -143,7 +147,8 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
   }
   else
   {
-    switch (m_linkmasta->read_word(0, slot_size - 0x0004))
+    const game_metadata* metadata = get_game_metadata(slot);
+    switch (metadata->rom_size)
     {
       case 0x0002:
         bytes_total = 0x80000; // 4Mbit (512KB)
@@ -201,8 +206,6 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
       }
     }
   }
-  
-  m_linkmasta->close();
   
   // Allocate a buffer with max size of a block
   const unsigned int BUFFER_MAX_SIZE = DEFAULT_BLOCK_SIZE;
@@ -1279,19 +1282,11 @@ void ws_cartridge::build_cartridge_destriptor()
     m_descriptor = nullptr;
   }
   
-  ws_rom_chip* chip;
-  
-  chip = new ws_rom_chip(m_linkmasta);
-  
   // Check if chip exists or not
-  if (chip->get_manufacturer_id() == 0x90 && chip->get_device_id() == 0x90)
+  if (m_rom_chip->get_manufacturer_id() == 0x90 && m_rom_chip->get_device_id() == 0x90)
   {
-    delete chip;
     return;
   }
-  
-  m_rom_chip = chip;
-  m_sram_chip = new ws_sram_chip(m_linkmasta);
   
   // Initialize cartridge descriptor
   m_descriptor = new cartridge_descriptor(1);
@@ -1368,6 +1363,11 @@ void ws_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int bloc
 
 void ws_cartridge::build_slots_layout()
 {
+  if (m_rom_chip->current_mode() != ws_rom_chip::chip_mode::READ)
+  {
+    m_rom_chip->reset();
+  }
+  
   m_slots.resize(m_linkmasta->read_num_slots());
   m_metadata.clear();
   m_metadata.resize(m_slots.size());
@@ -1393,8 +1393,8 @@ void ws_cartridge::build_game_metadata(int slot)
   {
     unsigned char* buffer = new unsigned char[10];
     
-    m_linkmasta->switch_slot(slot);
-    m_linkmasta->read_bytes(0, 0, buffer, 10);
+    m_rom_chip->select_slot(slot);
+    m_rom_chip->read_bytes(slot_size(slot) - 10, buffer, 10);
     
     m_metadata[slot].read_from_data_array(buffer);
     delete [] buffer;
@@ -1413,7 +1413,7 @@ void ws_cartridge::game_metadata::read_from_data_array(const unsigned char* data
   save_size = data[5];
   flags = data[6];
   RTC_present = data[7];
-  checksum = (data[8] << 8) | data[9];
+  checksum = (((unsigned short) data[8]) << 8) | data[9];
 }
 
 void ws_cartridge::game_metadata::write_to_data_array(unsigned char* data)
