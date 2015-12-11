@@ -64,6 +64,7 @@ void CartridgeWidget::refreshInBackground()
 
 void CartridgeWidget::refreshUi()
 {
+  int oldIndex = ui->slotsComboBox->currentIndex();
   setSlotsComboBoxVisible(m_cartridge->type() == cartridge_type::CARTRIDGE_FLASHMASTA);
   
   // Generate and display a name for the connected cartridge
@@ -129,8 +130,8 @@ void CartridgeWidget::refreshUi()
     }
   }
   
-  ui->slotsComboBox->setCurrentIndex(0);
-  on_slotsComboBox_currentIndexChanged(0);
+  ui->slotsComboBox->setCurrentIndex(oldIndex);
+  on_slotsComboBox_currentIndexChanged(oldIndex);
 }
 
 void CartridgeWidget::setCartridgeName(std::string label)
