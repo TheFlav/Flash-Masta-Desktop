@@ -24,6 +24,7 @@ public:
   explicit CartridgeWidget(unsigned int device_id, QWidget *parent = 0);
   ~CartridgeWidget();
   
+  void refreshInBackground();
   void refreshUi();
   void setCartridgeName(std::string label);
   void setCartridgeNameVisible(bool visible);
@@ -36,6 +37,7 @@ public slots:
   void deviceSelected(int old_device_id, int new_device_id);
   void slotSelected(int old_slot_id, int new_slot_id);
   void updateEnabledActions();
+  void cartridgeContentChanged(int device_id, int slot);
   
 private slots:
   void on_slotsComboBox_currentIndexChanged(int index);

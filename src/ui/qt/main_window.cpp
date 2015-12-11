@@ -35,6 +35,7 @@ using namespace std;
 
 #define PRE_ACTION \
   int device_index = FlashMastaApp::getInstance()->getSelectedDevice();\
+  int slot_index = FlashMastaApp::getInstance()->getSelectedSlot();\
   cartridge* cart = (device_index != -1 ? buildCartridgeForDevice(device_index) : nullptr);\
   \
   if (cart == nullptr)\
@@ -49,7 +50,8 @@ using namespace std;
 
 #define POST_ACTION \
   FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(device_index);\
-  delete cart;
+  delete cart;\
+  emit cartridgeContentChanged(device_index, slot_index);
 
 
 
@@ -205,11 +207,11 @@ void MainWindow::triggerActionFlashGame()
     switch (cart->system())
     {
     case system_type::SYSTEM_NEO_GEO_POCKET:
-      NgpCartridgeFlashTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
+      NgpCartridgeFlashTask(this, cart, slot_index).go();
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
-      WsCartridgeFlashTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
+      WsCartridgeFlashTask(this, cart, slot_index).go();
       break;
       
     default:
