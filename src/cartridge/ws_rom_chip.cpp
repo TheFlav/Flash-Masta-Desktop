@@ -312,17 +312,10 @@ bool ws_rom_chip::test_erasing()
   }
   
   // Send BLANK CHECK SETUP command sequence
-  write(ADDR_COMMAND1, 0xAA);
-  write(ADDR_COMMAND2, 0x55);
-  write(m_last_erased_addr, 0xEB);
-  write(m_last_erased_addr, 0x76);
-  write(m_last_erased_addr, 0x00);
-  write(m_last_erased_addr, 0x00);
-  write(m_last_erased_addr, 0x29);
+  unsigned char result1 = read(m_last_erased_addr);
+  unsigned char result2 = read(m_last_erased_addr);
   
-  unsigned char result = read(m_last_erased_addr);
-  
-  m_mode = (result == 0 ? ERASE : READ);
+  m_mode = (result1 != result2 ? ERASE : READ);
   
   return is_erasing();
 }
