@@ -36,6 +36,27 @@ class ws_sram_chip;
 class ws_cartridge: public cartridge
 {
 public:
+  /*! \brief A struct for representing and storing the metadata of a Wonderswan
+   * game.
+   */
+  struct game_metadata
+  {
+    void read_from_data_array(const unsigned char* data);
+    void write_to_data_array(unsigned char* data);
+    
+    unsigned char developer_id;
+    unsigned char minimum_system;
+    unsigned char game_id;
+    unsigned char mapper_version;
+    unsigned char rom_size;
+    unsigned char save_size;
+    unsigned char flags;
+    unsigned char RTC_present;
+    unsigned short checksum;
+  };
+  
+  
+  
   /*! \ brief Class constructor
    *  
    *  Main constructor for the class. Initializes members with default values
@@ -124,6 +145,26 @@ public:
    *  \see cartridge::fetch_game_name(int slot)
    */
   std::string           fetch_game_name(int slot);
+  
+  /*!
+   * \brief Gets the parsed metadata of the game in the given slot.
+   * 
+   * Gets a pointer to a struct containing the parsed metadata for the game
+   * stored in the given slot. If something went wrong while parsing the metadata
+   * or no metadata has been cached for the given slot, then this function returns
+   * a nullptr.
+   * 
+   * This is a non-blocking function as it merely returns a cached value. This cached
+   * value is constructed when \ref init() is called on this cartridge.
+   * 
+   * \param slot The slot of the game to get the metadata for.
+   * 
+   * \return Pointer to a const \ref game_metadata struct or nullptr something
+   *         went wrong.
+   * 
+   * \see game_metadata
+   */
+  const game_metadata*  get_game_metadata(int slot);
   
 
 protected:
@@ -219,6 +260,16 @@ protected:
    *  chip, caching the results to avoid future cartridge queries.
    */
   void                  build_slots_layout();
+  
+  /*! \brief Reads game metadata from the cartridge and caches it for later use.
+   * 
+   *  Reads data from the cartridge to get game metadata from all game slots on
+   *  the cartridge, caching the results to avoid future cartridge queries.
+   *  
+   *  \param [in] slot Target game slot to fetch metadata for. -1 will fetch
+   *                   metadata from all available slots on the cartridge.
+   */
+  void                  build_game_metadata(int slot = -1);
   
 private:
   
@@ -324,6 +375,18 @@ private:
    *  \ref build_slots_layout() function.
    */
   std::vector<unsigned int> m_slots;
+  
+  /*! \brief The vector used for cachingm game metadata for each slot.
+   *  
+   *  The vector used for caching the game metdata for each slot on the
+   *  cartridge.
+   *  
+   *  This member is initialized and filled with values when calling the
+   *  \ref build_game_metadata() function.
+   *  
+   *  \see game_metadata
+   */
+  std::vector<game_metadata> m_metadata;
 };
 
 #endif /* defined(__WS_CARTRIDGE_H__) */

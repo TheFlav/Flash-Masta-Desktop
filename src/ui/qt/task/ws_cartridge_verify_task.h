@@ -7,7 +7,7 @@
 class WsCartridgeVerifyTask : public WsCartridgeTask
 {
 public:
-  explicit WsCartridgeVerifyTask(QWidget *parent, cartridge* cart);
+  explicit WsCartridgeVerifyTask(QWidget *parent, cartridge* cart, int slot = -1);
   ~WsCartridgeVerifyTask();
   
 protected:

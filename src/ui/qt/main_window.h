@@ -40,6 +40,9 @@ public slots:
 private slots:
   void on_deviceListWidget_currentRowChanged(int currentRow);
   
+signals:
+  void cartridgeContentChanged(int, int);
+  
 private:
   Ui::MainWindow *ui;
   system_type m_target_system;

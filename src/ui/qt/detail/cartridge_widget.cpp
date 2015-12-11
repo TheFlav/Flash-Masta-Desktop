@@ -11,13 +11,14 @@
 
 #include "cartridge_info_widget.h"
 #include "fm_cartridge_slot_widget.h"
+#include "../main_window.h"
 #include "../device_manager.h"
 #include "../worker/lm_cartridge_fetching_worker.h"
 
 CartridgeWidget::CartridgeWidget(unsigned int device_id, QWidget *parent) :
   QWidget(parent),
   ui(new Ui::CartridgeWidget), m_current_slot(-1),
-  m_device_id(device_id), m_cartridge(nullptr),
+  m_device_id(device_id), m_worker(nullptr), m_cartridge(nullptr),
   m_slotsComboBoxHorizontalLayout(nullptr)
 {
   ui->setupUi(this);
@@ -29,16 +30,9 @@ CartridgeWidget::CartridgeWidget(unsigned int device_id, QWidget *parent) :
   
   connect(FlashMastaApp::getInstance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(deviceSelected(int,int)));
   connect(FlashMastaApp::getInstance(), SIGNAL(selectedSlotChanged(int,int)), this, SLOT(slotSelected(int,int)));
+  connect(FlashMastaApp::getInstance()->getMainWindow(), SIGNAL(cartridgeContentChanged(int,int)), this, SLOT(cartridgeContentChanged(int,int)));
   
-  QThread* thread = new QThread();
-  m_worker = new LmCartridgeFetchingWorker(m_device_id);
-  m_worker->moveToThread(thread);
-  connect(thread, SIGNAL(started()), m_worker, SLOT(run()));
-  connect(m_worker, SIGNAL(finished(cartridge*,std::string)), this, SLOT(cartridgeLoaded(cartridge*,std::string)));
-  connect(m_worker, SIGNAL(finished(cartridge*,std::string)), thread, SLOT(quit()));
-  connect(m_worker, SIGNAL(finished(cartridge*,std::string)), m_worker, SLOT(deleteLater()));
-  connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-  thread->start();
+  refreshInBackground();
 }
 
 CartridgeWidget::~CartridgeWidget()
@@ -51,8 +45,26 @@ CartridgeWidget::~CartridgeWidget()
 
 
 
+void CartridgeWidget::refreshInBackground()
+{
+  // Make sure we don't already have a background worker doing this
+  if (m_worker != nullptr) return;
+  
+  // Spin up new thread, have worker load cartridgte contents in background
+  QThread* thread = new QThread();
+  m_worker = new LmCartridgeFetchingWorker(m_device_id);
+  m_worker->moveToThread(thread);
+  connect(thread, SIGNAL(started()), m_worker, SLOT(run()));
+  connect(m_worker, SIGNAL(finished(cartridge*,std::string)), this, SLOT(cartridgeLoaded(cartridge*,std::string)));
+  connect(m_worker, SIGNAL(finished(cartridge*,std::string)), thread, SLOT(quit()));
+  connect(m_worker, SIGNAL(finished(cartridge*,std::string)), m_worker, SLOT(deleteLater()));
+  connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+  thread->start();  
+}
+
 void CartridgeWidget::refreshUi()
 {
+  int oldIndex = ui->slotsComboBox->currentIndex();
   setSlotsComboBoxVisible(m_cartridge->type() == cartridge_type::CARTRIDGE_FLASHMASTA);
   
   // Generate and display a name for the connected cartridge
@@ -118,8 +130,8 @@ void CartridgeWidget::refreshUi()
     }
   }
   
-  ui->slotsComboBox->setCurrentIndex(0);
-  on_slotsComboBox_currentIndexChanged(0);
+  ui->slotsComboBox->setCurrentIndex(oldIndex);
+  on_slotsComboBox_currentIndexChanged(oldIndex);
 }
 
 void CartridgeWidget::setCartridgeName(std::string label)
@@ -206,6 +218,16 @@ void CartridgeWidget::updateEnabledActions()
   }
 }
 
+void CartridgeWidget::cartridgeContentChanged(int device_id, int slot)
+{
+  (void) slot;
+  
+  if (device_id == (int) m_device_id)
+  {
+    refreshInBackground();
+  }
+}
+
 
 
 // private slots:
@@ -228,3 +250,5 @@ void CartridgeWidget::on_slotsComboBox_currentIndexChanged(int index)
   m_current_widget->show();
   FlashMastaApp::getInstance()->setSelectedSlot(index - 1);
 }
+
+
