@@ -41,7 +41,8 @@ typedef ws_rom_chip::address_t     address_t;
 
 ws_rom_chip::ws_rom_chip(linkmasta_device* linkmasta_device)
   : m_mode(READ), m_last_erased_addr(0),
-    m_linkmasta(linkmasta_device), m_chip_num(CHIP_INDEX)
+    m_linkmasta(linkmasta_device), m_chip_num(CHIP_INDEX),
+    m_slot_index(0)
 {
   // Nothing else to do
 }
@@ -311,17 +312,10 @@ bool ws_rom_chip::test_erasing()
   }
   
   // Send BLANK CHECK SETUP command sequence
-  write(ADDR_COMMAND1, 0xAA);
-  write(ADDR_COMMAND2, 0x55);
-  write(m_last_erased_addr, 0xEB);
-  write(m_last_erased_addr, 0x76);
-  write(m_last_erased_addr, 0x00);
-  write(m_last_erased_addr, 0x00);
-  write(m_last_erased_addr, 0x29);
+  unsigned char result1 = read(m_last_erased_addr);
+  unsigned char result2 = read(m_last_erased_addr);
   
-  unsigned char result = read(m_last_erased_addr);
-  
-  m_mode = (result == 0 ? ERASE : READ);
+  m_mode = (result1 != result2 ? ERASE : READ);
   
   return is_erasing();
 }
@@ -518,6 +512,45 @@ unsigned int ws_rom_chip::program_bytes(address_t address, const data_t* data, u
       controller->on_task_end(controller->is_task_cancelled() && i < num_bytes ? task_status::CANCELLED : task_status::COMPLETED, num_bytes);
     }
     return num_bytes;
+  }
+}
+
+unsigned int ws_rom_chip::selected_slot() const
+{
+  return m_slot_index;
+}
+
+bool ws_rom_chip::select_slot(unsigned int slot)
+{
+  if (is_erasing())
+  {
+    // We can only reset when we're not erasing
+    throw std::runtime_error("ERROR"); // TODO
+  }
+  
+  // Ensure chip has been reset
+  if (current_mode() != READ)
+  {
+    reset();
+  }
+  
+  if (m_linkmasta->supports_switch_slot())
+  {
+    // Use linkmasta's functionality if available
+    if (m_linkmasta->switch_slot(slot))
+    {
+      m_slot_index = slot;
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else
+  {
+    // Only linkmastas can switch slots. Simply fail if the linkmasta can't
+    return false;
   }
 }
 
