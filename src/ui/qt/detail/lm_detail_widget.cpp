@@ -31,7 +31,7 @@ LmDetailWidget::LmDetailWidget(unsigned int device_id, QWidget *parent) :
     startPolling();
   }
   
-  // Update header label with name of device
+  // Display name of device
   QString device_name = "";
   switch (linkmasta->system())
   {
@@ -56,6 +56,11 @@ LmDetailWidget::LmDetailWidget(unsigned int device_id, QWidget *parent) :
     break;
   }
   ui->deviceNameLabel->setText(device_name);
+  
+  // Display device firmware version
+  QString device_version = "v";
+  device_version += QString(linkmasta->firmware_version().c_str());
+  ui->deviceFirmwareVersionLabel->setText(device_version);
 }
 
 LmDetailWidget::~LmDetailWidget()

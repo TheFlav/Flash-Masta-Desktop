@@ -49,6 +49,21 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QLabel" name="deviceFirmwareVersionLabel">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
