@@ -30,6 +30,7 @@ public:
   int slotNumber() const;
   unsigned int slotSize() const;
   QString slotGameName() const;
+  unsigned int slotGameSize() const;
   bool gameBackupEnabled() const;
   bool gameFlashEnabled() const;
   bool gameVerifyEnabled() const;
@@ -43,6 +44,8 @@ private:
 public slots:
   void setSlotSize(unsigned int num_bytes);
   void setSlotGameName(QString name);
+  void setSlotGameSize(unsigned int num_bytes);
+  void setSlotGameSizeVisible(bool visible);
   void setGameBackupEnabled(bool enabled);
   void setGameFlashEnabled(bool enabled);
   void setGameVerifyEnabled(bool enabled);
@@ -57,6 +60,7 @@ private:
   int m_device_id;
   unsigned int m_slot_num_bytes;
   QString m_slot_game_name;
+  unsigned int m_slot_game_bytes;
   
   bool m_game_backup_enabled;
   bool m_game_flash_enabled;

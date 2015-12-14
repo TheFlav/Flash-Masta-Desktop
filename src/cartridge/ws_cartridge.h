@@ -164,7 +164,9 @@ public:
    * 
    * \see game_metadata
    */
-  const game_metadata*  get_game_metadata(int slot);
+  const game_metadata*  get_game_metadata(int slot) const;
+  
+  unsigned int          get_game_size(int slot) const;
   
 
 protected:

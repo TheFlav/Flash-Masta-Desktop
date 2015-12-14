@@ -98,6 +98,9 @@ void FmCartridgeSlotWidget::buildFromNgpCartridge(ngp_cartridge* cart, int slot)
     game_name = "Unknown";
   }
   setSlotGameName(QString(game_name.c_str()));
+  
+  // Hide game size, unimplemented/irrelevant
+  setSlotGameSizeVisible(false);
 }
 
 void FmCartridgeSlotWidget::buildFromWsCartridge(ws_cartridge* cart, int slot)
@@ -112,6 +115,10 @@ void FmCartridgeSlotWidget::buildFromWsCartridge(ws_cartridge* cart, int slot)
   {
     delete descriptor;
   }
+  
+  // Game size
+  setSlotGameSizeVisible(true);
+  setSlotGameSize(cart->slot_size(slot));
 }
 
 
@@ -131,6 +138,11 @@ unsigned int FmCartridgeSlotWidget::slotSize() const
 QString FmCartridgeSlotWidget::slotGameName() const
 {
   return m_slot_game_name;
+}
+
+unsigned int FmCartridgeSlotWidget::slotGameSize() const
+{
+  return m_slot_game_bytes;
 }
 
 bool FmCartridgeSlotWidget::gameBackupEnabled() const
@@ -207,6 +219,21 @@ void FmCartridgeSlotWidget::setSlotGameName(QString name)
   m_slot_game_name = name;
   
   ui->slotInfoGameTitleOutputLabel->setText(name);
+}
+
+void FmCartridgeSlotWidget::setSlotGameSize(unsigned int num_bytes)
+{
+  m_slot_game_bytes = num_bytes;
+  
+  QString text = stringifyBytesToBits(num_bytes);
+  
+  ui->slotInfoGameSizeOutputLabel->setText(text);
+}
+
+void FmCartridgeSlotWidget::setSlotGameSizeVisible(bool visible)
+{
+  ui->slotInfoGameSizeLabel->setVisible(visible);
+  ui->slotInfoGameSizeOutputLabel->setVisible(visible);
 }
 
 void FmCartridgeSlotWidget::setGameBackupEnabled(bool enabled)
