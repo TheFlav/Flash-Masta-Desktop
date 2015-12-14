@@ -118,7 +118,7 @@ void FmCartridgeSlotWidget::buildFromWsCartridge(ws_cartridge* cart, int slot)
   
   // Game size
   setSlotGameSizeVisible(true);
-  setSlotGameSize(cart->slot_size(slot));
+  setSlotGameSize(cart->get_game_size(slot));
 }
 
 
