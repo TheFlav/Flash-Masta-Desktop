@@ -548,9 +548,12 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task
       if (curr_offset >= slot_size)
       {
         slot_offset += slot_size;
-        curr_slot++;
-        m_rom_chip->select_slot(curr_slot);
-        curr_offset = 0;
+        curr_offset -= slot_size;
+        if (curr_slot < num_slots() - 1)
+        {
+          curr_slot++;
+          m_linkmasta->switch_slot(curr_slot);
+        }
         slot_size = this->slot_size(curr_slot);
       }
     }
@@ -807,10 +810,13 @@ bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, task
       if (curr_offset >= slot_size)
       {
         slot_offset += slot_size;
-        curr_slot++;
-        m_rom_chip->select_slot(curr_slot);
+        curr_offset -= slot_size;
+        if (curr_slot < num_slots() - 1)
+        {
+          curr_slot++;
+          m_linkmasta->switch_slot(curr_slot);
+        }
         slot_size = this->slot_size(curr_slot);
-        curr_offset = 0;
       }
     }
     
@@ -1327,11 +1333,40 @@ std::string ws_cartridge::fetch_game_name(int slot)
   return std::string(r.str());
 }
 
-const ws_cartridge::game_metadata* ws_cartridge::get_game_metadata(int slot)
+const ws_cartridge::game_metadata* ws_cartridge::get_game_metadata(int slot) const
 {
   if (slot < 0 || slot >= (int) m_metadata.size()) return nullptr;
   
   return &m_metadata[slot];
+}
+
+unsigned int ws_cartridge::get_game_size(int slot) const
+{
+  if (slot < 0 || slot >= (int) m_metadata.size()) return 0;
+  
+  switch (m_metadata[slot].rom_size)
+  {
+  case 0x02:
+    return 1 << 19;
+    
+  case 0x03:
+    return 1 << 20;
+    
+  case 0x04:
+    return 1 << 21;
+    
+  case 0x06:
+    return 1 << 22;
+    
+  case 0x08:
+    return 1 << 23;
+    
+  case 0x09:
+    return 1 << 24;
+    
+  default:
+    return 0;
+  }
 }
 
 
