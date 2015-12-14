@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="headerLayout">
+    <layout class="QHBoxLayout" name="headerLayout" stretch="1,0">
      <item>
       <widget class="QLabel" name="deviceNameLabel">
        <property name="font">
