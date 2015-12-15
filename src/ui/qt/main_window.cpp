@@ -476,6 +476,7 @@ void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
   else
   {
     FlashMastaApp::getInstance()->setSelectedDevice(-1);
+    m_prompt_no_devices->show();
   }
 }
 
