@@ -130,6 +130,7 @@ void CartridgeWidget::refreshUi()
     }
   }
   
+  if (oldIndex == -1) oldIndex = 0;
   ui->slotsComboBox->setCurrentIndex(oldIndex);
   on_slotsComboBox_currentIndexChanged(oldIndex);
 }
