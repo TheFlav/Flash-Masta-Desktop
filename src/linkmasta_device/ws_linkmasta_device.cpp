@@ -108,9 +108,13 @@ timeout_t ws_linkmasta_device::timeout() const
 
 version_t ws_linkmasta_device::firmware_version()
 {
-  if (!m_was_init || !m_is_open)
+  if (!m_was_init)
   {
-    throw std::runtime_error("ERROR");
+    throw std::runtime_error("Device not initialized");
+  }
+  if (!m_is_open)
+  {
+    throw std::runtime_error("Device not opened");
   }
   
   if (!m_firmware_version_set)
@@ -183,9 +187,13 @@ void ws_linkmasta_device::close()
 word_t ws_linkmasta_device::read_word(chip_index chip, address_t address)
 {
   // Make sure we are in a ready state
-  if (!m_was_init || !m_is_open)
+  if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Device not initialized");
+  }
+  if (!m_is_open)
+  {
+    throw std::runtime_error("Device not opened");
   }
   
   uint8_t data;
@@ -201,16 +209,20 @@ word_t ws_linkmasta_device::read_word(chip_index chip, address_t address)
   }
   else
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Error occured while attempting to read word");
   }
 }
 
 void ws_linkmasta_device::write_word(chip_index chip, address_t address, word_t data)
 {
   // Make sure we are in a ready state
-  if (!m_was_init || !m_is_open)
+  if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Device not initialized");
+  }
+  if (!m_is_open)
+  {
+    throw std::runtime_error("Device not opened");
   }
   
   uint8_t result;
@@ -221,13 +233,9 @@ void ws_linkmasta_device::write_word(chip_index chip, address_t address, word_t 
   
   m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
   get_result_reply(buffer, &result);
-  if (result == MSG_RESULT_SUCCESS)
+  if (result != MSG_RESULT_SUCCESS)
   {
-    // Yay!
-  }
-  else
-  {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Error occured while attempting to write word");
   }
 }
 
@@ -280,9 +288,13 @@ bool ws_linkmasta_device::supports_switch_slot() const
 unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes, task_controller* controller)
 {
   // Make sure we are in a ready state
-  if (!m_was_init || !m_is_open)
+  if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Device not initialized");
+  }
+  if (!m_is_open)
+  {
+    throw std::runtime_error("Device not opened");
   }
   
   // Some working variables
@@ -314,7 +326,7 @@ unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_ad
       // Get response from device and write directly to buffer
       if (m_usb_device->read(&buffer[offset], WS_LINKMASTA_USB_RXTX_SIZE) != WS_LINKMASTA_USB_RXTX_SIZE)
       {
-        throw std::runtime_error("ERROR"); // TODO
+        throw std::runtime_error("Unexpected number of bytes received");
       }
       
       // Update offset and inform controller of progress
@@ -366,9 +378,13 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
 {
   (void) bypass_mode;
   
-  if (!m_was_init || !m_is_open)
+  if (!m_was_init)
   {
-    throw std::runtime_error("ERROR");
+    throw std::runtime_error("Device not initialized");
+  }
+  if (!m_is_open)
+  {
+    throw std::runtime_error("Device not opened");
   }
   
   // Validate chip index
@@ -445,11 +461,11 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
     
     if(result != MSG_WRITE64xN_REPLY)
     {
-      throw std::runtime_error("ERROR"); // TODO
+      throw std::runtime_error("Unexpected reply from device");
     }
     if(packets_processed != num_packets)
     {
-      throw std::runtime_error("ERROR"); // TODO
+      throw std::runtime_error("Unexpected number of packets processed");
     }
   }
   
@@ -467,7 +483,7 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
     get_result_reply(_buffer, &result);
     if (result != MSG_RESULT_SUCCESS)
     {
-      throw std::runtime_error("ERROR"); // TODO
+      throw std::runtime_error("Error occured while attempting to program bytes");
     }
     
     // Update offset and inform controller of progress
@@ -504,7 +520,7 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
           {
             controller->on_task_end(task_status::ERROR, offset);
           }
-          throw std::runtime_error("ERROR"); // TODO
+          throw std::runtime_error("Error occured while attempting to program bytes");
         }
         
         // Update offset and inform controller of progress
@@ -530,7 +546,7 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
           {
             controller->on_task_end(task_status::ERROR, offset);
           }
-          throw std::runtime_error("ERROR"); // TODO
+          throw std::runtime_error("Error occured while attempting to program bytes");
         }
         
         // Update offset and inform controller of progress
@@ -555,9 +571,13 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
 unsigned int ws_linkmasta_device::read_num_slots()
 {
   // Make sure object has been initialized at least
-  if (!m_was_init || !m_is_open)
+  if (!m_was_init)
   {
-    throw std::runtime_error("ERROR");
+    throw std::runtime_error("Device not initialized");
+  }
+  if (!m_is_open)
+  {
+    throw std::runtime_error("Device not opened");
   }
   
   if (!m_slot_info_set)
@@ -571,8 +591,7 @@ unsigned int ws_linkmasta_device::read_num_slots()
   }
   else
   {
-    // TODO
-    return 1;
+    return 0; // TODO: Not implemented
   }
 }
 
@@ -581,9 +600,13 @@ unsigned int ws_linkmasta_device::read_slot_size(unsigned int slot_num)
   (void) slot_num;
   
   // Make sure object has been initialized at least
-  if (!m_was_init || !m_is_open)
+  if (!m_was_init)
   {
-    throw std::runtime_error("ERROR");
+    throw std::runtime_error("Device not initialized");
+  }
+  if (!m_is_open)
+  {
+    throw std::runtime_error("Device not opened");
   }
   
   if (!m_slot_info_set)
@@ -597,7 +620,6 @@ unsigned int ws_linkmasta_device::read_slot_size(unsigned int slot_num)
   }
   else
   {
-    // TODO
     return 0;
   }
 }
@@ -605,9 +627,13 @@ unsigned int ws_linkmasta_device::read_slot_size(unsigned int slot_num)
 bool ws_linkmasta_device::switch_slot(unsigned int slot_num)
 {
   // Make sure object has been initialized at least
-  if (!m_was_init || !m_is_open)
+  if (!m_was_init)
   {
-    throw std::runtime_error("ERROR");
+    throw std::runtime_error("Device not initialized");
+  }
+  if (!m_is_open)
+  {
+    throw std::runtime_error("Device not opened");
   }
   
   data_t buffer[WS_LINKMASTA_USB_RXTX_SIZE] = {0};
@@ -638,7 +664,7 @@ void ws_linkmasta_device::fetch_firmware_version()
   num_bytes = m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
   if (num_bytes != WS_LINKMASTA_USB_RXTX_SIZE)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Unexpected number of bytes received");
   }
   
   uint8_t majVer, minVer;
@@ -663,7 +689,7 @@ void ws_linkmasta_device::fetch_slot_info()
   num_bytes = m_usb_device->read(buffer, WS_LINKMASTA_USB_RXTX_SIZE);
   if (num_bytes != WS_LINKMASTA_USB_RXTX_SIZE)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Unexpected number of bytes received");
   }
   
   uint8_t isSlotNumFixed, isSlotSizeFixed, numSlotsPerCart, numAddrLinesPerSlot;

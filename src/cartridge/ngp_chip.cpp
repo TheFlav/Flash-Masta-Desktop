@@ -75,7 +75,7 @@ void ngp_chip::reset()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip is busy erasing");
   }
   
   if (current_mode() == BYPASS)
@@ -99,7 +99,7 @@ manufact_id_t ngp_chip::get_manufacturer_id()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip is busy erasing");
   }
   
   if (m_linkmasta->supports_read_manufacturer_id())
@@ -127,7 +127,7 @@ device_id_t ngp_chip::get_device_id()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip is busy erasing");
   }
   
   if (m_linkmasta->supports_read_device_id())
@@ -155,7 +155,7 @@ factory_prot_t ngp_chip::get_factory_prot()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip is busy erasing");
   }
   
   if (current_mode() != AUTOSELECT)
@@ -171,7 +171,7 @@ protect_t ngp_chip::get_block_protection(address_t sector_address)
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip is busy erasing");
   }
   
   if (m_linkmasta->supports_read_block_protection())
@@ -200,7 +200,7 @@ void ngp_chip::program_byte(address_t address, data_t data)
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip is busy erasing");
   }
   
   // Reset if in autoselect mode
@@ -229,7 +229,7 @@ void ngp_chip::unlock_bypass()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip is busy erasing");
   }
   
   // Ensure that we actually support bypass mode before doing anything
@@ -260,7 +260,7 @@ void ngp_chip::erase_chip()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip is busy erasing");
   }
   
   // Ensure chip has been reset
@@ -294,7 +294,7 @@ void ngp_chip::erase_block(address_t block_address)
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip is busy erasing");
   }
   
   // Ensure chip has been reset
@@ -340,7 +340,7 @@ bool ngp_chip::test_bypass_support()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip is busy erasing");
   }
   
   // Test against manufacturer id, device id, and some potentially custom data
@@ -388,7 +388,7 @@ unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int 
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip is busy erasing");
   }
   
   // Ensure we're in read mode
@@ -479,7 +479,7 @@ unsigned int ngp_chip::program_bytes(address_t address, const data_t* data, unsi
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip is busy erasing");
   }
   
   if (m_linkmasta->supports_program_bytes())

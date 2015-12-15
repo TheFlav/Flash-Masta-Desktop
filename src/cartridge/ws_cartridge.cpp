@@ -71,7 +71,7 @@ cartridge_type ws_cartridge::type() const
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   return cartridge_type::CARTRIDGE_FLASHMASTA;
@@ -115,7 +115,7 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
   // Ensure class was intiialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   m_linkmasta->open();
@@ -127,7 +127,7 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
   }
   else if (!m_rom_chip->select_slot(slot == SLOT_ALL ? 0 : (unsigned int) slot))
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Error occured while attempting to switch slot");
   }
   
   m_linkmasta->close();
@@ -379,7 +379,7 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task
   // Ensure class was intiialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   m_linkmasta->open();
@@ -402,12 +402,12 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task
   
   if (m_rom_chip->selected_slot() != curr_slot && !m_rom_chip->select_slot(curr_slot))
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Error occured while attempting to switch slot");
   }
   if ((slot == SLOT_ALL && bytes_total != descriptor()->num_bytes)
       || (slot != SLOT_ALL && bytes_total > slot_size))
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("File too large for destination");
   }
   
   m_linkmasta->close();
@@ -614,7 +614,7 @@ bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, task
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   m_linkmasta->open();
@@ -874,7 +874,7 @@ void ws_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, task
   // Ensure class was intiialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   // Determine the total number of bytes to write
@@ -993,7 +993,7 @@ void ws_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, task
   // Ensure class was intiialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   // Determine the total number of bytes to write
@@ -1113,7 +1113,7 @@ bool ws_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, task
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   // determine the total number of bytes to compare
@@ -1262,7 +1262,7 @@ unsigned int ws_cartridge::num_slots() const
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   return (unsigned int) m_slots.size();
@@ -1273,7 +1273,7 @@ unsigned int ws_cartridge::slot_size(int slot) const
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   if (slot >= 0 && slot < (int) num_slots())
@@ -1295,7 +1295,7 @@ std::string ws_cartridge::fetch_game_name(int slot)
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   static const unsigned int high_addr = 0x00FFFFFF;
@@ -1310,7 +1310,7 @@ std::string ws_cartridge::fetch_game_name(int slot)
   }
   if (!m_linkmasta->switch_slot(slot))
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Error occured while attempting to switch slot");
   }
   
   // Get developer ID

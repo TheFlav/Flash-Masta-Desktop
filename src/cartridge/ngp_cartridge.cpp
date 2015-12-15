@@ -76,10 +76,10 @@ cartridge_type ngp_cartridge::type() const
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
-  return descriptor()->type; // TODO
+  return descriptor()->type;
 }
 
 const cartridge_descriptor* ngp_cartridge::descriptor() const
@@ -109,7 +109,7 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, tas
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   unsigned int chip_lower_bound;
@@ -131,7 +131,7 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, tas
   else
   {
     // Throw error for invalid slot number
-    throw std::runtime_error("INVALID SLOT"); // TODO
+    throw std::runtime_error("INVALID SLOT");
   }
   
   // Determine the total number of bytes to write
@@ -288,7 +288,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, tas
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   unsigned int chip_lower_bound;
@@ -310,7 +310,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, tas
   else
   {
     // Throw error for invalid slot number
-    throw std::runtime_error("INVALID SLOT"); // TODO
+    throw std::runtime_error("INVALID SLOT");
   }
   
   // Determine the total number of bytes to write
@@ -328,7 +328,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, tas
   // Ensure file will fit
   if (bytes_total > bytes_chip_sum)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("File too large for cartridge");
   }
   
   // Initialize markers
@@ -487,7 +487,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, tas
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   unsigned int chip_lower_bound;
@@ -509,7 +509,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, tas
   else
   {
     // Throw error for invalid slot number
-    throw std::runtime_error("INVALID SLOT"); // TODO
+    throw std::runtime_error("INVALID SLOT");
   }
   
   // determine the total number of bytes to compare
@@ -699,7 +699,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, tas
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   unsigned int chip_lower_bound;
@@ -721,7 +721,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, tas
   else
   {
     // Throw error for invalid slot number
-    throw std::runtime_error("INVALID SLOT"); // TODO
+    throw std::runtime_error("INVALID SLOT");
   }
   
   // Determine the total number of bytes and blocks to write
@@ -913,7 +913,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   unsigned int chip_lower_bound;
@@ -935,7 +935,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
   else
   {
     // Throw error for invalid slot number
-    throw std::runtime_error("INVALID SLOT"); // TODO
+    throw std::runtime_error("INVALID SLOT");
   }
   
   // Seek to start of file
@@ -1141,7 +1141,7 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, tas
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   unsigned int chip_lower_bound;
@@ -1163,7 +1163,7 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, tas
   else
   {
     // Throw error for invalid slot number
-    throw std::runtime_error("INVALID SLOT"); // TODO
+    throw std::runtime_error("INVALID SLOT");
   }
   
   // Seek to start of file
@@ -1381,7 +1381,7 @@ unsigned int ngp_cartridge::num_slots() const
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   return descriptor()->num_chips;
@@ -1392,7 +1392,7 @@ unsigned int ngp_cartridge::slot_size(int slot) const
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   if (slot == SLOT_ALL)

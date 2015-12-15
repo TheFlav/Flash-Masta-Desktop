@@ -71,7 +71,7 @@ void ws_rom_chip::reset()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip still erasing");
   }
   
   // Send the full command
@@ -88,7 +88,7 @@ manufact_id_t ws_rom_chip::get_manufacturer_id()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip still erasing");
   }
   
   if (m_linkmasta->supports_read_manufacturer_id())
@@ -116,7 +116,7 @@ device_id_t ws_rom_chip::get_device_id()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip still erasing");
   }
   
   if (m_linkmasta->supports_read_device_id())
@@ -150,7 +150,7 @@ void ws_rom_chip::program_word(address_t address, word_t data)
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip still erasing");
   }
   
   // Reset if in autoselect mode
@@ -178,7 +178,7 @@ void ws_rom_chip::unlock_bypass()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip still erasing");
   }
   
   // Ensure that we actually support bypass mode before doing anything
@@ -209,7 +209,7 @@ void ws_rom_chip::erase_chip()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip still erasing");
   }
   
   // Ensure chip has been reset
@@ -243,7 +243,7 @@ void ws_rom_chip::erase_block(address_t block_address)
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip still erasing");
   }
   
   // Ensure chip has been reset
@@ -290,7 +290,7 @@ bool ws_rom_chip::test_bypass_support()
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip still erasing");
   }
   
   // Assume yes for this particular chip
@@ -325,7 +325,7 @@ unsigned int ws_rom_chip::read_bytes(address_t address, data_t* data, unsigned i
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip still erasing");
   }
   
   // Ensure we're in read mode
@@ -416,7 +416,7 @@ unsigned int ws_rom_chip::program_bytes(address_t address, const data_t* data, u
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip still erasing");
   }
   
   if (m_linkmasta->supports_program_bytes())
@@ -525,7 +525,7 @@ bool ws_rom_chip::select_slot(unsigned int slot)
   if (is_erasing())
   {
     // We can only reset when we're not erasing
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Chip still erasing");
   }
   
   // Ensure chip has been reset
