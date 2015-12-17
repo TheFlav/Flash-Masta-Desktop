@@ -12,7 +12,7 @@ CREATE TABLE Games (
   MinSystem INTEGER,
   License TEXT,
   CartName TEXT,
-  GameName TEXT,
+  GameName TEXT
 );
 
 CREATE INDEX Games_Hash_ind ON Games (`Hash`);
