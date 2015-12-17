@@ -27,7 +27,6 @@ using namespace std;
 #define DEFAULT_BLOCK_SIZE 0x10000
 #define NGF_HEADER_VERSION 0x0053
 
-
 struct NGFheader
 {
   uint16_t version;
@@ -87,6 +86,8 @@ const cartridge_descriptor* ngp_cartridge::descriptor() const
   return m_descriptor;
 }
 
+
+
 void ngp_cartridge::init()
 {
   if (m_was_init)
@@ -94,15 +95,15 @@ void ngp_cartridge::init()
     return;
   }
   
+  m_was_init = true;
+  
   m_linkmasta->init();
   m_linkmasta->open();
   build_cartridge_destriptor();
+  m_metadata.resize(num_slots());
+  // TODO call build_metadata();
   m_linkmasta->close();
-
-  m_was_init = true;
 }
-
-
 
 void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task_controller* controller)
 {
@@ -1450,6 +1451,29 @@ std::string ngp_cartridge::fetch_game_name(int slot)
   return s;
 }
 
+const ngp_cartridge::game_metadata* ngp_cartridge::get_game_metadata(int slot) const
+{
+  // TODO
+  (void) slot;
+  return nullptr;
+}
+
+
+
+bool ngp_cartridge::test_for_cartridge(linkmasta_device* linkmasta)
+{
+  bool exists;
+  
+  // Check the device id and manufacturer id and see if they are invalid
+  linkmasta->open();
+  ngp_chip chip(linkmasta, 0);
+  chip.reset();
+  exists = !(chip.get_device_id() == 0x90 || chip.get_manufacturer_id() == 0x90);
+  linkmasta->close();
+  
+  return exists;
+}
+
 
 
 void ngp_cartridge::build_cartridge_destriptor()
@@ -1616,17 +1640,22 @@ void ngp_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int blo
   block->is_protected = (chip->get_block_protection(block->base_address) == 0 ? false : true);
 }
 
-bool ngp_cartridge::test_for_cartridge(linkmasta_device* linkmasta)
+void ngp_cartridge::build_game_metadata(int slot)
 {
-  bool exists;
-  
-  // Check the device id and manufacturer id and see if they are invalid
-  linkmasta->open();
-  ngp_chip chip(linkmasta, 0);
-  chip.reset();
-  exists = !(chip.get_device_id() == 0x90 || chip.get_manufacturer_id() == 0x90);
-  linkmasta->close();
-  
-  return exists;
+  // TODO
+  (void) slot;
 }
 
+
+
+void ngp_cartridge::game_metadata::read_from_data_array(const unsigned char *data)
+{
+  // TODO
+  (void) data;
+}
+
+void ngp_cartridge::game_metadata::write_to_data_array(unsigned char *data)
+{
+  // TODO
+  (void) data;
+}

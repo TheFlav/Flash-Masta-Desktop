@@ -37,27 +37,30 @@ class ws_cartridge: public cartridge
 {
 public:
   /*! \brief A struct for representing and storing the metadata of a Wonderswan
-   * game.
+   *         game.
    */
   struct game_metadata
   {
+    /*! \brief Expects an array of the last 10 bytes of the game. */
     void read_from_data_array(const unsigned char* data);
+    
+    /*! \brief Expects an array of at least 10 bytes. */
     void write_to_data_array(unsigned char* data);
     
-    unsigned char developer_id;
-    unsigned char minimum_system;
-    unsigned char game_id;
-    unsigned char mapper_version;
-    unsigned char rom_size;
-    unsigned char save_size;
-    unsigned char flags;
-    unsigned char RTC_present;
+    unsigned char  developer_id;
+    unsigned char  minimum_system;
+    unsigned char  game_id;
+    unsigned char  mapper_version;
+    unsigned char  rom_size;
+    unsigned char  save_size;
+    unsigned char  flags;
+    unsigned char  RTC_present;
     unsigned short checksum;
   };
   
   
   
-  /*! \ brief Class constructor
+  /*! \brief Class constructor
    *  
    *  Main constructor for the class. Initializes members with default values
    *  and supplied parameters.
@@ -166,7 +169,20 @@ public:
    */
   const game_metadata*  get_game_metadata(int slot) const;
   
+  /*!
+   *  \brief Uses cached metadata about a game to calculate the number of bytes
+   *         the game occupies.
+   *  
+   *  Uses previously cached metadata about a game to calculate the number of bytes
+   *  the game occupies on the cartridge.
+   *  
+   *  \param [in] slot The index of the slot where the game for which to calculate
+   *         the size is located.
+   *  \return The number of bytes the game in the given slot occupies according
+   *          to the cached metadata.
+   */
   unsigned int          get_game_size(int slot) const;
+  
   
 
 protected:
@@ -273,6 +289,8 @@ protected:
    */
   void                  build_game_metadata(int slot = -1);
   
+  
+  
 private:
   
   /*! \brief Disabled copy constructor.
@@ -378,7 +396,7 @@ private:
    */
   std::vector<unsigned int> m_slots;
   
-  /*! \brief The vector used for cachingm game metadata for each slot.
+  /*! \brief The vector used for caching game metadata for each slot.
    *  
    *  The vector used for caching the game metdata for each slot on the
    *  cartridge.

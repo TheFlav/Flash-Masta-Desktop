@@ -14,6 +14,7 @@
 #define __NGP_CARTRIDGE_H__
 
 #include "cartridge.h"
+#include <vector>
 
 class linkmasta_device;
 class ngp_chip;
@@ -41,8 +42,30 @@ private:
    *  on a Neo Geo Pocket cartridge.
    */
   static const unsigned int MAX_NUM_CHIPS = 2;
+  
+  
 
 public:
+  /*! \brief A struct for representing and storing the metadata of a Neo Geo
+   *         Pocket game.
+   */
+  struct game_metadata
+  {
+    /*! \brief Expects an array of the first 48 bytes of data of game. */
+    void read_from_data_array(const unsigned char* data);
+    
+    /*! \brief Expects an array of at least 48 bytes. */
+    void write_to_data_array(unsigned char* data);
+    
+    char           license[29] = "";
+    unsigned long  startup_address;
+    unsigned short game_id;
+    unsigned char  game_version;
+    unsigned char  minimum_system;
+    char           game_name[13] = "";
+  };
+  
+  
   
   /*! \brief Class constructor.
    *  
@@ -135,6 +158,26 @@ public:
    *  \see cartridge::fetch_game_name(int slot)
    */
   std::string           fetch_game_name(int slot);
+  
+  /*!
+   * \brief Gets the parsed metadata of the game in the given slot.
+   * 
+   * Gets a pointer to a struct containing the parsed metadata for the game
+   * stored in the given slot. If something went wrong while parsing the metadata
+   * or no metadata has been cached for the given slot, then this function returns
+   * a nullptr.
+   * 
+   * This is a non-blocking function as it merely returns a cached value. This cached
+   * value is constructed when \ref init() is called on this cartridge.
+   * 
+   * \param slot The slot of the game to get the metadata for.
+   * 
+   * \return Pointer to a const \ref game_metadata struct or nullptr something
+   *         went wrong.
+   * 
+   * \see game_metadata
+   */
+  const game_metadata*  get_game_metadata(int slot) const;
   
   
   
@@ -249,6 +292,16 @@ protected:
    */
   void                  build_block_descriptor(unsigned int chip_i, unsigned int block_i);
   
+  /*! \brief Reads game metadata from the cartridge and caches it for later use.
+   * 
+   *  Reads data from the cartridge to get game metadata from all game slots on
+   *  the cartridge, caching the results to avoid future cartridge queries.
+   *  
+   *  \param [in] slot Target game slot to fetch metadata for. -1 will fetch
+   *         metadata from all available slots on the cartridge.
+   */
+  void                  build_game_metadata(int slot = -1);
+  
   
   
 private:
@@ -346,6 +399,18 @@ private:
    *  \see m_num_chips
   */
   ngp_chip*             m_chips[MAX_NUM_CHIPS];
+  
+  /*! \brief The vector used for caching game metadata for each slot.
+   *  
+   *  The vector used for caching the game metdata for each slot on the
+   *  cartridge.
+   *  
+   *  This member is initialized and filled with values when calling the
+   *  \ref build_game_metadata() function.
+   *  
+   *  \see game_metadata
+   */
+  std::vector<game_metadata> m_metadata;
 };
 
 #endif // __NGP_CARTRIDGE_H__
