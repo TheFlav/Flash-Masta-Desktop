@@ -3,7 +3,6 @@
 #include <cstring>
 #include <string>
 
-#include "cartridge/cartridge.h"
 #include "cartridge/ws_cartridge.h"
 #include "sqlite/sqlite3.h"
 
