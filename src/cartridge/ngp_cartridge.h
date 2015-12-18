@@ -55,14 +55,14 @@ public:
     void read_from_data_array(const unsigned char* data);
     
     /*! \brief Expects an array of at least 48 bytes. */
-    void write_to_data_array(unsigned char* data);
+    void write_to_data_array(unsigned char* data) const;
     
-    char           license[29] = "";
+    char           license[29];
     unsigned long  startup_address;
     unsigned short game_id;
     unsigned char  game_version;
     unsigned char  minimum_system;
-    char           game_name[13] = "";
+    char           game_name[13];
   };
   
   

@@ -101,7 +101,7 @@ void ngp_cartridge::init()
   m_linkmasta->open();
   build_cartridge_destriptor();
   m_metadata.resize(num_slots());
-  // TODO call build_metadata();
+  build_game_metadata();
   m_linkmasta->close();
 }
 
@@ -1453,9 +1453,19 @@ std::string ngp_cartridge::fetch_game_name(int slot)
 
 const ngp_cartridge::game_metadata* ngp_cartridge::get_game_metadata(int slot) const
 {
-  // TODO
-  (void) slot;
-  return nullptr;
+  // Ensure class was initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("Cartridge not initialized");
+  }
+  
+  // Validate arguments
+  if (slot < 0 || slot >= (int) m_metadata.size())
+  {
+    throw std::runtime_error("INVALID SLOT");
+  }
+  
+  return &m_metadata[slot];
 }
 
 
@@ -1642,20 +1652,96 @@ void ngp_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int blo
 
 void ngp_cartridge::build_game_metadata(int slot)
 {
-  // TODO
-  (void) slot;
+  if (m_metadata.empty()) return;
+  
+  if (slot == -1)
+  {
+    // Build metadata for each slot on cartridge
+    for (int i = 0; i < (int) m_metadata.size(); i++)
+    {
+      build_game_metadata(i);
+    }
+  }
+  else if (slot >= 0 && slot < (int) m_metadata.size())
+  {
+    // Read metadata from cartridge and build metadata from it
+    unsigned char* buffer = new unsigned char[64];
+    
+    m_chips[slot]->read_bytes(0, buffer, 64);
+    
+    m_metadata[slot].read_from_data_array(buffer);
+    delete [] buffer;
+  }
 }
 
 
 
 void ngp_cartridge::game_metadata::read_from_data_array(const unsigned char *data)
 {
-  // TODO
-  (void) data;
+  // Extract 28-byte license text, ensure string is null-terminated.
+  for (int i = 0; i < 28; i++)
+  {
+    license[i] = ((const char*) data)[0 + i];
+  }
+  license[28] = '\0';
+  
+  // Extract 4-byte starting address
+  startup_address = 0;
+  for (int i = 0; i < 4; i++)
+  {
+    startup_address |= ((unsigned long) data[28 + i]) << (8 * i);
+  }
+  
+  // Extract 2-byte game ID
+  game_id = 0;
+  for (int i = 0; i < 2; i++)
+  {
+    game_id |= ((unsigned short) data[32 + i]) << (8 * i);
+  }
+  
+  // Extract 1-byte game version
+  game_version = data[34];
+  
+  // Extract 1-byte minimum system code
+  minimum_system = data[35];
+  
+  // Extract 12-byte game name, ensure string is null-terminated
+  for (int i = 0; i < 12; i++)
+  {
+    game_name[i] = ((const char*) data)[36 + i];
+  }
+  game_name[12] = '\0';
 }
 
-void ngp_cartridge::game_metadata::write_to_data_array(unsigned char *data)
+void ngp_cartridge::game_metadata::write_to_data_array(unsigned char *data) const
 {
-  // TODO
-  (void) data;
+  // Export 28-byte license text, ignoring null terminator
+  for (int i = 0; i < 28; i++)
+  {
+    ((char*) data)[0 + i] = license[i];
+  }
+  
+  // Export 4-byte starting address
+  for (int i = 0; i < 4; i++)
+  {
+    data[28 + i] = (unsigned char) ((startup_address >> (8 * i)) & 0xFF);
+  }
+  
+  // Export 2-byte game ID
+  for (int i = 0; i < 2; i++)
+  {
+    data[32 + i] = (unsigned char) ((game_id >> (8 * i)) & 0xFF);
+  }
+  
+  // Export 1-byte game version
+  data[34] = game_version;
+  
+  // Export 1-byte minimum system code
+  data[35] = minimum_system;
+  
+  // Export 12-byte game name
+  for (int i = 0; i < 12; i++)
+  {
+    ((char*) data)[36 + i] = game_name[i];
+  }
 }
