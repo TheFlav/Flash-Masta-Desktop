@@ -36,14 +36,24 @@ const game_descriptor* ngp_game_catalog::identify_game(cartridge* cart, int slot
     return nullptr;
   }
   
-  // TODO Fetch game metadata
+  // Fetch game metadata
+  const ngp_cartridge::game_metadata* metadata = ((ngp_cartridge*) cart)->get_game_metadata(slot_num);
+  if (metadata == nullptr)
+  {
+    return nullptr;
+  }
   
-  // TODO Build hash
+  // Build hash
+  long long hash = 0;
+  hash |= ((long long) metadata->startup_address) << (4 * 8);
+  hash |= ((long long) metadata->game_id) << (2 * 8);
+  hash |= ((long long) metadata->game_version) << (1 * 8);
+  hash |= ((long long) metadata->minimum_system);
   
   // Query database for hash match in database and only get first matching result
-  string query = "SELECT GameName, CartName FROM Games WHERE Hash=:hash LIMIT 1";
+  string query = "SELECT GameName FROM Games WHERE Hash=:hash LIMIT 1";
   sqlite3_stmt* stmt = nullptr;
-  if (sqlite3_prepare(msqlite, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK)
+  if (sqlite3_prepare(m_sqlite, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK)
   {
     return nullptr;
   }
@@ -57,8 +67,8 @@ const game_descriptor* ngp_game_catalog::identify_game(cartridge* cart, int slot
   
   // Build descriptor from database result set
   string game_name = string((const char*) sqlite3_column_text(stmt, 0));
-  string cart_name = string((const char*) sqlite3_column_text(stmt, 1));
-  // TODO Build descriptor
+  game_descriptor* descriptor = new game_descriptor(game_name.c_str(), "");
+  descriptor->system = game_descriptor::game_system::NEO_GEO_POCKET;
   
   sqlite3_finalize(stmt);
   return descriptor;

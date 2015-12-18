@@ -9,7 +9,7 @@ class ngp_game_catalog : public game_catalog
 {
 public:
   ngp_game_catalog(const char* db_file_name);
-  ~ws_game_catalog();
+  ~ngp_game_catalog();
   
   const game_descriptor* identify_game(cartridge* cart, int slot_num =-1);
   
