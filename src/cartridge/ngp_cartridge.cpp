@@ -27,7 +27,6 @@ using namespace std;
 #define DEFAULT_BLOCK_SIZE 0x10000
 #define NGF_HEADER_VERSION 0x0053
 
-
 struct NGFheader
 {
   uint16_t version;
@@ -87,6 +86,8 @@ const cartridge_descriptor* ngp_cartridge::descriptor() const
   return m_descriptor;
 }
 
+
+
 void ngp_cartridge::init()
 {
   if (m_was_init)
@@ -94,15 +95,15 @@ void ngp_cartridge::init()
     return;
   }
   
+  m_was_init = true;
+  
   m_linkmasta->init();
   m_linkmasta->open();
   build_cartridge_destriptor();
+  m_metadata.resize(num_slots());
+  build_game_metadata();
   m_linkmasta->close();
-
-  m_was_init = true;
 }
-
-
 
 void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task_controller* controller)
 {
@@ -1450,6 +1451,39 @@ std::string ngp_cartridge::fetch_game_name(int slot)
   return s;
 }
 
+const ngp_cartridge::game_metadata* ngp_cartridge::get_game_metadata(int slot) const
+{
+  // Ensure class was initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("Cartridge not initialized");
+  }
+  
+  // Validate arguments
+  if (slot < 0 || slot >= (int) m_metadata.size())
+  {
+    throw std::runtime_error("INVALID SLOT");
+  }
+  
+  return &m_metadata[slot];
+}
+
+
+
+bool ngp_cartridge::test_for_cartridge(linkmasta_device* linkmasta)
+{
+  bool exists;
+  
+  // Check the device id and manufacturer id and see if they are invalid
+  linkmasta->open();
+  ngp_chip chip(linkmasta, 0);
+  chip.reset();
+  exists = !(chip.get_device_id() == 0x90 || chip.get_manufacturer_id() == 0x90);
+  linkmasta->close();
+  
+  return exists;
+}
+
 
 
 void ngp_cartridge::build_cartridge_destriptor()
@@ -1616,17 +1650,98 @@ void ngp_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int blo
   block->is_protected = (chip->get_block_protection(block->base_address) == 0 ? false : true);
 }
 
-bool ngp_cartridge::test_for_cartridge(linkmasta_device* linkmasta)
+void ngp_cartridge::build_game_metadata(int slot)
 {
-  bool exists;
+  if (m_metadata.empty()) return;
   
-  // Check the device id and manufacturer id and see if they are invalid
-  linkmasta->open();
-  ngp_chip chip(linkmasta, 0);
-  chip.reset();
-  exists = !(chip.get_device_id() == 0x90 || chip.get_manufacturer_id() == 0x90);
-  linkmasta->close();
-  
-  return exists;
+  if (slot == -1)
+  {
+    // Build metadata for each slot on cartridge
+    for (int i = 0; i < (int) m_metadata.size(); i++)
+    {
+      build_game_metadata(i);
+    }
+  }
+  else if (slot >= 0 && slot < (int) m_metadata.size())
+  {
+    // Read metadata from cartridge and build metadata from it
+    unsigned char* buffer = new unsigned char[64];
+    
+    m_chips[slot]->read_bytes(0, buffer, 64);
+    
+    m_metadata[slot].read_from_data_array(buffer);
+    delete [] buffer;
+  }
 }
 
+
+
+void ngp_cartridge::game_metadata::read_from_data_array(const unsigned char *data)
+{
+  // Extract 28-byte license text, ensure string is null-terminated.
+  for (int i = 0; i < 28; i++)
+  {
+    license[i] = ((const char*) data)[0 + i];
+  }
+  license[28] = '\0';
+  
+  // Extract 4-byte starting address
+  startup_address = 0;
+  for (int i = 0; i < 4; i++)
+  {
+    startup_address |= ((unsigned long) data[28 + i]) << (8 * i);
+  }
+  
+  // Extract 2-byte game ID
+  game_id = 0;
+  for (int i = 0; i < 2; i++)
+  {
+    game_id |= ((unsigned short) data[32 + i]) << (8 * i);
+  }
+  
+  // Extract 1-byte game version
+  game_version = data[34];
+  
+  // Extract 1-byte minimum system code
+  minimum_system = data[35];
+  
+  // Extract 12-byte game name, ensure string is null-terminated
+  for (int i = 0; i < 12; i++)
+  {
+    game_name[i] = ((const char*) data)[36 + i];
+  }
+  game_name[12] = '\0';
+}
+
+void ngp_cartridge::game_metadata::write_to_data_array(unsigned char *data) const
+{
+  // Export 28-byte license text, ignoring null terminator
+  for (int i = 0; i < 28; i++)
+  {
+    ((char*) data)[0 + i] = license[i];
+  }
+  
+  // Export 4-byte starting address
+  for (int i = 0; i < 4; i++)
+  {
+    data[28 + i] = (unsigned char) ((startup_address >> (8 * i)) & 0xFF);
+  }
+  
+  // Export 2-byte game ID
+  for (int i = 0; i < 2; i++)
+  {
+    data[32 + i] = (unsigned char) ((game_id >> (8 * i)) & 0xFF);
+  }
+  
+  // Export 1-byte game version
+  data[34] = game_version;
+  
+  // Export 1-byte minimum system code
+  data[35] = minimum_system;
+  
+  // Export 12-byte game name
+  for (int i = 0; i < 12; i++)
+  {
+    ((char*) data)[36 + i] = game_name[i];
+  }
+}
