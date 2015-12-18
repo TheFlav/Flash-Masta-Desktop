@@ -8,6 +8,9 @@
 
 #include "cartridge/cartridge.h"
 #include "linkmasta_device/linkmasta_device.h"
+#include "games/ngp_game_catalog.h"
+#include "games/ws_game_catalog.h"
+#include "games/game_descriptor.h"
 
 #include "cartridge_info_widget.h"
 #include "fm_cartridge_slot_widget.h"
@@ -22,8 +25,6 @@ CartridgeWidget::CartridgeWidget(unsigned int device_id, QWidget *parent) :
   m_slotsComboBoxHorizontalLayout(nullptr)
 {
   ui->setupUi(this);
-  setCartridgeNameVisible(false);
-  setSlotsComboBoxVisible(false);
   
   m_default_widget = ui->defaultWidget;
   m_current_widget = m_default_widget;
@@ -95,12 +96,29 @@ void CartridgeWidget::refreshUi()
       }
       break;
     case CARTRIDGE_OFFICIAL:
-      cartridgeName = "\"" + m_cartridge_game_name + "\" Official Cartridge";
+      const game_descriptor* desc = nullptr;
+      switch (m_cartridge->system())
+      {
+      default:
+      case SYSTEM_UNKNOWN:
+        cartridgeName = "Unrecognized Game";
+        break;
+      case SYSTEM_NEO_GEO_POCKET:
+        desc = FlashMastaApp::getInstance()->getNeoGeoGameCatalog()->identify_game(m_cartridge);
+        cartridgeName = (desc != nullptr ? desc->name : "Unrecognized Game");
+        break;
+      case SYSTEM_WONDERSWAN:
+        desc = FlashMastaApp::getInstance()->getWonderswanGameCatalog()->identify_game(m_cartridge);
+        cartridgeName = (desc != nullptr ? desc->name : "Unrecognized Game");
+        break;
+      }
+      if (desc != nullptr) delete desc;
       break;
     }
-    setCartridgeNameVisible(!linkmasta->is_integrated_with_cartridge());
     setCartridgeName(cartridgeName);
   }
+  setCartridgeNameVisible(!linkmasta->is_integrated_with_cartridge());
+  setCartridgeSubtitleVisible(m_cartridge->type() == CARTRIDGE_OFFICIAL);
   FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
   
   // Reset everything and erase cached data
@@ -137,13 +155,18 @@ void CartridgeWidget::refreshUi()
 
 void CartridgeWidget::setCartridgeName(std::string label)
 {
-  ui->cartridgeNameLabel->setText(label.c_str());
-  ui->cartridgeNameLabel->adjustSize();
+  ui->cartridgeTitleLabel->setText(label.c_str());
+  ui->cartridgeTitleLabel->adjustSize();
 }
 
 void CartridgeWidget::setCartridgeNameVisible(bool visible)
 {
-  ui->cartridgeNameLabel->setVisible(visible);
+  ui->cartridgeTitleLabel->setVisible(visible);
+}
+
+void CartridgeWidget::setCartridgeSubtitleVisible(bool visible)
+{
+  ui->cartridgeSubtitleLabel->setVisible(visible);
 }
 
 

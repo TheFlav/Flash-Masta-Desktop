@@ -35,6 +35,10 @@ const game_descriptor* ws_game_catalog::identify_game(cartridge* cart, int slot_
   {
     return nullptr;
   }
+  if (slot_num == -1)
+  {
+    slot_num = 0;
+  }
   
   // Fetch game metadata
   const ws_cartridge::game_metadata* metadata = ((ws_cartridge*) cart)->get_game_metadata(slot_num);

@@ -35,6 +35,10 @@ const game_descriptor* ngp_game_catalog::identify_game(cartridge* cart, int slot
   {
     return nullptr;
   }
+  if (slot_num == -1)
+  {
+    slot_num = 0;
+  }
   
   // Fetch game metadata
   const ngp_cartridge::game_metadata* metadata = ((ngp_cartridge*) cart)->get_game_metadata(slot_num);

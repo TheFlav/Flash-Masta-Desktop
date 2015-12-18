@@ -90,17 +90,28 @@ void FmCartridgeSlotWidget::buildFromCartridge(cartridge* cart, int slot)
 void FmCartridgeSlotWidget::buildFromNgpCartridge(ngp_cartridge* cart, int slot)
 {
   while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
-  std::string game_name = cart->fetch_game_name(slot);
+  const game_descriptor* descriptor = FlashMastaApp::getInstance()->getNeoGeoGameCatalog()->identify_game(cart, slot);
   FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
   
+  std::string game_name = cart->fetch_game_name(slot);
   if (game_name.empty())
   {
     game_name = "Unknown";
   }
-  setSlotGameName(QString(game_name.c_str()));
   
-  // Hide game size, unimplemented/irrelevant
+  // Set fields based on contents of descriptor
+  setSlotGameNameVisible(true);
+  setSlotGameName(QString(descriptor != nullptr ? descriptor->name : "Unknown"));
   setSlotGameSizeVisible(false);
+  setSlotDeveloperNameVisible(false);
+  setSlotCartNameVisible(true);
+  setSlotCartName(QString(game_name.c_str()));
+  
+  // Delete our dynamically allocated descriptor
+  if (descriptor != nullptr)
+  {
+    delete descriptor;
+  }
 }
 
 void FmCartridgeSlotWidget::buildFromWsCartridge(ws_cartridge* cart, int slot)
@@ -109,16 +120,20 @@ void FmCartridgeSlotWidget::buildFromWsCartridge(ws_cartridge* cart, int slot)
   const game_descriptor* descriptor = FlashMastaApp::getInstance()->getWonderswanGameCatalog()->identify_game(cart, slot);
   FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
   
+  // Set fields based on contents of descriptor
+  setSlotGameNameVisible(true);
   setSlotGameName(QString(descriptor != nullptr ? descriptor->name : "Unknown"));
+  setSlotGameSizeVisible(true);
+  setSlotGameSize(cart->get_game_size(slot));
+  setSlotDeveloperNameVisible(true);
+  setSlotDeveloperName(QString(descriptor != nullptr ? descriptor->developer_name : "Unknown"));
+  setSlotCartNameVisible(false);
   
+  // Delete our dynamically allocated descriptor
   if (descriptor != nullptr)
   {
     delete descriptor;
-  }
-  
-  // Game size
-  setSlotGameSizeVisible(true);
-  setSlotGameSize(cart->get_game_size(slot));
+  }  
 }
 
 
@@ -221,6 +236,12 @@ void FmCartridgeSlotWidget::setSlotGameName(QString name)
   ui->slotInfoGameTitleOutputLabel->setText(name);
 }
 
+void FmCartridgeSlotWidget::setSlotGameNameVisible(bool visible)
+{
+  ui->slotInfoGameTitleLabel->setVisible(visible);
+  ui->slotInfoGameTitleOutputLabel->setVisible(visible);
+}
+
 void FmCartridgeSlotWidget::setSlotGameSize(unsigned int num_bytes)
 {
   m_slot_game_bytes = num_bytes;
@@ -234,6 +255,32 @@ void FmCartridgeSlotWidget::setSlotGameSizeVisible(bool visible)
 {
   ui->slotInfoGameSizeLabel->setVisible(visible);
   ui->slotInfoGameSizeOutputLabel->setVisible(visible);
+}
+
+void FmCartridgeSlotWidget::setSlotDeveloperName(QString name)
+{
+  m_slot_developer_name = name;
+  
+  ui->slotInfoDeveloperOutputLabel->setText(m_slot_developer_name);
+}
+
+void FmCartridgeSlotWidget::setSlotDeveloperNameVisible(bool visible)
+{
+  ui->slotInfoDeveloperLabel->setVisible(visible);
+  ui->slotInfoDeveloperOutputLabel->setVisible(visible);
+}
+
+void FmCartridgeSlotWidget::setSlotCartName(QString name)
+{
+  m_slot_cart_name = name;
+  
+  ui->slotInfoCartNameOutputLabel->setText(m_slot_cart_name);
+}
+
+void FmCartridgeSlotWidget::setSlotCartNameVisible(bool visible)
+{
+  ui->slotInfoCartNameLabel->setVisible(visible);
+  ui->slotInfoCartNameOutputLabel->setVisible(visible);
 }
 
 void FmCartridgeSlotWidget::setGameBackupEnabled(bool enabled)

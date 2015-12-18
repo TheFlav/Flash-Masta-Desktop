@@ -31,6 +31,8 @@ public:
   unsigned int slotSize() const;
   QString slotGameName() const;
   unsigned int slotGameSize() const;
+  QString slotGameDeveloperName() const;
+  QString slotCartName() const;
   bool gameBackupEnabled() const;
   bool gameFlashEnabled() const;
   bool gameVerifyEnabled() const;
@@ -44,8 +46,13 @@ private:
 public slots:
   void setSlotSize(unsigned int num_bytes);
   void setSlotGameName(QString name);
+  void setSlotGameNameVisible(bool visible);
   void setSlotGameSize(unsigned int num_bytes);
   void setSlotGameSizeVisible(bool visible);
+  void setSlotDeveloperName(QString name);
+  void setSlotDeveloperNameVisible(bool visible);
+  void setSlotCartName(QString name);
+  void setSlotCartNameVisible(bool visible);
   void setGameBackupEnabled(bool enabled);
   void setGameFlashEnabled(bool enabled);
   void setGameVerifyEnabled(bool enabled);
@@ -61,6 +68,8 @@ private:
   unsigned int m_slot_num_bytes;
   QString m_slot_game_name;
   unsigned int m_slot_game_bytes;
+  QString m_slot_developer_name;
+  QString m_slot_cart_name;
   
   bool m_game_backup_enabled;
   bool m_game_flash_enabled;

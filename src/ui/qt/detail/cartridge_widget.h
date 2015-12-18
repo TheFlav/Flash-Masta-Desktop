@@ -28,6 +28,7 @@ public:
   void refreshUi();
   void setCartridgeName(std::string label);
   void setCartridgeNameVisible(bool visible);
+  void setCartridgeSubtitleVisible(bool visible);
   
 private:
   void setSlotsComboBoxVisible(bool visible);

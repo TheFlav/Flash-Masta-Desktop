@@ -130,9 +130,9 @@ HEADERS  +=\
 FORMS    +=\
     src/ui/qt/main_window.ui \
     src/ui/qt/detail/fm_cartridge_slot_widget.ui \
-    src/ui/qt/detail/cartridge_widget.ui \
     src/ui/qt/detail/lm_detail_widget.ui \
-    src/ui/qt/detail/cartridge_info_widget.ui
+    src/ui/qt/detail/cartridge_info_widget.ui \
+    src/ui/qt/detail/cartridge_widget.ui
 
 DISTFILES += \
     README.md
