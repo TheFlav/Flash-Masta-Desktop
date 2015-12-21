@@ -2,6 +2,7 @@
 
 #include "libusb_device_manager.h"
 #include "games/ws_game_catalog.h"
+#include "games/ngp_game_catalog.h"
 #include "main_window.h"
 
 FlashMastaApp* FlashMastaApp::instance = nullptr;
@@ -11,11 +12,11 @@ const int FlashMastaApp::NO_SLOT = -1;
 FlashMastaApp::FlashMastaApp(int argc, char **argv, int flags)
   : QApplication(argc, argv, flags),
     m_main_window(nullptr), m_device_manager(nullptr),
-    m_ws_game_catalog(nullptr), m_game_backup_enabled(false),
-    m_game_flash_enabled(false), m_game_verify_enabled(false),
-    m_save_backup_enabled(false), m_save_restore_enabled(false),
-    m_save_verify_enabled(false), m_selected_device(NO_DEVICE),
-    m_selected_slot(NO_SLOT)
+    m_ws_game_catalog(nullptr), m_ngp_game_catalog(nullptr),
+    m_game_backup_enabled(false), m_game_flash_enabled(false),
+    m_game_verify_enabled(false), m_save_backup_enabled(false),
+    m_save_restore_enabled(false), m_save_verify_enabled(false),
+    m_selected_device(NO_DEVICE), m_selected_slot(NO_SLOT)
 {
   if (FlashMastaApp::instance == nullptr)
   {
@@ -24,6 +25,7 @@ FlashMastaApp::FlashMastaApp(int argc, char **argv, int flags)
   
   m_device_manager = new LibusbDeviceManager();
   m_ws_game_catalog = new ws_game_catalog("wsgames.db");
+  m_ngp_game_catalog = new ngp_game_catalog("ngpgames.db");
   m_main_window = new MainWindow();
   
   qRegisterMetaType<std::string>("std::string");
@@ -36,6 +38,7 @@ FlashMastaApp::~FlashMastaApp()
 {
   delete m_device_manager;
   delete m_ws_game_catalog;
+  delete m_ngp_game_catalog;
 }
 
 DeviceManager* FlashMastaApp::getDeviceManager() const
@@ -51,6 +54,11 @@ MainWindow* FlashMastaApp::getMainWindow() const
 game_catalog* FlashMastaApp::getWonderswanGameCatalog() const
 {
   return m_ws_game_catalog;
+}
+
+game_catalog* FlashMastaApp::getNeoGeoGameCatalog() const
+{
+  return m_ngp_game_catalog;
 }
 
 int FlashMastaApp::getSelectedDevice() const

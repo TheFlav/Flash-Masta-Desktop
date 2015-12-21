@@ -66,7 +66,8 @@ SOURCES +=\
     src/ui/qt/detail/cartridge_info_widget.cpp \
     src/games/game_descriptor.cpp \
     src/sqlite/sqlite3.c \
-    src/games/ws_game_catalog.cpp
+    src/games/ws_game_catalog.cpp \
+    src/games/ngp_game_catalog.cpp
 
 HEADERS  +=\
     src/cartridge/cartridge.h \
@@ -123,14 +124,15 @@ HEADERS  +=\
     src/games/game_descriptor.h \
     src/sqlite/sqlite3.h \
     src/sqlite/sqlite3ext.h \
-    src/games/ws_game_catalog.h
+    src/games/ws_game_catalog.h \
+    src/games/ngp_game_catalog.h
 
 FORMS    +=\
     src/ui/qt/main_window.ui \
     src/ui/qt/detail/fm_cartridge_slot_widget.ui \
-    src/ui/qt/detail/cartridge_widget.ui \
     src/ui/qt/detail/lm_detail_widget.ui \
-    src/ui/qt/detail/cartridge_info_widget.ui
+    src/ui/qt/detail/cartridge_info_widget.ui \
+    src/ui/qt/detail/cartridge_widget.ui
 
 DISTFILES += \
     README.md

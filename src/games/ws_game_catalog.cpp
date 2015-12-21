@@ -3,7 +3,6 @@
 #include <cstring>
 #include <string>
 
-#include "cartridge/cartridge.h"
 #include "cartridge/ws_cartridge.h"
 #include "sqlite/sqlite3.h"
 
@@ -35,6 +34,10 @@ const game_descriptor* ws_game_catalog::identify_game(cartridge* cart, int slot_
   if (cart->system() != system_type::SYSTEM_WONDERSWAN)
   {
     return nullptr;
+  }
+  if (slot_num == -1)
+  {
+    slot_num = 0;
   }
   
   // Fetch game metadata

@@ -2855,7 +2855,7 @@
   </ROMINFO>
   
   <ROMINFO>
-    <NAME>Gomoku Narabe &amp; Reversi Touryuumon</NAME>
+    <NAME><![CDATA[Gomoku Narabe & Reversi Touryuumon]]></NAME>
     <REGION>Japan</REGION>
     <DUMP>
       <VERIFIED>NO</VERIFIED>
@@ -5661,7 +5661,7 @@
   </ROMINFO>
   
   <ROMINFO>
-    <NAME>Rockman &amp; Forte - Mirai Kara no Chousen Sha</NAME>
+    <NAME><![CDATA[Rockman & Forte - Mirai Kara no Chousen Sha]]></NAME>
     <REGION>Japan</REGION>
     <DUMP>
       <VERIFIED>YES</VERIFIED>
@@ -5707,7 +5707,7 @@
   </ROMINFO>
   
   <ROMINFO>
-    <NAME>Rockman &amp; Forte - Mirai Kara no Chousen Sha</NAME>
+    <NAME><![CDATA[Rockman & Forte - Mirai Kara no Chousen Sha]]></NAME>
     <REGION>Japan</REGION>
     <DUMP>
       <VERIFIED>NO</VERIFIED>
@@ -8283,7 +8283,7 @@
   </ROMINFO>
   
   <ROMINFO>
-    <NAME>Wondersnake Final Sep 11 2001 by Dox &amp; Kojote</NAME>
+    <NAME><![CDATA[Wondersnake Final Sep 11 2001 by Dox & Kojote]]></NAME>
     <REGION>Public Domain</REGION>
     <DUMP>
       <VERIFIED>NO</VERIFIED>
@@ -8329,7 +8329,7 @@
   </ROMINFO>
   
   <ROMINFO>
-    <NAME>Alchemist Marie &amp; Elie - Futari no Atelier</NAME>
+    <NAME><![CDATA[Alchemist Marie & Elie - Futari no Atelier]]></NAME>
     <REGION>Japan</REGION>
     <DUMP>
       <VERIFIED>YES</VERIFIED>
@@ -9022,7 +9022,7 @@
   </ROMINFO>
   
   <ROMINFO>
-    <NAME>Digimon Digital Monsters - Anode &amp; Cathode Tamer - Veedramon Version</NAME>
+    <NAME><![CDATA[Digimon Digital Monsters - Anode & Cathode Tamer - Veedramon Version]]></NAME>
     <REGION>Asia</REGION>
     <DUMP>
       <VERIFIED>YES</VERIFIED>
@@ -14370,7 +14370,7 @@
   </ROMINFO>
   
   <ROMINFO>
-    <NAME>WWWLib - BG1 &amp; BG2 &amp; Sprite Test by Orion_</NAME>
+    <NAME><![CDATA[WWWLib - BG1 & BG2 & Sprite Test by Orion_]]></NAME>
     <REGION>Public Domain</REGION>
     <DUMP>
       <VERIFIED>NO</VERIFIED>
