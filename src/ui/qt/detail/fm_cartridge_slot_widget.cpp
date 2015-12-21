@@ -229,6 +229,28 @@ void FmCartridgeSlotWidget::setSlotSize(unsigned int num_bytes)
   ui->slotInfoCapacityOutputLabel->setText(text);
 }
 
+void FmCartridgeSlotWidget::setSlotSizeVisible(bool visible)
+{
+  if (slotSizeVisible() && visible == false)
+  {
+    ui->slotInfoFormLayout->removeWidget(ui->slotInfoCapacityLabel);
+    ui->slotInfoFormLayout->removeWidget(ui->slotInfoCapacityOutputLabel);
+  }
+  else if (!slotSizeVisible() && visible == true)
+  {
+    int row = 0;
+    ui->slotInfoFormLayout->insertRow(row, ui->slotInfoCapacityLabel, ui->slotInfoCapacityOutputLabel);
+  }
+  
+  ui->slotInfoCapacityLabel->setVisible(visible);
+  ui->slotInfoCapacityOutputLabel->setVisible(visible);
+}
+
+bool FmCartridgeSlotWidget::slotSizeVisible() const
+{
+  return !!ui->slotInfoCapacityLabel->isHidden();
+}
+
 void FmCartridgeSlotWidget::setSlotGameName(QString name)
 {
   m_slot_game_name = name;
@@ -238,8 +260,88 @@ void FmCartridgeSlotWidget::setSlotGameName(QString name)
 
 void FmCartridgeSlotWidget::setSlotGameNameVisible(bool visible)
 {
+  if (slotGameNameVisible() && visible == false)
+  {
+    ui->slotInfoFormLayout->removeWidget(ui->slotInfoGameTitleLabel);
+    ui->slotInfoFormLayout->removeWidget(ui->slotInfoGameTitleOutputLabel);
+  }
+  else if (!slotGameNameVisible() && visible == true)
+  {
+    int row = 0;
+    if (slotSizeVisible()) row++;
+    ui->slotInfoFormLayout->insertRow(row, ui->slotInfoGameTitleLabel, ui->slotInfoGameTitleOutputLabel);
+  }
+  
   ui->slotInfoGameTitleLabel->setVisible(visible);
   ui->slotInfoGameTitleOutputLabel->setVisible(visible);
+}
+
+bool FmCartridgeSlotWidget::slotGameNameVisible() const
+{
+  return !ui->slotInfoGameTitleLabel->isHidden();
+}
+
+void FmCartridgeSlotWidget::setSlotCartName(QString name)
+{
+  m_slot_cart_name = name;
+  
+  ui->slotInfoCartNameOutputLabel->setText(m_slot_cart_name);
+}
+
+void FmCartridgeSlotWidget::setSlotCartNameVisible(bool visible)
+{
+  if (slotCartNameVisible() && visible == false)
+  {
+    ui->slotInfoFormLayout->removeWidget(ui->slotInfoCartNameLabel);
+    ui->slotInfoFormLayout->removeWidget(ui->slotInfoCartNameOutputLabel);
+  }
+  else if (!slotCartNameVisible() && visible == true)
+  {
+    int row = 0;
+    if (slotSizeVisible()) row++;
+    if (slotGameNameVisible()) row++;
+    ui->slotInfoFormLayout->insertRow(row, ui->slotInfoCartNameLabel, ui->slotInfoCartNameOutputLabel);
+  }
+  
+  ui->slotInfoCartNameLabel->setVisible(visible);
+  ui->slotInfoCartNameOutputLabel->setVisible(visible);
+}
+
+bool FmCartridgeSlotWidget::slotCartNameVisible() const
+{
+  return !ui->slotInfoCartNameLabel->isHidden();
+}
+
+void FmCartridgeSlotWidget::setSlotDeveloperName(QString name)
+{
+  m_slot_developer_name = name;
+  
+  ui->slotInfoDeveloperOutputLabel->setText(m_slot_developer_name);
+}
+
+void FmCartridgeSlotWidget::setSlotDeveloperNameVisible(bool visible)
+{
+  if (slotDeveloperNameVisible() && visible == false)
+  {
+    ui->slotInfoFormLayout->removeWidget(ui->slotInfoDeveloperLabel);
+    ui->slotInfoFormLayout->removeWidget(ui->slotInfoDeveloperOutputLabel);
+  }
+  else if (!slotDeveloperNameVisible() && visible == true)
+  {
+    int row = 0;
+    if (slotSizeVisible()) row++;
+    if (slotGameNameVisible()) row++;
+    if (slotCartNameVisible()) row++;
+    ui->slotInfoFormLayout->insertRow(row, ui->slotInfoDeveloperLabel, ui->slotInfoDeveloperOutputLabel);
+  }
+  
+  ui->slotInfoDeveloperLabel->setVisible(visible);
+  ui->slotInfoDeveloperOutputLabel->setVisible(visible);
+}
+
+bool FmCartridgeSlotWidget::slotDeveloperNameVisible() const
+{
+  return !ui->slotInfoDeveloperLabel->isHidden();
 }
 
 void FmCartridgeSlotWidget::setSlotGameSize(unsigned int num_bytes)
@@ -253,34 +355,28 @@ void FmCartridgeSlotWidget::setSlotGameSize(unsigned int num_bytes)
 
 void FmCartridgeSlotWidget::setSlotGameSizeVisible(bool visible)
 {
+  if (slotGameSizeVisible() && visible == false)
+  {
+    ui->slotInfoFormLayout->removeWidget(ui->slotInfoGameSizeLabel);
+    ui->slotInfoFormLayout->removeWidget(ui->slotInfoGameSizeOutputLabel);
+  }
+  else if (!slotGameSizeVisible() && visible == true)
+  {
+    int row = 0;
+    if (slotSizeVisible()) row++;
+    if (slotGameNameVisible()) row++;
+    if (slotCartNameVisible()) row++;
+    if (slotDeveloperNameVisible()) row++;
+    ui->slotInfoFormLayout->insertRow(row, ui->slotInfoGameSizeLabel, ui->slotInfoGameSizeOutputLabel);
+  }
+  
   ui->slotInfoGameSizeLabel->setVisible(visible);
   ui->slotInfoGameSizeOutputLabel->setVisible(visible);
 }
 
-void FmCartridgeSlotWidget::setSlotDeveloperName(QString name)
+bool FmCartridgeSlotWidget::slotGameSizeVisible() const
 {
-  m_slot_developer_name = name;
-  
-  ui->slotInfoDeveloperOutputLabel->setText(m_slot_developer_name);
-}
-
-void FmCartridgeSlotWidget::setSlotDeveloperNameVisible(bool visible)
-{
-  ui->slotInfoDeveloperLabel->setVisible(visible);
-  ui->slotInfoDeveloperOutputLabel->setVisible(visible);
-}
-
-void FmCartridgeSlotWidget::setSlotCartName(QString name)
-{
-  m_slot_cart_name = name;
-  
-  ui->slotInfoCartNameOutputLabel->setText(m_slot_cart_name);
-}
-
-void FmCartridgeSlotWidget::setSlotCartNameVisible(bool visible)
-{
-  ui->slotInfoCartNameLabel->setVisible(visible);
-  ui->slotInfoCartNameOutputLabel->setVisible(visible);
+  return !ui->slotInfoGameSizeLabel->isHidden();
 }
 
 void FmCartridgeSlotWidget::setGameBackupEnabled(bool enabled)

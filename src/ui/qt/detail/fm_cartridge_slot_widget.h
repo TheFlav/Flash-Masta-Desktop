@@ -45,14 +45,20 @@ private:
   
 public slots:
   void setSlotSize(unsigned int num_bytes);
+  void setSlotSizeVisible(bool visible);
+  bool slotSizeVisible() const;
   void setSlotGameName(QString name);
   void setSlotGameNameVisible(bool visible);
-  void setSlotGameSize(unsigned int num_bytes);
-  void setSlotGameSizeVisible(bool visible);
-  void setSlotDeveloperName(QString name);
-  void setSlotDeveloperNameVisible(bool visible);
+  bool slotGameNameVisible() const;
   void setSlotCartName(QString name);
   void setSlotCartNameVisible(bool visible);
+  bool slotCartNameVisible() const;
+  void setSlotDeveloperName(QString name);
+  void setSlotDeveloperNameVisible(bool visible);
+  bool slotDeveloperNameVisible() const;
+  void setSlotGameSize(unsigned int num_bytes);
+  void setSlotGameSizeVisible(bool visible);
+  bool slotGameSizeVisible() const;
   void setGameBackupEnabled(bool enabled);
   void setGameFlashEnabled(bool enabled);
   void setGameVerifyEnabled(bool enabled);
