@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS Games_Name_ind;
-DROP TABLE IF EXISTS Games_Meta_ind;
+DROP INDEX IF EXISTS Games_Name_ind;
+DROP INDEX IF EXISTS Games_Meta_ind;
 DROP INDEX IF EXISTS Games_Hash_ind;
 DROP TABLE IF EXISTS Games;
 
@@ -12,7 +12,9 @@ CREATE TABLE Games (
   MinSystem INTEGER,
   License TEXT,
   CartName TEXT,
-  GameName TEXT
+  GameName TEXT,
+  CartChips INTEGER DEFAULT NULL,
+  CartSize INTEGER DEFAULT NULL
 );
 
 CREATE INDEX Games_Hash_ind ON Games (`Hash`);
