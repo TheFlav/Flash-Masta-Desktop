@@ -28,10 +28,12 @@ public:
   void refreshUi();
   void setCartridgeName(std::string label);
   void setCartridgeNameVisible(bool visible);
+  bool cartridgeNameVisible() const;
+  void setCartridgeSubtitle(std::string subtitle);
   void setCartridgeSubtitleVisible(bool visible);
-  
-private:
+  bool cartridgeSubtitleVisible() const;
   void setSlotsComboBoxVisible(bool visible);
+  bool slotsComboBoxVisible() const;
   
 public slots:
   void cartridgeLoaded(cartridge* cartridge, std::string cartridge_game_name);

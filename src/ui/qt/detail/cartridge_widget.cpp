@@ -161,32 +161,71 @@ void CartridgeWidget::setCartridgeName(std::string label)
 
 void CartridgeWidget::setCartridgeNameVisible(bool visible)
 {
+  if (cartridgeNameVisible() && visible == false)
+  {
+    ui->verticalLayout->removeWidget(ui->cartridgeTitleLabel);
+  }
+  else if (!cartridgeNameVisible() && visible == true)
+  {
+    int row = 0;
+    ui->verticalLayout->insertWidget(row, ui->cartridgeTitleLabel);
+  }
+  
   ui->cartridgeTitleLabel->setVisible(visible);
+}
+
+bool CartridgeWidget::cartridgeNameVisible() const
+{
+  return !ui->cartridgeTitleLabel->isHidden();
+}
+
+void CartridgeWidget::setCartridgeSubtitle(std::string subtitle)
+{
+  ui->cartridgeSubtitleLabel->setText(QString(subtitle.c_str()));
+  ui->cartridgeSubtitleLabel->adjustSize();
 }
 
 void CartridgeWidget::setCartridgeSubtitleVisible(bool visible)
 {
+  if (cartridgeSubtitleVisible() && visible == false)
+  {
+    ui->verticalLayout->removeWidget(ui->cartridgeSubtitleLabel);
+  }
+  else if (!cartridgeSubtitleVisible() && visible == true)
+  {
+    int row = 0;
+    if (cartridgeNameVisible()) row++;
+    ui->verticalLayout->insertWidget(row, ui->cartridgeSubtitleLabel);
+  }
+  
   ui->cartridgeSubtitleLabel->setVisible(visible);
 }
 
-
-
-// private:
+bool CartridgeWidget::cartridgeSubtitleVisible() const
+{
+  return !ui->cartridgeSubtitleLabel->isHidden();
+}
 
 void CartridgeWidget::setSlotsComboBoxVisible(bool visible)
 {
+  if (slotsComboBoxVisible() && visible == false)
+  {
+    ui->verticalLayout->removeItem(ui->slotsComboBoxHorizontalLayout);
+  }
+  else if (!slotsComboBoxVisible() && visible == true)
+  {
+    int row = 0;
+    if (cartridgeNameVisible()) row++;
+    if (cartridgeSubtitleVisible()) row++;
+    ui->verticalLayout->insertItem(row, ui->slotsComboBoxHorizontalLayout);
+  }
+  
   ui->slotsComboBox->setVisible(visible);
-  if (visible)
-  {
-    if (m_slotsComboBoxHorizontalLayout == nullptr) return; // already visible
-    ui->verticalLayout->insertItem(0, m_slotsComboBoxHorizontalLayout);
-    m_slotsComboBoxHorizontalLayout = nullptr;
-  }
-  else
-  {
-    if (m_slotsComboBoxHorizontalLayout != nullptr) return; // already invisible
-    m_slotsComboBoxHorizontalLayout = ui->verticalLayout->takeAt(0);
-  }
+}
+
+bool CartridgeWidget::slotsComboBoxVisible() const
+{
+  return !ui->slotsComboBox->isHidden();
 }
 
 
