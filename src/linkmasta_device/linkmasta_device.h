@@ -328,7 +328,7 @@ public:
    *  are likely to throw an exception.
    *  
    *  \return true if this implementation supports calls to \ref read_bytes(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes, task_controller* controller = nullptr),
-   *          false if not.
+   *          false if not. Unless overridden, this function returns false.
    *  
    *  \see read_bytes(chip_index chip, address_t start_address, data_t* buffer, unsigned int num_bytes, task_controller* controller = nullptr)
    */
@@ -343,7 +343,7 @@ public:
    *  are likely to throw an exception.
    *  
    *  \return true if this implementation supports calls to \ref program_bytes(chip_index chip, address_t start_address, const data_t* buffer, unsigned int num_bytes, bool bypass_mode, task_controller* controller = nullptr),
-   *          false if not.
+   *          false if not. Unless overridden, this function returns false.
    */
   virtual bool             supports_program_bytes() const;
   
@@ -356,7 +356,7 @@ public:
    *  are likely to throw an exception.
    *  
    *  \return true if this implementation supports calls to \ref erase_chip(chip_index chip),
-   *          false if not.
+   *          false if not. Unless overridden, this function returns false.
    */
   virtual bool             supports_erase_chip() const;
   
@@ -369,7 +369,7 @@ public:
    *  are likely to throw an exception.
    *  
    *  \return true if this implementation supports calls to \ref erase_chip_block(chip_index chip, address_t block_address),
-   *          false if not.
+   *          false if not. Unless overridden, this function returns false.
    */
   virtual bool             supports_erase_chip_block() const;
   
@@ -382,7 +382,7 @@ public:
    *  are likely to throw an exception.
    *  
    *  \return true if this implementation supports calls to \ref read_manufacturer_id(chip_index chip),
-   *          false if not.
+   *          false if not. Unless overridden, this function returns false.
    */
   virtual bool             supports_read_manufacturer_id() const;
   
@@ -395,7 +395,7 @@ public:
    *  are likely to throw an exception.
    *  
    *  \return true if this implementation supports calls to \ref read_device_id(chip_index chip),
-   *          false if not.
+   *          false if not. Unless overridden, this function returns false.
    */
   virtual bool             supports_read_device_id() const;
   
@@ -408,7 +408,7 @@ public:
    *  are likely to throw an exception.
    *  
    *  \return true if this implementation supports calls to \ref read_block_protection(chip_index chip, address_t block_address),
-   *          false if not.
+   *          false if not. Unless overridden, this function returns false.
    */
   virtual bool             supports_read_block_protection() const;
   
@@ -421,7 +421,7 @@ public:
    *  are likely to throw an exception.
    *  
    *  \return true if this implementation supports calls to \ref read_num_slots(),
-   *          false if not.
+   *          false if not. Unless overridden, this function returns false.
    */
   virtual bool             supports_read_num_slots() const;
   
@@ -434,7 +434,7 @@ public:
    *  are likely to throw an exception.
    *  
    *  \return true if this implementation supports calls to \ref read_slot_size(unsigned int slot_num),
-   *          false if not.
+   *          false if not. Unless overridden, this function returns false.
    */
   virtual bool             supports_read_slot_size() const;
   
@@ -447,7 +447,7 @@ public:
    *  are likely to throw an exception.
    *  
    *  \return true if this implementation supports calls to \ref switch_slot(unsigned int slot_num),
-   *          false if not.
+   *          false if not. Unless overridden, this function returns false.
    */
   virtual bool             supports_switch_slot() const;
   
