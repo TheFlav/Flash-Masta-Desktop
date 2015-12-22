@@ -32,8 +32,10 @@ string ws_games_row::insert_query() const
     ")");
 }
 
-bool ws_games_row::parse_xml(const node_t* node)
+bool ws_games_row::parse_xml(const node_t* node, sqlite3* db)
 {
+  (void) db;
+  
   bool success = true;
   node_t* n;
   
@@ -230,140 +232,149 @@ bool ws_games_row::parse_xml(const node_t* node)
   return success;
 }
 
-bool ws_games_row::bind_to_stmt(sqlite3_stmt* stmt)
+bool ws_games_row::bind_to_stmt(sqlite3_stmt* stmt, int query)
 {
   int ind;
   
-  ind = sqlite3_bind_parameter_index(stmt, ":hash");
-  if (ind == 0)
+  switch (query)
   {
-    cerr << "Unable to find index of parameter 'hash'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int64(stmt, ind, Hash) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'hash'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":gameid");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'gameid'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int(stmt, ind, GameID) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'gameid'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":gamename");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'gamename'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_text(stmt, ind, GameName.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'gamename'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":developer");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'developer'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_text(stmt, ind, Developer.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'developer'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":romsize");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'romsize'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int(stmt, ind, RomSize) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'romsize'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":savesize");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'savesize'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int(stmt, ind, SaveSize) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'savesize'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":minsystem");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'minsystem'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int(stmt, ind, MinSystem) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'minsystem'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":mapperversion");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'mapperversion'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int(stmt, ind, MapperVersion) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'mapperversion'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":rtc");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'rtc'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int(stmt, ind, RTC) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'rtc'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":checksum");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'checksum'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int(stmt, ind, Checksum) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'checksum'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":flags");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'flags'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int(stmt, ind, Flags) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'flags'" << endl;
-    return false;
+  case 0:
+    ind = sqlite3_bind_parameter_index(stmt, ":hash");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'hash'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int64(stmt, ind, Hash) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'hash'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":gameid");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'gameid'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int(stmt, ind, GameID) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'gameid'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":gamename");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'gamename'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_text(stmt, ind, GameName.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'gamename'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":developer");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'developer'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_text(stmt, ind, Developer.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'developer'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":romsize");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'romsize'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int(stmt, ind, RomSize) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'romsize'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":savesize");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'savesize'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int(stmt, ind, SaveSize) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'savesize'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":minsystem");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'minsystem'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int(stmt, ind, MinSystem) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'minsystem'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":mapperversion");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'mapperversion'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int(stmt, ind, MapperVersion) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'mapperversion'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":rtc");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'rtc'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int(stmt, ind, RTC) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'rtc'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":checksum");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'checksum'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int(stmt, ind, Checksum) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'checksum'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":flags");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'flags'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int(stmt, ind, Flags) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'flags'" << endl;
+      return false;
+    }
+    break;
+    
+  default:
+    // do nothing
+    break;
   }
   
   return true;

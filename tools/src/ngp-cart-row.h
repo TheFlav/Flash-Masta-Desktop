@@ -20,8 +20,8 @@ class ngp_cart_row : public games_row
 public:
               ~ngp_cart_row() {};
   std::string insert_query() const;
-  bool        parse_xml(const node_t* node);
-  bool        bind_to_stmt(sqlite3_stmt* stmt);
+  bool        parse_xml(const node_t* node, sqlite3* db);
+  bool        bind_to_stmt(sqlite3_stmt* stmt, int query);
   
   struct SaveBlock {
     int  BlockNumber;

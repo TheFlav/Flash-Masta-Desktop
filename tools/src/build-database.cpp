@@ -1,6 +1,7 @@
 #include "build-database.h"
 #include "ws-games-row.h"
 #include "ngp-games-row.h"
+#include "ngp-cart-row.h"
 
 int main(const int argc, const char** const argv)
 {
@@ -12,30 +13,34 @@ int main(const int argc, const char** const argv)
   /////////////////////////////////////
   
   // Number of databases to operate on
-  const int num_databases = 2;
+  const int num_databases = 3;
   
   // SQLite database file
   const string db_file_name[] = {
     ws::db_file_name,
-    ngp::db_file_name
+    ngp::db_file_name,
+    ngpcart::db_file_name
   };
   
   // SQLite table creation query file
   const string schema_file_name[] = {
     ws::schema_file_name,
-    ngp::schema_file_name
+    ngp::schema_file_name,
+    ngpcart::schema_file_name
   };
   
   // Data XML files
   const string data_file_name[] = {
     ws::data_file_name,
-    ngp::data_file_name
+    ngp::data_file_name,
+    ngpcart::data_file_name
   };
   
   // Table row objects
   games_row* const data_row[] = {
     new ws::ws_games_row,
-    new ngp::ngp_games_row
+    new ngp::ngp_games_row,
+    new ngpcart::ngp_cart_row
   };
   
   // Build each database using parameters above
@@ -143,58 +148,69 @@ bool add_games_to_db(sqlite3* db, const doc_t* games_xml, games_row* row)
 {
   bool success = true;
   
-  // Construct statement that uses bound parameters
-  string query = row->insert_query();
-  sqlite3_stmt* stmt;
-  sqlite3_prepare(db, query.c_str(), -1, &stmt, nullptr);
-  
-  // Check for statement errors
-  int errcode = sqlite3_errcode(db);
-  if (errcode != SQLITE_OK && errcode != SQLITE_ROW && errcode != SQLITE_DONE)
-  {
-    cerr << sqlite3_errcode(db) << ": " << sqlite3_errmsg(db) << endl;
-    success = false;
-  }
-  
   // Parse each ROMINFO node and add to table
   node_t* rominfo_node = games_xml->first_node()->first_node();
   while (success && rominfo_node != nullptr)
   {
     // Create struct from xml data
-    if (!row->parse_xml(rominfo_node))
+    if (!row->parse_xml(rominfo_node, db))
     {
       cerr << "An error occured while parsing XML" << endl;
-      success = false;
+      rominfo_node = rominfo_node->next_sibling();
+      continue;
     }
     
-    // Reset statement status so we can rebind parameters
-    if (success) sqlite3_reset(stmt);
+    // Get query string
+    string query;
+    if (success) query = row->insert_query();
     
-    // Bind parameters to statement
-    if (success) if (!row->bind_to_stmt(stmt))
+    // Execute all statements in query string
+    const char* c = &(query.c_str()[0]);
+    for (int q = 0;
+         success && c != &(query.c_str()[query.size()]);
+         q++)
     {
-      cerr << sqlite3_errcode(db) << ": " << sqlite3_errmsg(db) << endl;
-      cerr << "An error occured while binding parameters to statement" << endl;
-      success = false;
-    }
-    
-    // Insert into database
-    if (success) sqlite3_step(stmt);
-    
-    // Check for query errors
-    int errcode = sqlite3_errcode(db);
-    if (success) if (errcode != SQLITE_OK && errcode != SQLITE_ROW && errcode != SQLITE_DONE)
-    {
-      cerr << sqlite3_errcode(db) << ": " << sqlite3_errmsg(db) << endl;
-      success = false;
+      // Construct statement that uses bound parameters
+      sqlite3_stmt* stmt = nullptr;
+      if (success)
+      {
+        sqlite3_prepare_v2(db, c, -1, &stmt, &c);
+
+        // Check for statement errors
+        int errcode = sqlite3_errcode(db);
+        if (errcode != SQLITE_OK && errcode != SQLITE_ROW && errcode != SQLITE_DONE)
+        {
+          cerr << sqlite3_errcode(db) << ": " << sqlite3_errmsg(db) << endl;
+          success = false;
+        }
+      }
+
+      // Bind parameters to statement
+      if (success) if (!row->bind_to_stmt(stmt, q))
+      {
+        cerr << sqlite3_errcode(db) << ": " << sqlite3_errmsg(db) << endl;
+        cerr << "An error occured while binding parameters to statement" << endl;
+        success = false;
+      }
+
+      // Insert into database
+      if (success) sqlite3_step(stmt);
+
+      // Check for query errors
+      int errcode = sqlite3_errcode(db);
+      if (success) if (errcode != SQLITE_OK && errcode != SQLITE_ROW && errcode != SQLITE_DONE)
+      {
+        cerr << sqlite3_errcode(db) << ": " << sqlite3_errmsg(db) << endl;
+        success = false;
+      }
+
+      // Clean up prepared statement
+      sqlite3_finalize(stmt);
     }
     
     // Move to next node
     if (success) rominfo_node = rominfo_node->next_sibling();
   }
-  
-  // Clean up prepared statement
-  sqlite3_finalize(stmt);
   
   return success;
 }

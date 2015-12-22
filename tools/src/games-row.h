@@ -10,8 +10,8 @@ class games_row
 public:
   virtual             ~games_row() {};
   virtual std::string insert_query() const = 0;
-  virtual bool        parse_xml(const node_t* node) = 0;
-  virtual bool        bind_to_stmt(sqlite3_stmt* stmt) = 0;
+  virtual bool        parse_xml(const node_t* node, sqlite3* db) = 0;
+  virtual bool        bind_to_stmt(sqlite3_stmt* stmt, int query) = 0;
 };
 
 #endif

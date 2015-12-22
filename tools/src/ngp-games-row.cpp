@@ -26,8 +26,10 @@ string ngp_games_row::insert_query() const
     ")");
 }
 
-bool ngp_games_row::parse_xml(const node_t* node)
+bool ngp_games_row::parse_xml(const node_t* node, sqlite3* db)
 {
+  (void) db;
+  
   bool success = true;
   node_t* n;
   
@@ -203,104 +205,113 @@ bool ngp_games_row::parse_xml(const node_t* node)
   return success;
 }
 
-bool ngp_games_row::bind_to_stmt(sqlite3_stmt* stmt)
+bool ngp_games_row::bind_to_stmt(sqlite3_stmt* stmt, int query)
 {
   int ind;
   
-  ind = sqlite3_bind_parameter_index(stmt, ":hash");
-  if (ind == 0)
+  switch (query)
   {
-    cerr << "Unable to find index of parameter 'hash'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int64(stmt, ind, Hash) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'hash'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":gameid");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'gameid'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int(stmt, ind, GameID) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'gameid'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":gameversion");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'gameversion'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int(stmt, ind, GameVersion) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'gameversion'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":startupaddress");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'startupaddress'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int64(stmt, ind, (long long) StartupAddress) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'startupaddress'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":minsystem");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'minsystem'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_int(stmt, ind, MinSystem) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'minsystem'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":license");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'license'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_text(stmt, ind, License.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'license'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":cartname");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'cartname'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_text(stmt, ind, CartName.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'cartname'" << endl;
-    return false;
-  }
-  
-  ind = sqlite3_bind_parameter_index(stmt, ":gamename");
-  if (ind == 0)
-  {
-    cerr << "Unable to find index of parameter 'gamename'" << endl;
-    return false;
-  }
-  if (sqlite3_bind_text(stmt, ind, GameName.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK)
-  {
-    cerr << "Unable to bind parameter 'gamename'" << endl;
-    return false;
+  case 0:
+    ind = sqlite3_bind_parameter_index(stmt, ":hash");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'hash'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int64(stmt, ind, Hash) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'hash'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":gameid");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'gameid'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int(stmt, ind, GameID) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'gameid'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":gameversion");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'gameversion'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int(stmt, ind, GameVersion) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'gameversion'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":startupaddress");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'startupaddress'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int64(stmt, ind, (long long) StartupAddress) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'startupaddress'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":minsystem");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'minsystem'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_int(stmt, ind, MinSystem) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'minsystem'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":license");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'license'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_text(stmt, ind, License.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'license'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":cartname");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'cartname'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_text(stmt, ind, CartName.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'cartname'" << endl;
+      return false;
+    }
+
+    ind = sqlite3_bind_parameter_index(stmt, ":gamename");
+    if (ind == 0)
+    {
+      cerr << "Unable to find index of parameter 'gamename'" << endl;
+      return false;
+    }
+    if (sqlite3_bind_text(stmt, ind, GameName.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK)
+    {
+      cerr << "Unable to bind parameter 'gamename'" << endl;
+      return false;
+    }
+    break;
+    
+  default:
+    // Do nothing
+    break;
   }
   
   return true;
