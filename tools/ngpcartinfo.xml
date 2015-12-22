@@ -7,7 +7,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0001</GAME_ID>
-  <GAME_VER>0x0A</GAME_VER>
+  <GAME_VER>0x0A</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>32</NUM>
@@ -34,7 +34,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0002</GAME_ID>
-  <GAME_VER>0x08</GAME_VER>
+  <GAME_VER>0x08</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -61,7 +61,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0004</GAME_ID>
-  <GAME_VER>0x02</GAME_VER>
+  <GAME_VER>0x02</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>17</NUM>
@@ -83,7 +83,7 @@
   <CART_MBITS>4</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0005</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>8</NUM>
@@ -110,7 +110,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0007</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>14</NUM>
@@ -147,7 +147,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0008</GAME_ID>
-  <GAME_VER>0x0A</GAME_VER>
+  <GAME_VER>0x0A</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>34</NUM>
@@ -164,7 +164,7 @@
   <CART_MBITS>4</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0009</GAME_ID>
-  <GAME_VER>0x50</GAME_VER>
+  <GAME_VER>0x50</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>9</NUM>
@@ -186,7 +186,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0011</GAME_ID>
-  <GAME_VER>0x90</GAME_VER>
+  <GAME_VER>0x90</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>33</NUM>
@@ -208,7 +208,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0015</GAME_ID>
-  <GAME_VER>0x13</GAME_VER>
+  <GAME_VER>0x13</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>15</NUM>
@@ -230,7 +230,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0016</GAME_ID>
-  <GAME_VER>0x12</GAME_VER>
+  <GAME_VER>0x12</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -257,7 +257,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0017</GAME_ID>
-  <GAME_VER>0x13</GAME_VER>
+  <GAME_VER>0x13</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>28</NUM>
@@ -289,7 +289,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0018</GAME_ID>
-  <GAME_VER>0x11</GAME_VER>
+  <GAME_VER>0x11</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>14</NUM>
@@ -321,7 +321,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0019</GAME_ID>
-  <GAME_VER>0x11</GAME_VER>
+  <GAME_VER>0x11</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>14</NUM>
@@ -353,7 +353,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0020</GAME_ID>
-  <GAME_VER>0x10</GAME_VER>
+  <GAME_VER>0x10</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>6</NUM>
@@ -380,7 +380,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0021</GAME_ID>
-  <GAME_VER>0x15</GAME_VER>
+  <GAME_VER>0x15</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>30</NUM>
@@ -417,7 +417,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0023</GAME_ID>
-  <GAME_VER>0x15</GAME_VER>
+  <GAME_VER>0x15</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>32</NUM>
@@ -444,7 +444,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0024</GAME_ID>
-  <GAME_VER>0x10</GAME_VER>
+  <GAME_VER>0x10</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -471,7 +471,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0025</GAME_ID>
-  <GAME_VER>0x07</GAME_VER>
+  <GAME_VER>0x07</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>14</NUM>
@@ -508,7 +508,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0026</GAME_ID>
-  <GAME_VER>0x1F</GAME_VER>
+  <GAME_VER>0x1F</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -535,7 +535,7 @@
   <CART_MBITS>4</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0027</GAME_ID>
-  <GAME_VER>0x04</GAME_VER>
+  <GAME_VER>0x04</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>8</NUM>
@@ -562,7 +562,7 @@
   <CART_MBITS>4</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0028</GAME_ID>
-  <GAME_VER>0x30</GAME_VER>
+  <GAME_VER>0x30</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>9</NUM>
@@ -584,7 +584,7 @@
   <CART_MBITS>4</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0029</GAME_ID>
-  <GAME_VER>0x30</GAME_VER>
+  <GAME_VER>0x30</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>6</NUM>
@@ -611,7 +611,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0030</GAME_ID>
-  <GAME_VER>0x1A</GAME_VER>
+  <GAME_VER>0x1A</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>31</NUM>
@@ -643,7 +643,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0032</GAME_ID>
-  <GAME_VER>0x15</GAME_VER>
+  <GAME_VER>0x15</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -670,7 +670,7 @@
   <CART_MBITS>4</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0033</GAME_ID>
-  <GAME_VER>0x21</GAME_VER>
+  <GAME_VER>0x21</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>8</NUM>
@@ -697,7 +697,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0035</GAME_ID>
-  <GAME_VER>0x11</GAME_VER>
+  <GAME_VER>0x11</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>30</NUM>
@@ -734,7 +734,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0036</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>30</NUM>
@@ -756,7 +756,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0037</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>30</NUM>
@@ -778,7 +778,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0038</GAME_ID>
-  <GAME_VER>0x00</GAME_VER>
+  <GAME_VER>0x00</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -805,7 +805,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0039</GAME_ID>
-  <GAME_VER>0x10</GAME_VER>
+  <GAME_VER>0x10</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -832,7 +832,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0040</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>18</NUM>
@@ -849,7 +849,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0040</GAME_ID>
-  <GAME_VER>0x04</GAME_VER>
+  <GAME_VER>0x04</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>18</NUM>
@@ -866,7 +866,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0041</GAME_ID>
-  <GAME_VER>0x06</GAME_VER>
+  <GAME_VER>0x06</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>17</NUM>
@@ -888,7 +888,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0044</GAME_ID>
-  <GAME_VER>0x08</GAME_VER>
+  <GAME_VER>0x08</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>28</NUM>
@@ -935,7 +935,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0045</GAME_ID>
-  <GAME_VER>0x14</GAME_VER>
+  <GAME_VER>0x14</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>29</NUM>
@@ -977,7 +977,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0046</GAME_ID>
-  <GAME_VER>0x02</GAME_VER>
+  <GAME_VER>0x02</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>13</NUM>
@@ -1019,7 +1019,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0048</GAME_ID>
-  <GAME_VER>0x04</GAME_VER>
+  <GAME_VER>0x04</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>15</NUM>
@@ -1041,7 +1041,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0049</GAME_ID>
-  <GAME_VER>0x50</GAME_VER>
+  <GAME_VER>0x50</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -1068,7 +1068,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0050</GAME_ID>
-  <GAME_VER>0x60</GAME_VER>
+  <GAME_VER>0x60</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>30</NUM>
@@ -1105,7 +1105,7 @@
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0051</GAME_ID>
-  <GAME_VER>0x09</GAME_VER>
+  <GAME_VER>0x09</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>30</NUM>
@@ -1142,7 +1142,7 @@
   <CART_MBITS>4</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0052</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>6</NUM>
@@ -1179,7 +1179,7 @@
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0053</GAME_ID>
-  <GAME_VER>0x00</GAME_VER>
+  <GAME_VER>0x00</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>17</NUM>
@@ -1201,7 +1201,7 @@
   <CART_MBITS>4</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0054</GAME_ID>
-  <GAME_VER>0x20</GAME_VER>
+  <GAME_VER>0x20</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>6</NUM>
@@ -1220,17 +1220,22 @@
     </UNPROTECTED_BLOCK>
   </CHIP>
 </CARTINFO>
-ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just decided to sing this. We didn't even know she knew the lyrics. We've been listening to it in the car while looking at Christmas lights.﻿"
-  line[0] = 104
 
 <CARTINFO>
   <FILENAME><![CDATA[005580-PACMAN.txt]]></FILENAME>
   <NAME_FROM_FILENAME><![CDATA[PACMAN]]></NAME_FROM_FILENAME>
-  <NAME_FROM_TXTDATA><![CDATA[]]></NAME_FROM_TXTDATA>
-  <CART_MBITS>0</CART_MBITS>
-  <CART_NUM_CHIPS>0</CART_NUM_CHIPS>
+  <NAME_FROM_TXTDATA><![CDATA[PACMAN      ]]></NAME_FROM_TXTDATA>
+  <CART_MBITS>4</CART_MBITS>
+  <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0055</GAME_ID>
-  <GAME_VER>0x80</GAME_VER>
+  <GAME_VER>0x80</GAMGAME_VERE_ID>
+  <CHIP INDEX="0">
+    <UNPROTECTED_BLOCK>
+      <NUM>10</NUM>
+      <ADDRESS>0x0007C000</ADDRESS>
+      <SIZE>0x00002000</SIZE>
+    </UNPROTECTED_BLOCK>
+  </CHIP>
 </CARTINFO>
 
 <CARTINFO>
@@ -1240,7 +1245,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0056</GAME_ID>
-  <GAME_VER>0x07</GAME_VER>
+  <GAME_VER>0x07</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>31</NUM>
@@ -1272,7 +1277,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0057</GAME_ID>
-  <GAME_VER>0x07</GAME_VER>
+  <GAME_VER>0x07</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>31</NUM>
@@ -1304,7 +1309,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0058</GAME_ID>
-  <GAME_VER>0x04</GAME_VER>
+  <GAME_VER>0x04</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>15</NUM>
@@ -1326,7 +1331,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0059</GAME_ID>
-  <GAME_VER>0x04</GAME_VER>
+  <GAME_VER>0x04</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>32</NUM>
@@ -1353,7 +1358,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0059</GAME_ID>
-  <GAME_VER>0x05</GAME_VER>
+  <GAME_VER>0x05</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>32</NUM>
@@ -1380,7 +1385,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>32</CART_MBITS>
   <CART_NUM_CHIPS>2</CART_NUM_CHIPS>
   <GAME_ID>0x0060</GAME_ID>
-  <GAME_VER>0x50</GAME_VER>
+  <GAME_VER>0x50</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>31</NUM>
@@ -1419,7 +1424,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>32</CART_MBITS>
   <CART_NUM_CHIPS>2</CART_NUM_CHIPS>
   <GAME_ID>0x0061</GAME_ID>
-  <GAME_VER>0x04</GAME_VER>
+  <GAME_VER>0x04</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>33</NUM>
@@ -1448,7 +1453,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0062</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>28</NUM>
@@ -1495,7 +1500,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0063</GAME_ID>
-  <GAME_VER>0x06</GAME_VER>
+  <GAME_VER>0x06</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>30</NUM>
@@ -1517,7 +1522,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0064</GAME_ID>
-  <GAME_VER>0x1F</GAME_VER>
+  <GAME_VER>0x1F</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>31</NUM>
@@ -1549,7 +1554,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0065</GAME_ID>
-  <GAME_VER>0x30</GAME_VER>
+  <GAME_VER>0x30</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>32</NUM>
@@ -1576,7 +1581,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0066</GAME_ID>
-  <GAME_VER>0x02</GAME_VER>
+  <GAME_VER>0x02</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>30</NUM>
@@ -1613,7 +1618,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0067</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>31</NUM>
@@ -1645,7 +1650,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0068</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>31</NUM>
@@ -1677,7 +1682,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>32</CART_MBITS>
   <CART_NUM_CHIPS>2</CART_NUM_CHIPS>
   <GAME_ID>0x0069</GAME_ID>
-  <GAME_VER>0x15</GAME_VER>
+  <GAME_VER>0x15</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>32</NUM>
@@ -1711,7 +1716,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0070</GAME_ID>
-  <GAME_VER>0x20</GAME_VER>
+  <GAME_VER>0x20</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>14</NUM>
@@ -1738,7 +1743,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0071</GAME_ID>
-  <GAME_VER>0x10</GAME_VER>
+  <GAME_VER>0x10</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -1765,7 +1770,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0074</GAME_ID>
-  <GAME_VER>0x04</GAME_VER>
+  <GAME_VER>0x04</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>6</NUM>
@@ -1842,7 +1847,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0074</GAME_ID>
-  <GAME_VER>0x06</GAME_VER>
+  <GAME_VER>0x06</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>6</NUM>
@@ -1919,7 +1924,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0075</GAME_ID>
-  <GAME_VER>0x02</GAME_VER>
+  <GAME_VER>0x02</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -1941,7 +1946,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0076</GAME_ID>
-  <GAME_VER>0x30</GAME_VER>
+  <GAME_VER>0x30</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -1968,7 +1973,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>4</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0078</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>9</NUM>
@@ -1990,7 +1995,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>4</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0081</GAME_ID>
-  <GAME_VER>0x0B</GAME_VER>
+  <GAME_VER>0x0B</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>7</NUM>
@@ -2017,7 +2022,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0083</GAME_ID>
-  <GAME_VER>0x04</GAME_VER>
+  <GAME_VER>0x04</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>17</NUM>
@@ -2039,7 +2044,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>4</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0084</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>6</NUM>
@@ -2076,7 +2081,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0085</GAME_ID>
-  <GAME_VER>0x08</GAME_VER>
+  <GAME_VER>0x08</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>27</NUM>
@@ -2113,7 +2118,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0087</GAME_ID>
-  <GAME_VER>0x07</GAME_VER>
+  <GAME_VER>0x07</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -2140,7 +2145,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0088</GAME_ID>
-  <GAME_VER>0x02</GAME_VER>
+  <GAME_VER>0x02</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>30</NUM>
@@ -2162,7 +2167,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0089</GAME_ID>
-  <GAME_VER>0x02</GAME_VER>
+  <GAME_VER>0x02</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>30</NUM>
@@ -2184,7 +2189,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0090</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>30</NUM>
@@ -2221,7 +2226,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>4</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0091</GAME_ID>
-  <GAME_VER>0x08</GAME_VER>
+  <GAME_VER>0x08</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>9</NUM>
@@ -2243,7 +2248,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0092</GAME_ID>
-  <GAME_VER>0x05</GAME_VER>
+  <GAME_VER>0x05</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>32</NUM>
@@ -2270,7 +2275,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0093</GAME_ID>
-  <GAME_VER>0x30</GAME_VER>
+  <GAME_VER>0x30</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>32</NUM>
@@ -2297,7 +2302,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0094</GAME_ID>
-  <GAME_VER>0x04</GAME_VER>
+  <GAME_VER>0x04</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>32</NUM>
@@ -2324,7 +2329,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0095</GAME_ID>
-  <GAME_VER>0x24</GAME_VER>
+  <GAME_VER>0x24</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>31</NUM>
@@ -2356,7 +2361,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0096</GAME_ID>
-  <GAME_VER>0x18</GAME_VER>
+  <GAME_VER>0x18</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>16</NUM>
@@ -2383,7 +2388,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0097</GAME_ID>
-  <GAME_VER>0x02</GAME_VER>
+  <GAME_VER>0x02</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>32</NUM>
@@ -2410,7 +2415,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0099</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>31</NUM>
@@ -2442,7 +2447,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0100</GAME_ID>
-  <GAME_VER>0x35</GAME_VER>
+  <GAME_VER>0x35</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>31</NUM>
@@ -2474,7 +2479,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0102</GAME_ID>
-  <GAME_VER>0x02</GAME_VER>
+  <GAME_VER>0x02</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>6</NUM>
@@ -2551,7 +2556,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0103</GAME_ID>
-  <GAME_VER>0x05</GAME_VER>
+  <GAME_VER>0x05</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>8</NUM>
@@ -2618,7 +2623,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0105</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>17</NUM>
@@ -2640,7 +2645,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0107</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>14</NUM>
@@ -2677,7 +2682,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0108</GAME_ID>
-  <GAME_VER>0x01</GAME_VER>
+  <GAME_VER>0x01</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>14</NUM>
@@ -2714,7 +2719,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0109</GAME_ID>
-  <GAME_VER>0x22</GAME_VER>
+  <GAME_VER>0x22</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>17</NUM>
@@ -2736,7 +2741,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0110</GAME_ID>
-  <GAME_VER>0x01</GAME_VER>
+  <GAME_VER>0x01</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>14</NUM>
@@ -2773,7 +2778,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0111</GAME_ID>
-  <GAME_VER>0x02</GAME_VER>
+  <GAME_VER>0x02</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>33</NUM>
@@ -2795,7 +2800,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>8</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0112</GAME_ID>
-  <GAME_VER>0x03</GAME_VER>
+  <GAME_VER>0x03</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>14</NUM>
@@ -2832,7 +2837,7 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
   <CART_MBITS>16</CART_MBITS>
   <CART_NUM_CHIPS>1</CART_NUM_CHIPS>
   <GAME_ID>0x0116</GAME_ID>
-  <GAME_VER>0x06</GAME_VER>
+  <GAME_VER>0x06</GAMGAME_VERE_ID>
   <CHIP INDEX="0">
     <UNPROTECTED_BLOCK>
       <NUM>32</NUM>
@@ -2850,357 +2855,5 @@ ERROR: Unknown line encountered! "http://youtu.be/DcqorwQ3f|U My daughter just d
       <SIZE>0x00002000</SIZE>
     </UNPROTECTED_BLOCK>
   </CHIP>
-</CARTINFO>
-ERROR: Unknown line encountered! "0001;0A;KOF R1      ;16;01 00 0A 00 4B 4F 46 20 52 31 20 20 20 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0002;08;NeoGeo Cup98;8;02 00 08 00 4E 65 6F 47 65 6F 20 43 75 70 39 38
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0004;02;MELON       ;8;04 00 02 00 4D 45 4C 4F 4E 20 20 20 20 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0005;03;shogi       ;4;05 00 03 00 73 68 6F 67 69 20 20 20 20 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0007;03;BASEBALL1.10;8;07 00 03 00 42 41 53 45 42 41 4C 4C 31 2E 31 30
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0008;0A;SAMURAI v010;16;08 00 0A 00 53 41 4D 55 52 41 49 20 76 30 31 30                                       
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0009;50;PocketTennis;4;09 00 50 00 50 6F 63 6B 65 74 54 65 6E 6E 69 73
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0011;90;RB_F_CONTACT;16;11 00 90 10 52 42 5F 46 5F 43 4F 4E 54 41 43 54
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0015;13;DRAGONS WILD;8;15 00 13 10 44 52 41 47 4F 4E 53 20 57 49 4C 44
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0016;12;N.Mystery B.;8;16 00 12 10 4E 2E 4D 79 73 74 65 72 79 20 42 2E
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0017;13;N.DerbyChamp;16;17 00 13 10 4E 2E 44 65 72 62 79 43 68 61 6D 70
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0018;11;N.Twenty One;8;18 00 11 10 4E 2E 54 77 65 6E 74 79 20 4F 6E 65
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0019;11;Neo Bacarrat;8;19 00 11 10 4E 65 6F 20 42 61 63 61 72 72 61 74
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0020;10;PUZZLE MINI.;8;20 00 10 10 50 55 5A 5A 4C 45 20 4D 49 4E 49 00
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0021;15;METALSLUG1ST;16;21 00 15 10 4D 45 54 41 4C 53 4C 55 47 31 53 54
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0023;15;KOF R2      ;16;23 00 15 10 4B 4F 46 20 52 32 20 20 20 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0024;10;N.C.M.color ;8;24 00 10 10 4E 2E 43 2E 4D 2E 63 6F 6C 6F 72 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0025;07;BASEBALL2.10;8;25 00 07 10 42 41 53 45 42 41 4C 4C 32 2E 31 30
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0026;1F;NGP YAKYUU..;8;26 00 1F 10 4E 47 50 20 59 41 4B 59 55 55 00 00
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0027;04;shogi color ;4;27 00 04 10 73 68 6F 67 69 20 63 6F 6C 6F 72 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0028;30;PTennisColor;4;28 00 30 10 50 54 65 6E 6E 69 73 43 6F 6C 6F 72
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0029;30;TUNAGETE COL;4;29 00 30 10 54 55 4E 41 47 45 54 45 20 43 4F 4C
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0030;1A;SAMURAI2v000;16;30 00 1A 10 53 41 4D 55 52 41 49 32 76 30 30 30
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0032;15;party mail  ;8;32 00 15 10 70 61 72 74 79 20 6D 61 69 6C 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0033;21;Mahjong K2  ;4;33 00 21 10 4D 61 68 6A 6F 6E 67 20 4B 32 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0035;11;B_T_GOLF    ;16;35 00 11 10 42 5F 54 5F 47 4F 4C 46 20 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0036;03;DIVE ALERT B;16;36 00 03 10 44 49 56 45 20 41 4C 45 52 54 20 42
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0037;03;DIVE ALERT R;16;37 00 03 10 44 49 56 45 20 41 4C 45 52 54 20 52
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0038;00;CRUSH ROLLER;8;38 00 00 10 43 52 55 53 48 20 52 4F 4C 4C 45 52
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0039;10;NGC98+COLOR ;8;39 00 10 10 4E 47 43 39 38 2B 43 4F 4C 4F 52 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0040;03;SHANGHAIMINI;8;40 00 03 10 53 48 41 4E 47 48 41 49 4D 49 4E 49
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0040;04;SHANGHAIMINI;8;40 00 04 10 53 48 41 4E 47 48 41 49 4D 49 4E 49
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0041;06;PUYOPUYO2   ;8;41 00 06 10 50 55 59 4F 50 55 59 4F 32 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0044;08;PocketLoveIf;16;44 00 08 10 50 6F 63 6B 65 74 4C 6F 76 65 49 66
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0045;14;BEAST BUSTER;16;45 00 14 10 42 45 41 53 54 20 42 55 53 54 45 52
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0046;02;JV PACHI V01;8;46 00 02 10 4A 56 20 50 41 43 48 49 20 56 30 31
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0048;04;magical drop;8;48 00 04 10 6D 61 67 69 63 61 6C 20 64 72 6F 70
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0049;50;TSUNAGETE P2;8;49 00 50 10 54 53 55 4E 41 47 45 54 45 20 50 32
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0050;60;B.M.Unitron2;16;50 00 60 10 42 2E 4D 2E 55 6E 69 74 72 6F 6E 32
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0051;09;FASELEI!    ;16;51 00 09 10 46 41 53 45 4C 45 49 21 20 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0052;03;HANABI 1.02 ;4;52 00 03 10 48 41 4E 41 42 49 20 31 2E 30 32 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0053;00;B.M.Unitron1;8;53 00 00 10 42 2E 4D 2E 55 6E 69 74 72 6F 6E 31
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0054;20;PUZZLE LINK ;4;54 00 20 10 50 55 5A 5A 4C 45 20 4C 49 4E 4B 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0055;80;PACMAN      ;4;55 00 80 10 50 41 43 4D 41 4E 20 20 20 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0056;07;CARD FIGHTER;16;56 00 07 10 43 41 52 44 20 46 49 47 48 54 45 52
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0057;07;CARD FIGHTER;16;57 00 07 10 43 41 52 44 20 46 49 47 48 54 45 52
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0058;04;magical drop;8;58 00 04 10 6D 61 67 69 63 61 6C 20 64 72 6F 70
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0059;04;SONIC POCKET;16;59 00 04 10 53 4F 4E 49 43 20 50 4F 43 4B 45 54
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0059;05;SONIC POCKET;16;59 00 05 10 53 4F 4E 49 43 20 50 4F 43 4B 45 54
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0060;50;DENSHADEGO2 ;32;60 00 50 10 44 45 4E 53 48 41 44 45 47 4F 32 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0061;04;METALSLUG2ND;32;61 00 04 10 4D 45 54 41 4C 53 4C 55 47 32 4E 44
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0062;03;YOUKAISYASIN;16;62 00 03 10 59 4F 55 4B 41 49 53 59 41 53 49 4E
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0063;06;MEZASE!KANJI;16;63 00 06 10 4D 45 5A 41 53 45 21 4B 41 4E 4A 49
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0064;1F;GEKKAv1.1F00;16;64 00 1F 10 47 45 4B 4B 41 76 31 2E 31 46 30 30
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0065;30;GalsFighters;16;65 00 30 10 47 61 6C 73 46 69 67 68 74 65 72 73
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0066;02;BBPROWRESTLE;16;66 00 02 10 42 42 50 52 4F 57 52 45 53 54 4C 45
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0067;03;CARD FIGHT E;16;67 00 03 10 43 41 52 44 20 46 49 47 48 54 20 45
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0068;03;CARD FIGHT E;16;68 00 03 10 43 41 52 44 20 46 49 47 48 54 20 45
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0069;15;SNKvsCAPCOM1;32;69 00 15 10 53 4E 4B 76 73 43 41 50 43 4F 4D 31
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0070;20;N.Twenty One;8;70 00 20 10 4E 2E 54 77 65 6E 74 79 20 4F 6E 65
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0071;10;NGP BBall...;8;71 00 10 10 4E 47 50 20 42 42 61 6C 6C 00 00 00
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0074;04;AZTECA 1.03 ;8;74 00 04 10 41 5A 54 45 43 41 20 31 2E 30 33 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0074;06;AZTECA 1.04 ;8;74 00 06 10 41 5A 54 45 43 41 20 31 2E 30 34 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0075;02;COOLBOARDERS;8;75 00 02 10 43 4F 4F 4C 42 4F 41 52 44 45 52 53
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0076;30;PUZZLE LINK2;8;76 00 30 10 50 55 5A 5A 4C 45 20 4C 49 4E 4B 32
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0078;03;HANAFUDA DJ ;4;78 00 03 10 48 41 4E 41 46 55 44 41 20 44 4A 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0081;0B;OEKAKIPAZURU;4;81 00 0B 10 4F 45 4B 41 4B 49 50 41 5A 55 52 55
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0083;04;BM2000      ;8;83 00 04 10 42 4D 32 30 30 30 20 20 20 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0084;03;WARD 1.02   ;4;84 00 03 10 57 41 52 44 20 31 2E 30 32 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0085;08;OGRE_BATTLE ;16;85 00 08 10 4F 47 52 45 5F 42 41 54 54 4C 45 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0087;07;MEMORIES OFF;8;87 00 07 10 4D 45 4D 4F 52 49 45 53 20 4F 46 46
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0088;02;DIVEALERT ME;16;88 00 02 10 44 49 56 45 41 4C 45 52 54 20 4D 45
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0089;02;DIVEALERT BE;16;89 00 02 10 44 49 56 45 41 4C 45 52 54 20 42 45
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0090;03;FASELEI!(E) ;16;90 00 03 10 46 41 53 45 4C 45 49 21 28 45 29 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0091;08;KOIKOIMARJAN;4;91 00 08 10 4B 4F 49 4B 4F 49 4D 41 52 4A 41 4E
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0092;05;BATTLEDEPARA;16;92 00 05 10 42 41 54 54 4C 45 44 45 50 41 52 41
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0093;30;GalsFighters;16;93 00 30 10 47 61 6C 73 46 69 67 68 74 65 72 73
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0094;04;ROCKMAN     ;16;94 00 04 10 52 4F 43 4B 4D 41 4E 20 20 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0095;24;LASTBLADE124;16;95 00 24 10 4C 41 53 54 42 4C 41 44 45 31 32 34
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0096;18; NIGE-RONPA ;8;96 00 18 10 20 4E 49 47 45 2D 52 4F 4E 50 41 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0097;02;NEOPOKE KUN ;16;97 00 02 10 4E 45 4F 50 4F 4B 45 20 4B 55 4E 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0099;03;EVOLUTION US;16;99 00 03 10 45 56 4F 4C 55 54 49 4F 4E 20 55 53
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0100;35;CoolCoolJAM ;16;00 01 35 10 43 6F 6F 6C 43 6F 6F 6C 4A 41 4D 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0102;02;PORCANO 1.01;8;02 01 02 10 50 4F 52 43 41 4E 4F 20 31 2E 30 31
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0103;05;DELTA WARP .;8;03 01 05 10 44 45 4C 54 41 20 57 41 52 50 20 00
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0105;03;COTTON-NGP/C;8;05 01 03 10 43 4F 54 54 4F 4E 2D 4E 47 50 2F 43
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0107;03;DELSOL2     ;8;07 01 03 10 44 45 4C 53 4F 4C 32 20 20 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0108;01;DH2 DEKAHEL ;8;08 01 01 10 44 48 32 20 44 45 4B 41 48 45 4C 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0109;22;InfinityCure;8;09 01 22 10 49 6E 66 69 6E 69 74 79 43 75 72 65
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0110;01;OHANABI     ;8;10 01 01 10 4F 48 41 4E 41 42 49 20 20 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0111;02;S-REAL-MAJAN;16;11 01 02 10 53 2D 52 45 41 4C 2D 4D 41 4A 41 4E
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0112;03;e-cup       ;8;12 01 03 10 65 2D 63 75 70 20 20 20 20 20 20 20
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0116;06;CARD FIGHT 2;16;16 01 06 10 43 41 52 44 20 46 49 47 48 54 20 32"
-  line[0] = 48
-
-<CARTINFO>
-  <FILENAME><![CDATA[dumped_games.txt]]></FILENAME>
-  <NAME_FROM_FILENAME><![CDATA[_games]]></NAME_FROM_FILENAME>
-  <NAME_FROM_TXTDATA><![CDATA[]]></NAME_FROM_TXTDATA>
-  <CART_MBITS>0</CART_MBITS>
-  <CART_NUM_CHIPS>0</CART_NUM_CHIPS>
-  <GAME_ID>0x000D</GAME_ID>
-  <GAME_VER>0xED</GAME_VER>
-</CARTINFO>
-ERROR: Unknown line encountered! "0010;Biomotor Unitron
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0012;Puzzle Tsunagete Pon!
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0014;Neo Cherry Master
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0022;Neo Geo Cup '98 Plus
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0031;Bust a Move Pocket (Puzzle Bobble Mini)
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0073;Sonic Pocket Adventure
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0079;Pocket Reversi
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0080;Cotton
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0082;Evolution: Eternal Dungeon
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0098;Neo Baccarat
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0104;Pocket Reversi
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0106;Picture Puzzle
-"
-  line[0] = 48
-
-<CARTINFO>
-  <FILENAME><![CDATA[missing.txt]]></FILENAME>
-  <NAME_FROM_FILENAME><![CDATA[g]]></NAME_FROM_FILENAME>
-  <NAME_FROM_TXTDATA><![CDATA[]]></NAME_FROM_TXTDATA>
-  <CART_MBITS>0</CART_MBITS>
-  <CART_NUM_CHIPS>0</CART_NUM_CHIPS>
-  <GAME_ID>0x0000</GAME_ID>
-  <GAME_VER>0x00</GAME_VER>
-</CARTINFO>
-ERROR: Unknown line encountered! "0040;Shanghai Mini
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0059;Sonic Pocket Adventure
-"
-  line[0] = 48
-ERROR: Unknown line encountered! "0074;Pachislot Azteca"
-  line[0] = 48
-
-<CARTINFO>
-  <FILENAME><![CDATA[multi_sub_catalog.txt]]></FILENAME>
-  <NAME_FROM_FILENAME><![CDATA[sub_catalog]]></NAME_FROM_FILENAME>
-  <NAME_FROM_TXTDATA><![CDATA[]]></NAME_FROM_TXTDATA>
-  <CART_MBITS>0</CART_MBITS>
-  <CART_NUM_CHIPS>0</CART_NUM_CHIPS>
-  <GAME_ID>0x0000</GAME_ID>
-  <GAME_VER>0x00</GAME_VER>
 </CARTINFO>
 </ROMDB>
