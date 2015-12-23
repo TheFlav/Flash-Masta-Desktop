@@ -1,5 +1,5 @@
 /*! \file
- *  \brief File containing hte implementation of \ref ngp_linkmasta_device.
+ *  \brief File containing the implementation of \ref ngp_linkmasta_device.
  *  
  *  File containing the implementation of \ref ngp_linkmasta_device. See
  *  corresponding header file to view documentation for the class, its methods,

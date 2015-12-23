@@ -3,9 +3,8 @@
  *         class.
  *  
  *  File containing the header information and declaration of the
- *  \ref ngp_linkmasta_device abstract class. This file includes the minimal
- *  number of files necessary to use any instance of the
- *  \ref ngp_linkmasta_device class.
+ *  \ref ngp_linkmasta_device class. This file includes the minimal number of
+ *  files necessary to use any instance of the \ref ngp_linkmasta_device class.
  *  
  *  \author Daniel Andrus
  *  \date 2015-07-24
@@ -15,9 +14,8 @@
 #ifndef __NGP_LINKMASTA_DEVICE_H__
 #define __NGP_LINKMASTA_DEVICE_H__
 
-#include "usb/usbfwd.h"
 #include "linkmasta_device.h"
-#include "cartridge/ngp_cartridge.h"
+#include "usb/usbfwd.h"
 
 
 
