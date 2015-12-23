@@ -968,14 +968,26 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
     controller->on_task_start(bytes_total);
   }
   
+  // Array of blocks that have been previously written to
+  // (so we don't erase the same block twice!)
+  bool** erased_blocks;
+  erased_blocks = new bool*[this->descriptor()->num_chips];
+  for (unsigned int c = 0; c < this->descriptor()->num_chips; c++)
+  {
+    erased_blocks[c] = new bool[this->descriptor()->chips[c]->num_blocks];
+    for (unsigned int b = 0; b < this->descriptor()->chips[c]->num_blocks; b++)
+    {
+      erased_blocks[c][b] = false;
+    }
+  }
+  
   // Begin writing data block-by-block
   try
   {
     // Open connection to NGP chip
     m_linkmasta->open();
     
-    
-    // Loop through all blocks in file
+    // Loop through all segments in file
     for (unsigned int i = 0; i < file_header.num_blocks; ++i)
     {
       // Convenience functions
@@ -1004,16 +1016,14 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
       for (curr_block = 0; curr_block < chip->num_blocks; ++curr_block)
       {
         block = chip->blocks[curr_block];
-        if (block_header.address <= block->base_address)
+        if (block_header.address >= block->base_address && block_header.address < block->base_address + block->num_bytes)
         {
           break;
         }
       }
       
       // Ensure integrity
-      if (curr_block >= chip->num_blocks
-          || block_header.address != block->base_address
-          || block_header.num_bytes != block->num_bytes)
+      if (curr_block >= chip->num_blocks)
       {
         throw std::runtime_error("Save file does not fit on this cartridge");
       }
@@ -1026,7 +1036,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
 #endif
       
       // Calculate number of expected bytes
-      unsigned bytes_expected = block->num_bytes;
+      unsigned bytes_expected = block_header.num_bytes;
       if (bytes_expected > bytes_total - bytes_written)
       {
         bytes_expected = bytes_total - bytes_written;
@@ -1054,22 +1064,27 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
         throw std::runtime_error("ERROR");
       }
       
-      // Erase block from cartridge
-      m_chips[curr_chip]->erase_block(block->base_address);
-      
-      // Wait for erasure to complete
-      while (m_chips[curr_chip]->test_erasing())
+      // Erase block from cartridge if not already erased
+      if (erased_blocks[curr_chip][curr_block] == false)
       {
-        if (controller != nullptr)
+        m_chips[curr_chip]->erase_block(block->base_address);
+        
+        // Wait for erasure to complete
+        while (m_chips[curr_chip]->test_erasing())
         {
-          controller->on_task_update(task_status::RUNNING, 0);
+          if (controller != nullptr)
+          {
+            controller->on_task_update(task_status::RUNNING, 0);
+          }
         }
+        
+        erased_blocks[curr_chip][curr_block] = true;
       }
       
       // Write buffer to cartridge
       if (controller == nullptr)
       {
-        m_chips[curr_chip]->program_bytes(block->base_address, buffer, buffer_size);
+        m_chips[curr_chip]->program_bytes(block_header.address, buffer, buffer_size);
       }
       else
       {
@@ -1077,7 +1092,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
         fwd_controller.scale_work_to(buffer_size);
         try
         {
-          m_chips[curr_chip]->program_bytes(block->base_address, buffer, buffer_size, &fwd_controller);
+          m_chips[curr_chip]->program_bytes(block_header.address, buffer, buffer_size, &fwd_controller);
         }
         catch (std::exception& ex)
         {
@@ -1119,7 +1134,14 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
     {
       controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
     }
+    
+    for (unsigned int c = 0; c < descriptor()->num_chips; c++)
+    {
+      delete [] erased_blocks[c];
+    }
+    delete [] erased_blocks;
     delete [] buffer;
+    
     throw;
   }
   
@@ -1128,6 +1150,11 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
   {
     controller->on_task_end(controller->is_task_cancelled() && bytes_written < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_written);
   }
+  for (unsigned int c = 0; c < descriptor()->num_chips; c++)
+  {
+    delete [] erased_blocks[c];
+  }
+  delete [] erased_blocks;
   delete [] buffer;
 }
 
