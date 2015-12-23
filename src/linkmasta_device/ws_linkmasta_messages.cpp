@@ -1,3 +1,16 @@
+/*! \file
+ *  \brief File containing implementations of functions used in constructing
+ *         and interpretting messages passed to and from a Wonderswan LinkMasta
+ *         device.
+ *  
+ *  File containing implementations of functions used in constructing and
+ *  interpretting messages passed to and from a Wonderswan LinkMasta device.
+ *  
+ *  \author Edward Mandy
+ *  \date 2015-08-14
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
+
 #include "ws_linkmasta_messages.h"
 #include <stdio.h>
 
@@ -655,4 +668,5 @@ void get_set_cartslot_command(uint8_t *buf, uint8_t *slot_num)
 {
   *slot_num = buf[MSG_DATA8_OFFSET];
 }
-};
+
+}
