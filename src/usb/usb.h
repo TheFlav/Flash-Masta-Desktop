@@ -1,10 +1,16 @@
-//
-//  usb.h
-//  FlashMasta
-//
-//  Created by Dan on 8/3/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing includes necessary for accessing all classes and
+ *         all functionality in the USB module.
+ *  
+ *  File containing includes necessary for accessing all classes and all
+ *  functionality in the USB module. If this file is included in another file,
+ *  then no other files in this module will need to be included in order to have
+ *  access to the full functionality of this module.
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-08-03
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #ifndef __USB_H__
 #define __USB_H__

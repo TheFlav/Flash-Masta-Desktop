@@ -30,13 +30,13 @@ class task_controller;
  */
 enum linkmasta_system
 {
-  /*! \brief Unknown linkmasta system */
+  /*! \brief Unknown linkmasta system. */
   LINKMASTA_UNKNOWN,
   
-  /*! \brief Neo Geo Pocket or Neo Geo Pocket Color */
+  /*! \brief Neo Geo Pocket or Neo Geo Pocket Color. */
   LINKMASTA_NEO_GEO_POCKET,
   
-  /*! \brief Wonderswan or Wonderswan Color */
+  /*! \brief Wonderswan or Wonderswan Color. */
   LINKMASTA_WONDERSWAN
 };
 
