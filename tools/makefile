@@ -22,7 +22,7 @@ $(BUILDDIR)/%.o: $(SOURCEDIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 
-build-database: $(addprefix $(BUILDDIR)/, build-database.o ngp-games-row.o ws-games-row.o sqlite/sqlite3.o)
+build-database: $(addprefix $(BUILDDIR)/, build-database.o ngp-games-row.o ws-games-row.o ngp-cart-row.o sqlite/sqlite3.o)
 	$(CPPC) $(CPPFLAGS) $^ -o $@
 
 clean:
