@@ -1,26 +1,26 @@
-#include "ws_cartridge_verify_task.h"
+#include "ngp_cartridge_verify_save_task.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-WsCartridgeVerifyTask::WsCartridgeVerifyTask(QWidget *parent, cartridge* cart, int slot)
-  : WsCartridgeTask(parent, cart, slot)
+NgpCartridgeVerifySaveTask::NgpCartridgeVerifySaveTask(QWidget* parent, cartridge* cart, int slot)
+  : NgpCartridgeTask(parent, cart, slot)
 {
   // Nothing else to do
 }
 
-WsCartridgeVerifyTask::~WsCartridgeVerifyTask()
+NgpCartridgeVerifySaveTask::~NgpCartridgeVerifySaveTask()
 {
   // Nothing else to do
 }
 
-void WsCartridgeVerifyTask::run_task()
+void NgpCartridgeVerifySaveTask::run_task()
 {
   // Get source file from user
   QString filename = QFileDialog::getOpenFileName(
     (QWidget*) this->parent(), tr("Open File"), QString(),
-    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws);;All Files (*)"));
+    tr("Neo Geo Pocket (*.ngf);;All files (*)"));
   if (filename == QString::null)
   {
     // Quietly fail
@@ -38,12 +38,19 @@ void WsCartridgeVerifyTask::run_task()
     return;
   }
   
-  set_progress_label("Verifying cartridge");
+  if (m_slot == -1)
+  {
+    setProgressLabel("Comparing cartridge save data to file");
+  }
+  else
+  {
+    setProgressLabel(QString("Comparing slot ") + QString::number(m_slot+1) + QString(" data to file"));
+  }
   
   // Begin task
   try
   {
-    if (m_cartridge->compare_cartridge_game_data(*m_fin, m_slot, this) && !is_task_cancelled())
+    if (m_cartridge->compare_cartridge_save_data(*m_fin, (m_slot == -1 ? cartridge::SLOT_ALL : m_slot), this) && !is_task_cancelled())
     {
       QMessageBox msgBox;
       msgBox.setText("Cartridge and file match.");

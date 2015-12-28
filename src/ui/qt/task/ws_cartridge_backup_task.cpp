@@ -20,7 +20,7 @@ void WsCartridgeBackupTask::run_task()
   // Get destination file from user
   QString filename = QFileDialog::getSaveFileName(
     (QWidget*) this->parent(), tr("Save File"), "backup.wsc",
-    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws)"));
+    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws);;All Files (*)"));
   if (filename == QString::null)
   {
     // Quietly fail

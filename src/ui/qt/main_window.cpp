@@ -19,11 +19,13 @@
 #include "task/ngp_cartridge_flash_task.h"
 #include "task/ngp_cartridge_restore_save_task.h"
 #include "task/ngp_cartridge_verify_task.h"
+#include "task/ngp_cartridge_verify_save_task.h"
 #include "task/ws_cartridge_backup_task.h"
 #include "task/ws_cartridge_backup_save_task.h"
 #include "task/ws_cartridge_flash_task.h"
 #include "task/ws_cartridge_restore_save_task.h"
 #include "task/ws_cartridge_verify_task.h"
+#include "task/ws_cartridge_verify_save_task.h"
 
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
@@ -321,7 +323,32 @@ void MainWindow::triggerActionRestoreSave()
 
 void MainWindow::triggerActionVerifySave()
 {
-  // TODO
+  PRE_ACTION
+  
+  try
+  {
+    switch (cart->system())
+    {
+    case system_type::SYSTEM_NEO_GEO_POCKET:
+      NgpCartridgeVerifySaveTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
+      break;
+      
+    case system_type::SYSTEM_WONDERSWAN:
+      WsCartridgeVerifySaveTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
+      break;
+      
+    default:
+      break;
+    }
+  }
+  catch (std::runtime_error& ex)
+  {
+    QMessageBox msgBox(this);
+    msgBox.setText(ex.what());
+    msgBox.exec();    
+  }
+  
+  POST_ACTION
 }
 
 void MainWindow::refreshDeviceList_timeout()
