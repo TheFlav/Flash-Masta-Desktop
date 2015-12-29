@@ -170,16 +170,19 @@ public:
   const game_metadata*  get_game_metadata(int slot) const;
   
   /*!
-   *  \brief Uses cached metadata about a game to calculate the number of bytes
-   *         the game occupies.
+   *  \brief Gets the calculated number of bytes for a game in the given slot.
    *  
-   *  Uses previously cached metadata about a game to calculate the number of bytes
-   *  the game occupies on the cartridge.
+   *  Gets the number of bytes the game in the given slot occupies. This value
+   *  is directly derived from the game metadata stored in that slot. This value
+   *  may not be the same as that of the slot itself.
    *  
-   *  \param [in] slot The index of the slot where the game for which to calculate
-   *         the size is located.
-   *  \return The number of bytes the game in the given slot occupies according
-   *          to the cached metadata.
+   *  This is a non-blocking function as it merely returns a cached value. This
+   *  cached valuei s constructed when \ref init() is called on this cartridge.
+   *  
+   *  \param slot The slot of the game to get the metadata for.
+   *  
+   *  \return The number of bytes the game in slot \ref slot occupies which may
+   *          be fewer than the size of the slot itself.
    */
   unsigned int          get_game_size(int slot) const;
   

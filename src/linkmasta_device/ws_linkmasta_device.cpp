@@ -1,10 +1,17 @@
-//
-//  ws_linkmasta_device.cpp
-//  FlashMasta
-//
-//  Created by Dan on 8/14/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing the implementation of \ref ws_linkmasta_device.
+ *  
+ *  File containing the implementation of \ref ws_linkmasta_device. See
+ *  corresponding header file to view documentation for the class, its methods,
+ *  and its member variables.
+ *  
+ *  \see ws_linkmasta_device
+ *  \see linkmasta_device
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-08-14
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #include "ws_linkmasta_device.h"
 #include "usb/usb_device.h"
@@ -143,8 +150,6 @@ void ws_linkmasta_device::set_timeout(timeout_t timeout)
   
   return m_usb_device->set_timeout(timeout);
 }
-
-
 
 void ws_linkmasta_device::open()
 {
@@ -700,5 +705,3 @@ void ws_linkmasta_device::fetch_slot_info()
   m_num_slots = (unsigned int) numSlotsPerCart;
   m_slot_size = 1 << numAddrLinesPerSlot;
 }
-
-

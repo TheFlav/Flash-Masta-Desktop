@@ -1,10 +1,15 @@
-//
-//  ngp_linkmasta_messages.cpp
-//  FlashMasta
-//
-//  Created by Dan on 7/24/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing implementations of functions used in constructing
+ *         and interpretting messages passed to and from a Neo Geo Pocket
+ *         LinkMasta device.
+ *  
+ *  File containing implementations of functions used in constructing and
+ *  interpretting messages passed to and from a Neo Geo Pocket LinkMasta device.
+ *  
+ *  \author Edward Mandy
+ *  \date 2015-07-24
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #include "ngp_linkmasta_messages.h"
 
@@ -343,4 +348,4 @@ void get_blink_led_message(uint8_t *buf, uint8_t *blinkCount)
   *blinkCount = buf[MSG_DATA_OFFSET];
 }
 
-};
+}

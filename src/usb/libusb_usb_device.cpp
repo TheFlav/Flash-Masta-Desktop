@@ -1,3 +1,18 @@
+/*! \file
+ *  \brief File containing the implementation of the \ref usb::libusb_usb_device
+ *         class.
+ *  
+ *  File containing the implementation of the \ref usb::libusb_usb_device class.
+ *  See corresponding header file to view documentation for the class, its
+ *  methods, and its member variables.
+ *  
+ *  \see usb::libusb_usb_device
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-08-05
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
+
 #include "libusb_usb_device.h"
 #include "usb.h"
 #include "tasks/task_controller.h"

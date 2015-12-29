@@ -1,10 +1,17 @@
-//
-//  ngp_linkmasta_flash_device.cpp
-//  FlashMasta
-//
-//  Created by Dan on 7/24/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing the implementation of \ref ngp_linkmasta_device.
+ *  
+ *  File containing the implementation of \ref ngp_linkmasta_device. See
+ *  corresponding header file to view documentation for the class, its methods,
+ *  and its member variables.
+ *  
+ *  \see ngp_linkmasta_device
+ *  \see linkmasta_device
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-07-24
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #include "ngp_linkmasta_device.h"
 #include "usb/usb_device.h"
@@ -150,8 +157,6 @@ void ngp_linkmasta_device::set_timeout(timeout_t timeout)
   
   return m_usb_device->set_timeout(timeout);
 }
-
-
 
 void ngp_linkmasta_device::open()
 {
@@ -527,5 +532,3 @@ void ngp_linkmasta_device::fetch_firmware_version()
   m_firmware_minor_version = (unsigned int) minVer;
   m_firmware_version_set = true;
 }
-
-

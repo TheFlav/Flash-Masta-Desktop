@@ -5,7 +5,7 @@
  *  the declaration of helper structs \ref NGFheader and \ref NGFblock, which
  *  are used in backing up and restoring saev data.
  *  
- *  See corrensponding header file to view documentation for class, its methods,
+ *  See corresponding header file to view documentation for class, its methods,
  *  and its member variables.
  *  
  *  \see ngp_cartridge

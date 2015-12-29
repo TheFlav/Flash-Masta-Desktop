@@ -1,10 +1,16 @@
-//
-//  linkmasta_device.cpp
-//  FlashMasta
-//
-//  Created by Dan on 8/14/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing the implementation of \ref linkmasta_device
+ *  
+ *  File containing the implementation of \ref linkmasta_device. See
+ *  corresponding header file to view documentation for the class, its methods,
+ *  and its member variables.
+ *  
+ *  \see linkmasta_device
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-08-14
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #include "linkmasta_device.h"
 #include <stdexcept>

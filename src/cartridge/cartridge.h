@@ -29,16 +29,22 @@ class task_controller;
  *  system. Provides functions for performing high-level operations on a
  *  cartridge.
  *  
- *  This class is *not* thread-safe. use caution when working in a multithreaded
+ *  This class is *not* thread-safe. Use caution when working in a multithreaded
  *  environment.
  */
 class cartridge
 {
 public:
   
+  /*!
+   *  \brief Constant sentinal value for indicating an operation is to be
+   *         performed on an entire cartridge's contants rather than on a
+   *         specific slot.
+   */
   static int const    SLOT_ALL = -1;
   
-  /*! \brief Cass destructor.
+  /*!
+   *  \brief Class destructor.
    *  
    *  Destructor for the class. Cleans up and frees resources.
    */

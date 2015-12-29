@@ -1,3 +1,21 @@
+/*! \file
+ *  \brief File containing the implementation of the \ref usb::usb_device
+ *         abstract class.
+ *  
+ *  File containing the implementation of the \ref usb::usb_device abstract
+ *  class. See corresponding header file to view documentation for the class,
+ *  its methods, and its member variables.
+ *  
+ *  Contains implementation of the \ref usb::usb_device::device_description
+ *  structure and its sub structures.
+ *  
+ *  \see usb::usb_device
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-08-03
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
+
 #include "usb_device.h"
 #include <stddef.h>
 
