@@ -383,70 +383,286 @@ public:
 
 
 
+/*! \struct usb_device::device_description
+ *  \brief Descriptor struct for conveying metadata about a USB device.
+ *  
+ *  Descriptor struct containing metadata about a \ref usb_device, including
+ *  identification codes, onboard configurations, interfaces, alternate
+ *  settings, and endpoints.
+ */
 struct usb_device::device_description
 {
-  //////////////// METHODS ////////////////
-  explicit                device_description(unsigned int num_configurations);
-                          device_description(const device_description& other);
-                          ~device_description();
+  /*!
+   *  \brief The main constructor for the class.
+   *  
+   *  Main constructor for the struct. Initializes dynamically allocated arrays.
+   *  Once these arrays have been allocated at construction time, they cannot
+   *  be resized; only their contents can be modified.
+   *  
+   *  \param [in] num_configurations The number of configurations available on
+   *         the device. This value directly determines the number of
+   *         elements allocated in the \ref configurations array.
+   */
+  explicit device_description(unsigned int num_configurations);
   
-  //////////////// DATA ////////////////
+  /*!
+   *  /brief The copy constructor for the struct.
+   *  
+   *  Copy constructor for the struct. Performs a deep copy of every element
+   *  in the current struct, as well as of every element it contains pointers
+   *  to.
+   *  
+   *  \param [in] other The original object to copy.
+   */
+  device_description(const device_description& other);
+  
+  /*!
+   *  \brief Destructor.
+   *  
+   *  Destructor for the struct. Releases dynamically allocated resources and
+   *  deletes any \ref device_configuration objects referenced in
+   *  \ref configurations.
+   */
+  ~device_description();
+  
+  
+  
+  /*! \brief Integer representing the class of device connected. */
   int                     device_class;
+  
+  /*! \brief Assigned vendor identifier for the device. */
   int                     vendor_id;
+  
+  /*! \brief Unique product identifier assigned by vendor. */
   int                     product_id;
+  
+  /*! \brief The total number of configurations onboard the device. */
   const unsigned int      num_configurations;
+  
+  /*! \brief Dynamically allocated array of configuration descriptors. */
   device_configuration**  const configurations;
 };
 
+
+
+/*! \struct usb_device::device_configuration
+ *  \brief Descriptor struct for a single configuration on the deivce.
+ *  
+ *  Descriptor for a configuration on a device. Contains metadata on the
+ *  configuration, including the unique identifier of a configuration and
+ *  descriptors of the interfaces found in this configuration.
+ */
 struct usb_device::device_configuration  
 {
-  //////////////// METHODS ////////////////
-  explicit                  device_configuration(unsigned int num_interfaces);
-                            device_configuration(const device_configuration& other);
-                            ~device_configuration();
+  /*!
+   *  \brief Main constructor for the struct.
+   *  
+   *  Main constructor for the class. Dynamically allocates necessary resources
+   *  based on parameters passed to it.
+   *  
+   *  \param [in] num_interfaces The number of interfaces contained in this
+   *         configuration. This value is directly used for one-time dynamic
+   *         resource allocation, which means data dependent on this value
+   *         cannot be changed after this constructor is called.
+   */
+  explicit device_configuration(unsigned int num_interfaces);
   
-  //////////////// DATA ////////////////
+  /*!
+   *  \brief Copy constructor for the struct.
+   *  
+   *  Copy constructor for the struct. Performs a deep copy so as to make the
+   *  new instance of the struct completely and entirely independent from the
+   *  original.
+   *  
+   *  \param [in] other The original object to copy.
+   */
+  device_configuration(const device_configuration& other);
+  
+  /*!
+   *  \brief Destructor.
+   *  
+   *  Destructor for the struct. Releases dynamically allocated resources and
+   *  deletes any \ref device_interface objects referenced in \ref interfaces.
+   */
+  ~device_configuration();
+  
+  
+  
+  /*!
+   *  \brief The unique identifier for this configuration. This is not the same
+   *         as the index number used to access this struct from its parent
+   *         \ref device_description object.
+   */
   unsigned int              config_id;
+  
+  /*! \brief The number of interfaces contained in this configuration. */
   const unsigned int        num_interfaces;
+  
+  /*! \brief Dynamic array of interface descriptors. */
   device_interface** const  interfaces;
 };
 
+
+
+/*! \struct usb_device::device_interface
+ *  \brief Descriptor struct for a single interface on a single configuration
+ *         on a \ref usb_device.
+ *  
+ *  Descriptor for an interface on the device.. Contains metadata on the
+ *  interface, including unique identifier and the alternate settings supported
+ *  by this interface.
+ */
 struct usb_device::device_interface
 {
-  //////////////// METHODS ////////////////
-  explicit                device_interface(unsigned int num_alt_settings);
-                          device_interface(const device_interface& other);
-                          ~device_interface();
+  /*!
+   *  \brief Main constructor for the struct.
+   *  
+   *  Main constructor for the struct. Dynamically allocates resources based
+   *  on input parameters.
+   *  
+   *  \param [in] num_alt_settings The number of alternate settings to prepare
+   *         this object for.
+   */
+  explicit device_interface(unsigned int num_alt_settings);
   
-  //////////////// DATA ////////////////
+  /*!
+   *  \brief Copy constructor for the struct.
+   *  
+   *  Copy constructor for the struct. Performs a deep copy so that all the
+   *  new object is completely independent from the original instance.
+   *  
+   *  \param [in] other The original object to copy.
+   */
+  device_interface(const device_interface& other);
+  
+  /*!
+   *  \brief Destructor.
+   *  
+   *  Destructor for the struct. Releases dynamically allocated resources and
+   *  deletes any \ref device_alt_setting objects referenced in
+   *  \ref alt_settings.
+   */
+  ~device_interface();
+  
+  
+  
+  /*!
+   *  \brief Unique identifier for the interface. This is not the same as the
+   *         index number used to access this struct from its parent
+   *         \ref device_configuration object.
+   */
   usb_device::interface_t interface_id;
+  
+  /*! \brief Number of alternate settings supported by this interface. */
   const unsigned int      num_alt_settings;
+  
+  /*! \brief Array of alternate settings supported by this interface. */
   device_alt_setting**    const alt_settings;
 };
 
+
+
+/*! \struct usb_device::device_alt_setting
+ *  \brief Descriptor struct for a single alternate setting on a single
+ *         interface on a single configuration on a \ref usb_device.
+ *  
+ *  Descriptor struct for an alternate setting on the device. Contains metadata
+ *  about the alternate setting, including the unique identifier for the
+ *  interface to which it belongs, the alternate setting's unique identifier,
+ *  the number of endpoints located in this alternate setting, and descriptors
+ *  for the endpoints themselves.
+ */
 struct usb_device::device_alt_setting
 {
-  //////////////// METHODS ////////////////
-  explicit                  device_alt_setting(unsigned int num_endpoints);
-                            device_alt_setting(const device_alt_setting& other);
-                            ~device_alt_setting();
+  /*!
+   *  \brief Main constructor for the struct.
+   *  
+   *  Main constructor for the struct. Dynamically allocates resources based on
+   *  input parameters.
+   *  
+   *  \param [in] num_endpoints The number of endpoints contained by this
+   *         alternate setting.
+   */
+  explicit device_alt_setting(unsigned int num_endpoints);
   
-  //////////////// DATA ////////////////
+  /*!
+   *  \brief Copy constructor for the struct.
+   *  
+   *  Copy constructor for the struct. Performs a deep copy of all elements
+   *  owned by this object so that the new instance is completely independent
+   *  from the original.
+   *  
+   *  \param [in] other The original object to copy.
+   */
+  device_alt_setting(const device_alt_setting& other);
+  
+  /*!
+   *  \brief Destructor.
+   *  
+   *  Destructor for the struct. Releases dynamically allocated resources and
+   *  deletes any \ref device_endpoint objects referenced from \ref endpoints.
+   */
+  ~device_alt_setting();
+  
+  
+  
+  /*!
+   *  \brief The unique identifier of the parent \ref device_interface object.
+   */
   usb_device::interface_t   interface_id;
+  
+  /*!
+   *  \brief Unique identifier for the alternate setting. This is not the same
+   *         as the index number used to access this struct from the parent
+   *         \ref device_interface object.
+   */
   usb_device::alt_setting_t alt_setting_id;
+  
+  /*! \brief The number of endpoints contained in this alternate setting. */
   const unsigned int        num_endpoints;
+  
+  /*! \brief Array of endpoint descriptors. */
   device_endpoint** const   endpoints;
 };
 
+
+
+/*! \struct usb_device::device_endpoint
+ *  \brief Descriptor struct for a single endpoint of an alternate setting of
+ *         an interface of a configuration on a \ref usb_device. And a partridge
+ *         in a pear tree.
+ *  
+ *  Descriptor struct for an endpoint on the device. Contains metadata about the
+ *  endpoint, including the endpoint's address, its transfer type, the 
+ */
 struct usb_device::device_endpoint
 {
-  //////////////// METHODS ////////////////
-                                      device_endpoint();
-                                      device_endpoint(const device_endpoint& other);
+  /*!
+   *  \brief Default constructor for the struct.
+   *  
+   *  Default constructor for this struct.
+   */
+  device_endpoint();
   
-  //////////////// DATA ////////////////
+  /*!
+   *  \brief Copy constructor for the struct.
+   *  
+   *  Copy constructor for the struct. Performs a deep copy of each property so
+   *  that the new instance is completely independent from the original.
+   *  
+   *  \param [in] other The original object to copy.
+   */
+  device_endpoint(const device_endpoint& other);
+  
+  
+  
+  /*! \brief Address of the endpoint. */
   usb_device::endpoint_t              address;
+  
+  /*! \brief Type of data supported by this endpoint. */
   usb_device::endpoint_transfer_type  transfer_type;
+  
+  /*! \brief The direction of data flow of this endpoint. */
   usb_device::endpoint_direction      direction;
 };
 
