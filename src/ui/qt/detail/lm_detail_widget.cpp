@@ -20,6 +20,9 @@ LmDetailWidget::LmDetailWidget(unsigned int device_id, QWidget *parent) :
   
   while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(device_id));
   linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(device_id);
+  linkmasta->open();
+  std::string ver = linkmasta->firmware_version();
+  linkmasta->close();
   FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(device_id);
   
   if (linkmasta->is_integrated_with_cartridge())
@@ -31,7 +34,7 @@ LmDetailWidget::LmDetailWidget(unsigned int device_id, QWidget *parent) :
     startPolling();
   }
   
-  // Update header label with name of device
+  // Display name of device
   QString device_name = "";
   switch (linkmasta->system())
   {
@@ -56,6 +59,11 @@ LmDetailWidget::LmDetailWidget(unsigned int device_id, QWidget *parent) :
     break;
   }
   ui->deviceNameLabel->setText(device_name);
+  
+  // Display device firmware version
+  QString device_version = "v";
+  device_version += QString(ver.c_str());
+  ui->deviceFirmwareVersionLabel->setText(device_version);
 }
 
 LmDetailWidget::~LmDetailWidget()

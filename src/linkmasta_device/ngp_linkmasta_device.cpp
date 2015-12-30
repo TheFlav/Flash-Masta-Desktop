@@ -1,10 +1,17 @@
-//
-//  ngp_linkmasta_flash_device.cpp
-//  FlashMasta
-//
-//  Created by Dan on 7/24/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing the implementation of \ref ngp_linkmasta_device.
+ *  
+ *  File containing the implementation of \ref ngp_linkmasta_device. See
+ *  corresponding header file to view documentation for the class, its methods,
+ *  and its member variables.
+ *  
+ *  \see ngp_linkmasta_device
+ *  \see linkmasta_device
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-07-24
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #include "ngp_linkmasta_device.h"
 #include "usb/usb_device.h"
@@ -151,8 +158,6 @@ void ngp_linkmasta_device::set_timeout(timeout_t timeout)
   return m_usb_device->set_timeout(timeout);
 }
 
-
-
 void ngp_linkmasta_device::open()
 {
   // Make sure object was initialized
@@ -194,9 +199,13 @@ void ngp_linkmasta_device::close()
 word_t ngp_linkmasta_device::read_word(chip_index chip, address_t address)
 {
   // Make sure we are in a ready state
-  if (!m_was_init || !m_is_open)
+  if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Device not initialized");
+  }
+  if (!m_is_open)
+  {
+    throw std::runtime_error("Device not opened");
   }
   
   uint8_t data;
@@ -212,16 +221,20 @@ word_t ngp_linkmasta_device::read_word(chip_index chip, address_t address)
   }
   else
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Error occured when reading word from device");
   }
 }
 
 void ngp_linkmasta_device::write_word(chip_index chip, address_t address, word_t data)
 {
   // Make sure we are in a ready state
-  if (!m_was_init || !m_is_open)
+  if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Device not initialized");
+  }
+  if (!m_is_open)
+  {
+    throw std::runtime_error("Device not opened");
   }
   
   uint8_t result;
@@ -238,7 +251,7 @@ void ngp_linkmasta_device::write_word(chip_index chip, address_t address, word_t
   }
   else
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Error occured while attempting to write word to device");
   }
 }
 
@@ -283,9 +296,13 @@ bool ngp_linkmasta_device::supports_program_bytes() const
 unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_address, data_t *buffer, unsigned int num_bytes, task_controller* controller)
 {
   // Make sure we are in a ready state
-  if (!m_was_init || !m_is_open)
+  if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Device not initialized");
+  }
+  if (!m_is_open)
+  {
+    throw std::runtime_error("Device not opened");
   }
   
   // Some working variables
@@ -317,7 +334,7 @@ unsigned int ngp_linkmasta_device::read_bytes(chip_index chip, address_t start_a
       // Get response from device and write directly to buffer
       if (m_usb_device->read(&buffer[offset], NGP_LINKMASTA_USB_RXTX_SIZE) != NGP_LINKMASTA_USB_RXTX_SIZE)
       {
-        throw std::runtime_error("ERROR"); // TODO
+        throw std::runtime_error("Unexpected number of bytes received from USB device");
       }
       
       // Update offset and inform controller of progress
@@ -417,11 +434,11 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
     
     if(result != MSG_WRITE64xN_REPLY)
     {
-      throw std::runtime_error("ERROR"); // TODO
+      throw std::runtime_error("Unexpected reply from device");
     }
     if(packets_processed != num_packets)
     {
-      throw std::runtime_error("ERROR"); // TODO
+      throw std::runtime_error("Unexpected number of packets processed");
     }
   }
   
@@ -437,7 +454,7 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
     get_result_reply(_buffer, &result);
     if (result != MSG_RESULT_SUCCESS)
     {
-      throw std::runtime_error("ERROR"); // TODO
+      throw std::runtime_error("Error occured while attempting to program bytes");
     }
     
     // Update offset and inform controller of progress
@@ -470,7 +487,7 @@ unsigned int ngp_linkmasta_device::program_bytes(chip_index chip, address_t star
       {
         controller->on_task_end(task_status::ERROR, offset);
       }
-      throw std::runtime_error("ERROR"); // TODO
+      throw std::runtime_error("Error occured while attempting to program bytes");
     }
     
     // Update offset and inform controller of progress
@@ -505,7 +522,7 @@ void ngp_linkmasta_device::fetch_firmware_version()
   num_bytes = m_usb_device->read(buffer, NGP_LINKMASTA_USB_RXTX_SIZE);
   if (num_bytes != NGP_LINKMASTA_USB_RXTX_SIZE)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Unexpected number of bytes received");
   }
   
   uint8_t majVer, minVer;
@@ -515,5 +532,3 @@ void ngp_linkmasta_device::fetch_firmware_version()
   m_firmware_minor_version = (unsigned int) minVer;
   m_firmware_version_set = true;
 }
-
-

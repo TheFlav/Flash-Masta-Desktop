@@ -4,7 +4,8 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-WsCartridgeRestoreSaveTask::WsCartridgeRestoreSaveTask(QWidget* parent, cartridge* cart): WsCartridgeTask(parent, cart)
+WsCartridgeRestoreSaveTask::WsCartridgeRestoreSaveTask(QWidget* parent, cartridge* cart, int slot)
+  : WsCartridgeTask(parent, cart, slot)
 {
   // Nothing else to do
 }
@@ -44,7 +45,7 @@ void WsCartridgeRestoreSaveTask::run_task()
   // Begin task
   try
   {
-    m_cartridge->restore_cartridge_save_data(*m_fin, cartridge::SLOT_ALL, this);
+    m_cartridge->restore_cartridge_save_data(*m_fin, m_slot, this);
   }
   catch (std::exception& ex)
   {

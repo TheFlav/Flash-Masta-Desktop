@@ -19,11 +19,13 @@
 #include "task/ngp_cartridge_flash_task.h"
 #include "task/ngp_cartridge_restore_save_task.h"
 #include "task/ngp_cartridge_verify_task.h"
+#include "task/ngp_cartridge_verify_save_task.h"
 #include "task/ws_cartridge_backup_task.h"
 #include "task/ws_cartridge_backup_save_task.h"
 #include "task/ws_cartridge_flash_task.h"
 #include "task/ws_cartridge_restore_save_task.h"
 #include "task/ws_cartridge_verify_task.h"
+#include "task/ws_cartridge_verify_save_task.h"
 
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
@@ -35,6 +37,7 @@ using namespace std;
 
 #define PRE_ACTION \
   int device_index = FlashMastaApp::getInstance()->getSelectedDevice();\
+  int slot_index = FlashMastaApp::getInstance()->getSelectedSlot();\
   cartridge* cart = (device_index != -1 ? buildCartridgeForDevice(device_index) : nullptr);\
   \
   if (cart == nullptr)\
@@ -49,7 +52,8 @@ using namespace std;
 
 #define POST_ACTION \
   FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(device_index);\
-  delete cart;
+  delete cart;\
+  emit cartridgeContentChanged(device_index, slot_index);
 
 
 
@@ -178,7 +182,7 @@ void MainWindow::triggerActionBackupGame()
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
-      WsCartridgeBackupTask(this, cart).go();
+      WsCartridgeBackupTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     default:
@@ -205,11 +209,11 @@ void MainWindow::triggerActionFlashGame()
     switch (cart->system())
     {
     case system_type::SYSTEM_NEO_GEO_POCKET:
-      NgpCartridgeFlashTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
+      NgpCartridgeFlashTask(this, cart, slot_index).go();
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
-      WsCartridgeFlashTask(this, cart).go();
+      WsCartridgeFlashTask(this, cart, slot_index).go();
       break;
       
     default:
@@ -240,7 +244,7 @@ void MainWindow::triggerActionVerifyGame()
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
-      WsCartridgeVerifyTask(this, cart).go();
+      WsCartridgeVerifyTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     default:
@@ -270,7 +274,7 @@ void MainWindow::triggerActionBackupSave()
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
-      WsCartridgeBackupSaveTask(this, cart).go();
+      WsCartridgeBackupSaveTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     default:
@@ -300,7 +304,7 @@ void MainWindow::triggerActionRestoreSave()
       break;
       
     case system_type::SYSTEM_WONDERSWAN:
-      WsCartridgeRestoreSaveTask(this, cart).go();
+      WsCartridgeRestoreSaveTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
       break;
       
     default:
@@ -319,7 +323,32 @@ void MainWindow::triggerActionRestoreSave()
 
 void MainWindow::triggerActionVerifySave()
 {
-  // TODO
+  PRE_ACTION
+  
+  try
+  {
+    switch (cart->system())
+    {
+    case system_type::SYSTEM_NEO_GEO_POCKET:
+      NgpCartridgeVerifySaveTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
+      break;
+      
+    case system_type::SYSTEM_WONDERSWAN:
+      WsCartridgeVerifySaveTask(this, cart, FlashMastaApp::getInstance()->getSelectedSlot()).go();
+      break;
+      
+    default:
+      break;
+    }
+  }
+  catch (std::runtime_error& ex)
+  {
+    QMessageBox msgBox(this);
+    msgBox.setText(ex.what());
+    msgBox.exec();    
+  }
+  
+  POST_ACTION
 }
 
 void MainWindow::refreshDeviceList_timeout()
@@ -474,6 +503,7 @@ void MainWindow::on_deviceListWidget_currentRowChanged(int currentRow)
   else
   {
     FlashMastaApp::getInstance()->setSelectedDevice(-1);
+    m_prompt_no_devices->show();
   }
 }
 

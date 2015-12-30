@@ -4,7 +4,8 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-WsCartridgeFlashTask::WsCartridgeFlashTask(QWidget* parent, cartridge* cart): WsCartridgeTask(parent, cart)
+WsCartridgeFlashTask::WsCartridgeFlashTask(QWidget* parent, cartridge* cart, int slot)
+  : WsCartridgeTask(parent, cart, slot)
 {
   // Nothing else to do
 }
@@ -21,7 +22,7 @@ void WsCartridgeFlashTask::run_task()
   // Get source file from user
   QString filename = QFileDialog::getOpenFileName(
     (QWidget*) this->parent(), tr("Open File"), QString(),
-    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws)"));
+    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws);;All Files (*)"));
   if (filename == QString::null)
   {
     // Quietly fail
@@ -44,7 +45,7 @@ void WsCartridgeFlashTask::run_task()
   // Begin task
   try
   {
-    m_cartridge->restore_cartridge_game_data(*m_fin, cartridge::SLOT_ALL, this);
+    m_cartridge->restore_cartridge_game_data(*m_fin, m_slot, this);
   }
   catch (std::exception& ex)
   {

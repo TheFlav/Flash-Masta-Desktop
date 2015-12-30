@@ -4,7 +4,8 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-WsCartridgeVerifyTask::WsCartridgeVerifyTask(QWidget *parent, cartridge* cart) : WsCartridgeTask(parent, cart)
+WsCartridgeVerifyTask::WsCartridgeVerifyTask(QWidget *parent, cartridge* cart, int slot)
+  : WsCartridgeTask(parent, cart, slot)
 {
   // Nothing else to do
 }
@@ -19,7 +20,7 @@ void WsCartridgeVerifyTask::run_task()
   // Get source file from user
   QString filename = QFileDialog::getOpenFileName(
     (QWidget*) this->parent(), tr("Open File"), QString(),
-    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws)"));
+    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws);;All Files (*)"));
   if (filename == QString::null)
   {
     // Quietly fail
@@ -42,7 +43,7 @@ void WsCartridgeVerifyTask::run_task()
   // Begin task
   try
   {
-    if (m_cartridge->compare_cartridge_game_data(*m_fin, cartridge::SLOT_ALL, this) && !is_task_cancelled())
+    if (m_cartridge->compare_cartridge_game_data(*m_fin, m_slot, this) && !is_task_cancelled())
     {
       QMessageBox msgBox;
       msgBox.setText("Cartridge and file match.");

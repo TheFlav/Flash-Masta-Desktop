@@ -17,7 +17,7 @@ class WsCartridgeTask : public QObject, public task_controller
 {
   Q_OBJECT
 public:
-  explicit              WsCartridgeTask(QWidget *parent, cartridge* cart);
+  explicit              WsCartridgeTask(QWidget *parent, cartridge* cart, int slot = -1);
   virtual               ~WsCartridgeTask();
   
   virtual void          go();
@@ -34,6 +34,7 @@ protected:
   
 protected:
   cartridge*            m_cartridge;
+  int                   m_slot;
   
 private:
   std::mutex*           m_mutex;

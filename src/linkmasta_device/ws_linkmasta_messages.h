@@ -1,10 +1,16 @@
-//
-//  ws_linkmasta_messages.h
-//  FlashMasta
-//
-//  Created by Dan on 8/14/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing prototypes for functions used in constructing and
+ *         interpretting messages passed to and from a Wonderswan LinkMasta
+ *         device.
+ *  
+ *  File containing prototypes for functions used in constructing and
+ *  interpretting messages passed to and from a Wonderswan LinkMasta device.
+ *  
+ *  \author Edward Mandy
+ *  \author Daniel Andrus
+ *  \date 2015-08-14
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #ifndef __WS_LINKMASTA_MESSAGES_H__
 #define __WS_LINKMASTA_MESSAGES_H__
@@ -82,6 +88,7 @@ void get_write64xN_reply(uint8_t *buf, uint8_t *msgType, uint8_t *packetsProcess
 void get_result_reply(uint8_t *buf, uint8_t *result);
 void get_blink_led_message(uint8_t *buf, uint8_t *blinkCount);
 void get_set_cartslot_command(uint8_t *buf, uint8_t *slot_num);
-};
+
+}
 
 #endif /* defined(__WS_LINKMASTA_MESSAGES_H__) */

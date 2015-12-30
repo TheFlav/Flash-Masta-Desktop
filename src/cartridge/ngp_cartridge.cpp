@@ -5,7 +5,7 @@
  *  the declaration of helper structs \ref NGFheader and \ref NGFblock, which
  *  are used in backing up and restoring saev data.
  *  
- *  See corrensponding header file to view documentation for class, its methods,
+ *  See corresponding header file to view documentation for class, its methods,
  *  and its member variables.
  *  
  *  \see ngp_cartridge
@@ -26,7 +26,6 @@ using namespace std;
 
 #define DEFAULT_BLOCK_SIZE 0x10000
 #define NGF_HEADER_VERSION 0x0053
-
 
 struct NGFheader
 {
@@ -76,16 +75,18 @@ cartridge_type ngp_cartridge::type() const
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
-  return descriptor()->type; // TODO
+  return descriptor()->type;
 }
 
 const cartridge_descriptor* ngp_cartridge::descriptor() const
 {
   return m_descriptor;
 }
+
+
 
 void ngp_cartridge::init()
 {
@@ -94,22 +95,22 @@ void ngp_cartridge::init()
     return;
   }
   
+  m_was_init = true;
+  
   m_linkmasta->init();
   m_linkmasta->open();
   build_cartridge_destriptor();
+  m_metadata.resize(num_slots());
+  build_game_metadata();
   m_linkmasta->close();
-
-  m_was_init = true;
 }
-
-
 
 void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task_controller* controller)
 {
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   unsigned int chip_lower_bound;
@@ -131,7 +132,7 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, tas
   else
   {
     // Throw error for invalid slot number
-    throw std::runtime_error("INVALID SLOT"); // TODO
+    throw std::runtime_error("INVALID SLOT");
   }
   
   // Determine the total number of bytes to write
@@ -288,7 +289,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, tas
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   unsigned int chip_lower_bound;
@@ -310,7 +311,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, tas
   else
   {
     // Throw error for invalid slot number
-    throw std::runtime_error("INVALID SLOT"); // TODO
+    throw std::runtime_error("INVALID SLOT");
   }
   
   // Determine the total number of bytes to write
@@ -328,7 +329,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, tas
   // Ensure file will fit
   if (bytes_total > bytes_chip_sum)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("File too large for cartridge");
   }
   
   // Initialize markers
@@ -487,7 +488,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, tas
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   unsigned int chip_lower_bound;
@@ -509,7 +510,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, tas
   else
   {
     // Throw error for invalid slot number
-    throw std::runtime_error("INVALID SLOT"); // TODO
+    throw std::runtime_error("INVALID SLOT");
   }
   
   // determine the total number of bytes to compare
@@ -699,7 +700,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, tas
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   unsigned int chip_lower_bound;
@@ -721,7 +722,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, tas
   else
   {
     // Throw error for invalid slot number
-    throw std::runtime_error("INVALID SLOT"); // TODO
+    throw std::runtime_error("INVALID SLOT");
   }
   
   // Determine the total number of bytes and blocks to write
@@ -913,7 +914,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   unsigned int chip_lower_bound;
@@ -935,7 +936,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
   else
   {
     // Throw error for invalid slot number
-    throw std::runtime_error("INVALID SLOT"); // TODO
+    throw std::runtime_error("INVALID SLOT");
   }
   
   // Seek to start of file
@@ -967,14 +968,26 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
     controller->on_task_start(bytes_total);
   }
   
+  // Array of blocks that have been previously written to
+  // (so we don't erase the same block twice!)
+  bool** erased_blocks;
+  erased_blocks = new bool*[this->descriptor()->num_chips];
+  for (unsigned int c = 0; c < this->descriptor()->num_chips; c++)
+  {
+    erased_blocks[c] = new bool[this->descriptor()->chips[c]->num_blocks];
+    for (unsigned int b = 0; b < this->descriptor()->chips[c]->num_blocks; b++)
+    {
+      erased_blocks[c][b] = false;
+    }
+  }
+  
   // Begin writing data block-by-block
   try
   {
     // Open connection to NGP chip
     m_linkmasta->open();
     
-    
-    // Loop through all blocks in file
+    // Loop through all segments in file
     for (unsigned int i = 0; i < file_header.num_blocks; ++i)
     {
       // Convenience functions
@@ -1003,16 +1016,14 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
       for (curr_block = 0; curr_block < chip->num_blocks; ++curr_block)
       {
         block = chip->blocks[curr_block];
-        if (block_header.address <= block->base_address)
+        if (block_header.address >= block->base_address && block_header.address < block->base_address + block->num_bytes)
         {
           break;
         }
       }
       
       // Ensure integrity
-      if (curr_block >= chip->num_blocks
-          || block_header.address != block->base_address
-          || block_header.num_bytes != block->num_bytes)
+      if (curr_block >= chip->num_blocks)
       {
         throw std::runtime_error("Save file does not fit on this cartridge");
       }
@@ -1025,7 +1036,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
 #endif
       
       // Calculate number of expected bytes
-      unsigned bytes_expected = block->num_bytes;
+      unsigned bytes_expected = block_header.num_bytes;
       if (bytes_expected > bytes_total - bytes_written)
       {
         bytes_expected = bytes_total - bytes_written;
@@ -1053,22 +1064,27 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
         throw std::runtime_error("ERROR");
       }
       
-      // Erase block from cartridge
-      m_chips[curr_chip]->erase_block(block->base_address);
-      
-      // Wait for erasure to complete
-      while (m_chips[curr_chip]->test_erasing())
+      // Erase block from cartridge if not already erased
+      if (erased_blocks[curr_chip][curr_block] == false)
       {
-        if (controller != nullptr)
+        m_chips[curr_chip]->erase_block(block->base_address);
+        
+        // Wait for erasure to complete
+        while (m_chips[curr_chip]->test_erasing())
         {
-          controller->on_task_update(task_status::RUNNING, 0);
+          if (controller != nullptr)
+          {
+            controller->on_task_update(task_status::RUNNING, 0);
+          }
         }
+        
+        erased_blocks[curr_chip][curr_block] = true;
       }
       
       // Write buffer to cartridge
       if (controller == nullptr)
       {
-        m_chips[curr_chip]->program_bytes(block->base_address, buffer, buffer_size);
+        m_chips[curr_chip]->program_bytes(block_header.address, buffer, buffer_size);
       }
       else
       {
@@ -1076,7 +1092,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
         fwd_controller.scale_work_to(buffer_size);
         try
         {
-          m_chips[curr_chip]->program_bytes(block->base_address, buffer, buffer_size, &fwd_controller);
+          m_chips[curr_chip]->program_bytes(block_header.address, buffer, buffer_size, &fwd_controller);
         }
         catch (std::exception& ex)
         {
@@ -1118,7 +1134,14 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
     {
       controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
     }
+    
+    for (unsigned int c = 0; c < descriptor()->num_chips; c++)
+    {
+      delete [] erased_blocks[c];
+    }
+    delete [] erased_blocks;
     delete [] buffer;
+    
     throw;
   }
   
@@ -1127,6 +1150,11 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
   {
     controller->on_task_end(controller->is_task_cancelled() && bytes_written < bytes_total ? task_status::CANCELLED : task_status::COMPLETED, bytes_written);
   }
+  for (unsigned int c = 0; c < descriptor()->num_chips; c++)
+  {
+    delete [] erased_blocks[c];
+  }
+  delete [] erased_blocks;
   delete [] buffer;
 }
 
@@ -1141,7 +1169,7 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, tas
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   unsigned int chip_lower_bound;
@@ -1163,7 +1191,7 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, tas
   else
   {
     // Throw error for invalid slot number
-    throw std::runtime_error("INVALID SLOT"); // TODO
+    throw std::runtime_error("INVALID SLOT");
   }
   
   // Seek to start of file
@@ -1381,7 +1409,7 @@ unsigned int ngp_cartridge::num_slots() const
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   return descriptor()->num_chips;
@@ -1392,7 +1420,7 @@ unsigned int ngp_cartridge::slot_size(int slot) const
   // Ensure class was initialized
   if (!m_was_init)
   {
-    throw std::runtime_error("ERROR"); // TODO
+    throw std::runtime_error("Cartridge not initialized");
   }
   
   if (slot == SLOT_ALL)
@@ -1448,6 +1476,39 @@ std::string ngp_cartridge::fetch_game_name(int slot)
     s += name[i];
   }
   return s;
+}
+
+const ngp_cartridge::game_metadata* ngp_cartridge::get_game_metadata(int slot) const
+{
+  // Ensure class was initialized
+  if (!m_was_init)
+  {
+    throw std::runtime_error("Cartridge not initialized");
+  }
+  
+  // Validate arguments
+  if (slot < 0 || slot >= (int) m_metadata.size())
+  {
+    throw std::runtime_error("INVALID SLOT");
+  }
+  
+  return &m_metadata[slot];
+}
+
+
+
+bool ngp_cartridge::test_for_cartridge(linkmasta_device* linkmasta)
+{
+  bool exists;
+  
+  // Check the device id and manufacturer id and see if they are invalid
+  linkmasta->open();
+  ngp_chip chip(linkmasta, 0);
+  chip.reset();
+  exists = !(chip.get_device_id() == 0x90 || chip.get_manufacturer_id() == 0x90);
+  linkmasta->close();
+  
+  return exists;
 }
 
 
@@ -1616,17 +1677,98 @@ void ngp_cartridge::build_block_descriptor(unsigned int chip_i, unsigned int blo
   block->is_protected = (chip->get_block_protection(block->base_address) == 0 ? false : true);
 }
 
-bool ngp_cartridge::test_for_cartridge(linkmasta_device* linkmasta)
+void ngp_cartridge::build_game_metadata(int slot)
 {
-  bool exists;
+  if (m_metadata.empty()) return;
   
-  // Check the device id and manufacturer id and see if they are invalid
-  linkmasta->open();
-  ngp_chip chip(linkmasta, 0);
-  chip.reset();
-  exists = !(chip.get_device_id() == 0x90 || chip.get_manufacturer_id() == 0x90);
-  linkmasta->close();
-  
-  return exists;
+  if (slot == -1)
+  {
+    // Build metadata for each slot on cartridge
+    for (int i = 0; i < (int) m_metadata.size(); i++)
+    {
+      build_game_metadata(i);
+    }
+  }
+  else if (slot >= 0 && slot < (int) m_metadata.size())
+  {
+    // Read metadata from cartridge and build metadata from it
+    unsigned char* buffer = new unsigned char[64];
+    
+    m_chips[slot]->read_bytes(0, buffer, 64);
+    
+    m_metadata[slot].read_from_data_array(buffer);
+    delete [] buffer;
+  }
 }
 
+
+
+void ngp_cartridge::game_metadata::read_from_data_array(const unsigned char *data)
+{
+  // Extract 28-byte license text, ensure string is null-terminated.
+  for (int i = 0; i < 28; i++)
+  {
+    license[i] = ((const char*) data)[0 + i];
+  }
+  license[28] = '\0';
+  
+  // Extract 4-byte starting address
+  startup_address = 0;
+  for (int i = 0; i < 4; i++)
+  {
+    startup_address |= ((unsigned long) data[28 + i]) << (8 * i);
+  }
+  
+  // Extract 2-byte game ID
+  game_id = 0;
+  for (int i = 0; i < 2; i++)
+  {
+    game_id |= ((unsigned short) data[32 + i]) << (8 * i);
+  }
+  
+  // Extract 1-byte game version
+  game_version = data[34];
+  
+  // Extract 1-byte minimum system code
+  minimum_system = data[35];
+  
+  // Extract 12-byte game name, ensure string is null-terminated
+  for (int i = 0; i < 12; i++)
+  {
+    game_name[i] = ((const char*) data)[36 + i];
+  }
+  game_name[12] = '\0';
+}
+
+void ngp_cartridge::game_metadata::write_to_data_array(unsigned char *data) const
+{
+  // Export 28-byte license text, ignoring null terminator
+  for (int i = 0; i < 28; i++)
+  {
+    ((char*) data)[0 + i] = license[i];
+  }
+  
+  // Export 4-byte starting address
+  for (int i = 0; i < 4; i++)
+  {
+    data[28 + i] = (unsigned char) ((startup_address >> (8 * i)) & 0xFF);
+  }
+  
+  // Export 2-byte game ID
+  for (int i = 0; i < 2; i++)
+  {
+    data[32 + i] = (unsigned char) ((game_id >> (8 * i)) & 0xFF);
+  }
+  
+  // Export 1-byte game version
+  data[34] = game_version;
+  
+  // Export 1-byte minimum system code
+  data[35] = minimum_system;
+  
+  // Export 12-byte game name
+  for (int i = 0; i < 12; i++)
+  {
+    ((char*) data)[36 + i] = game_name[i];
+  }
+}

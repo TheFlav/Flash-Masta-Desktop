@@ -83,6 +83,10 @@ public:
     ERASE
   };
   
+  
+  
+public:
+  
   /*! \brief The constructor for this class.
    *  
    *  The main constructor for this class. Initializes members with supplied
@@ -490,7 +494,42 @@ public:
    */
   unsigned int            program_bytes(address_t address, const data_t* data, unsigned int num_bytes, task_controller* controller = nullptr);
   
+  /*! \brief Gets the last slot selected on this chip.
+   * 
+   *  Gets the index of the slot last selected on the cartridge using the
+   *  \ref select_slot(unsigned int) method.
+   *  
+   *  This function does not query the chip to determine the currently selected
+   *  slot. Instead, it checks an internally cached variable. Thus it is
+   *  imperative that all slot switching is done using this class.
+   * 
+   *  \return The index of the most recently selected slot.
+   *  
+   *  \see select_slot(unsigned int)
+   */
+  unsigned int            selected_slot() const;
+  
+  /*! \brief Sends the slot selection command to the device.
+   *  
+   *  Sends the slot selection command to the device, effectively changing
+   *  which frame of addresses are available for access. This function directly
+   *  affects the results of calls to other operations, such as
+   *  \ref read_bytes(address_t, data_t*, unsigned int, task_controller*) and
+   *  \ref program_bytes(address_t, const data_t*, unsigned int, task_controller*).
+   *  
+   *  This function is a blocking function that can take several seconds to
+   *  complete.
+   *  
+   *  \param [in] The index of the slot to switch to.
+   *  
+   *  \returns True if the operation was a success, false if not.
+   */
+  bool                    select_slot(unsigned int slot);
+  
+  
+  
 private:
+  
   /*! \brief Send the command sequence to enter \ref chip_mode::AUTOSELECT mode
    *         to the chip.
    *  
@@ -507,6 +546,8 @@ private:
   void                    enter_autoselect();
   
   
+  
+private:
   
   /*! \brief The currently predicted mode of the chip.
    *  
@@ -529,6 +570,15 @@ private:
    *  \ref erase_block(address_t block_address)
    */
   address_t               m_last_erased_addr;
+  
+  /*! \brief Boolean indicating whether the chip supports bypass program mode.
+   * 
+   *  Cached value indicating whether the device supports bypass programming,
+   *  allowing for faster data programming. Can be accessed through the
+   *  \ref supports_bypass() method.
+   * 
+   *  \see supports_bypass()
+   */
   bool                    m_supports_bypass;
   
   /*! \brief A pointer to the \ref linkmasta_device used for communicating with
@@ -552,6 +602,18 @@ private:
    *  \see chip_index_t
    */
   chip_index_t const      m_chip_num;
+  
+  /*! \brief The index number of the slot currently selected on the chip.
+   * 
+   *  The index number of the currently selected game slot on the chip. Used
+   *  for remembering the current address "frame" that is available. Can be
+   *  accessed using the \ref selected_slot() and \ref select_slot(unsigned int)
+   *  methods.
+   *  
+   *  \see selected_slot()
+   *  \see select_slot(unsigned int)
+   */
+  unsigned int            m_slot_index;
 };
 
 #endif /* defined(__WS_ROM_CHIP_H__) */

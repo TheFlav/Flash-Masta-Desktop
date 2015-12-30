@@ -4,7 +4,8 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 
-WsCartridgeBackupTask::WsCartridgeBackupTask(QWidget *parent, cartridge* cart) : WsCartridgeTask(parent, cart)
+WsCartridgeBackupTask::WsCartridgeBackupTask(QWidget *parent, cartridge* cart, int slot)
+  : WsCartridgeTask(parent, cart, slot)
 {
   // Nothing else to do
 }
@@ -19,7 +20,7 @@ void WsCartridgeBackupTask::run_task()
   // Get destination file from user
   QString filename = QFileDialog::getSaveFileName(
     (QWidget*) this->parent(), tr("Save File"), "backup.wsc",
-    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws)"));
+    tr("WonderSwan Color (*.wsc);;WonderSwan (*.ws);;All Files (*)"));
   if (filename == QString::null)
   {
     // Quietly fail
@@ -42,7 +43,7 @@ void WsCartridgeBackupTask::run_task()
   // Begin task
   try
   {
-    m_cartridge->backup_cartridge_game_data(*m_fout, cartridge::SLOT_ALL, this);
+    m_cartridge->backup_cartridge_game_data(*m_fout, m_slot, this);
   }
   catch (std::exception& ex)
   {
