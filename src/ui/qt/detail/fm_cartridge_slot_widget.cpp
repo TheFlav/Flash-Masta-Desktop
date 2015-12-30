@@ -102,7 +102,8 @@ void FmCartridgeSlotWidget::buildFromNgpCartridge(ngp_cartridge* cart, int slot)
   // Set fields based on contents of descriptor
   setSlotGameNameVisible(true);
   setSlotGameName(QString(descriptor != nullptr ? descriptor->name : "Unknown"));
-  setSlotGameSizeVisible(false);
+  setSlotGameSizeVisible(descriptor != nullptr && descriptor->num_bytes != 0);
+  setSlotGameSize(descriptor != nullptr ? descriptor->num_bytes : 0);
   setSlotDeveloperNameVisible(false);
   setSlotCartNameVisible(true);
   setSlotCartName(QString(game_name.c_str()));

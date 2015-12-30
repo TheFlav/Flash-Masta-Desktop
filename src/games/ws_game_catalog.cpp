@@ -77,6 +77,7 @@ const game_descriptor* ws_game_catalog::identify_game(cartridge* cart, int slot_
   string developer_name = string((const char*) sqlite3_column_text(stmt, 1));
   game_descriptor* descriptor = new game_descriptor(game_name.c_str(), developer_name.c_str());
   descriptor->system = game_descriptor::game_system::WONDERSWAN;
+  descriptor->num_bytes = ((ws_cartridge*) cart)->get_game_size(slot_num);
   
   sqlite3_finalize(stmt);
   return descriptor;

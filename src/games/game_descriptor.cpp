@@ -2,7 +2,7 @@
 #include <cstring>
 
 game_descriptor::game_descriptor(const char* name, const char* developer_name)
-  : name(new char [strlen(name)]), developer_name(new char [strlen(developer_name)])
+  : name(new char [strlen(name)]), developer_name(new char [strlen(developer_name)]), num_bytes(0)
 {
   strcpy(this->name, name);
   strcpy(this->developer_name, developer_name);
