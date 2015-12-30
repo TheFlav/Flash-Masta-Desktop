@@ -17,6 +17,7 @@ struct game_descriptor
   char* const name;
   char* const developer_name;
   game_system system;
+  unsigned int num_bytes;
 };
 
 #endif // defined(__GAME_DESCRIPTOR_H__)
