@@ -1344,7 +1344,12 @@ unsigned int ws_cartridge::get_game_size(int slot) const
 {
   if (slot < 0 || slot >= (int) m_metadata.size()) return 0;
   
-  switch (m_metadata[slot].rom_size)
+  return calculate_game_size(m_metadata[slot].rom_size);
+}
+
+unsigned int ws_cartridge::calculate_game_size(int size_code)
+{
+  switch (size_code)
   {
   case 0x02:
     return 1 << 19;

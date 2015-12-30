@@ -177,7 +177,7 @@ public:
    *  may not be the same as that of the slot itself.
    *  
    *  This is a non-blocking function as it merely returns a cached value. This
-   *  cached valuei s constructed when \ref init() is called on this cartridge.
+   *  cached value is constructed when \ref init() is called on this cartridge.
    *  
    *  \param slot The slot of the game to get the metadata for.
    *  
@@ -185,6 +185,20 @@ public:
    *          be fewer than the size of the slot itself.
    */
   unsigned int          get_game_size(int slot) const;
+  
+  /*!
+   *  \brief Calculates the number of bytes a game occupies given a numerical
+   *        size code.
+   *  
+   *  Calcualtes the number of bytes a game occupies given a numerical size
+   *  code.
+   *  
+   *  \param [in] size_code The size code to translate to bytes.
+   *  
+   *  \return The number of bytes the game is expected to occupy. If
+   *          \ref size_code is not recognized, a 0 is returned.
+   */
+  static unsigned int   calculate_game_size(int size_code);
   
   
 
