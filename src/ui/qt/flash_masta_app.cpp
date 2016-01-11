@@ -24,8 +24,8 @@ FlashMastaApp::FlashMastaApp(int argc, char **argv, int flags)
   }
   
   m_device_manager = new LibusbDeviceManager();
-  m_ws_game_catalog = new ws_game_catalog("wsgames.db");
-  m_ngp_game_catalog = new ngp_game_catalog("ngpgames.db");
+  m_ws_game_catalog = new ws_game_catalog((QCoreApplication::applicationDirPath() + QString("/wsgames.db")).toStdString().c_str());
+  m_ngp_game_catalog = new ngp_game_catalog((QCoreApplication::applicationDirPath() + QString("/ngpgames.db")).toStdString().c_str());
   m_main_window = new MainWindow();
   
   qRegisterMetaType<std::string>("std::string");
