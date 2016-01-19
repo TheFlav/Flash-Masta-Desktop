@@ -171,10 +171,13 @@ win32 {
     INCLUDEPATH +=\
         includes/win
 
-    LIBS     +=\
-        -L"$$PWD/libs/win32" -l"libusb-1.0"
-		
-
+    CONFIG(64bit) {
+        LIBS += -L"$$PWD/libs/win64" -l"libusb-1.0"
+    }
+    CONFIG(32bit) {
+        LIBS += -L"$$PWD/libs/win32" -l"libusb-1.0"
+    }
+	
     DEFINES  +=\
         OS_WINDOWS
 }

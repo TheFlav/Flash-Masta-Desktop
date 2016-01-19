@@ -50,8 +50,9 @@ void LmCartridgePollingWorker::run()
   {
     device_connected = linkmasta->test_for_cartridge();
   }
-  catch (std::runtime_error& e)
+  catch (std::runtime_error& ex)
   {
+    (void) ex;
     // Do nothing; fail quietly
     FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_id);
     return;

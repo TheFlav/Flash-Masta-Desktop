@@ -13,6 +13,10 @@
  *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
  */
 
+#ifdef _MSC_VER
+#pragma warning( disable : 4200 )
+#endif
+
 #include "libusb_usb_device.h"
 #include "usb.h"
 #include "tasks/task_controller.h"
@@ -94,6 +98,7 @@ libusb_usb_device::~libusb_usb_device()
     }
     catch (std::exception& ex)
     {
+      (void) ex;
       // Do nothing, fail silently
     }
   }

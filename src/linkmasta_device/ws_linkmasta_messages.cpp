@@ -219,12 +219,12 @@ void build_write16_command(uint8_t *buf, uint32_t addr_host, uint16_t data, uint
   buf[MSG_ADDRNEGATIVEONE_OFFSET] = addr_host & 1;  //for 8bit addresses, we need to save this bit and pass it on
   addr_host >>= 1;
   
-  buf[MSG_ADDRHB_OFFSET] = addr_host>>16;
-  buf[MSG_ADDRMB_OFFSET] = addr_host>>8;
-  buf[MSG_ADDRLB_OFFSET] = addr_host;
+  buf[MSG_ADDRHB_OFFSET] = (uint8_t) (addr_host>>16);
+  buf[MSG_ADDRMB_OFFSET] = (uint8_t) (addr_host>>8);
+  buf[MSG_ADDRLB_OFFSET] = (uint8_t) addr_host;
   
-  buf[MSG_DATA16HB_OFFSET] = data>>8;
-  buf[MSG_DATA16LB_OFFSET] = data;
+  buf[MSG_DATA16HB_OFFSET] = (uint8_t) (data>>8);
+  buf[MSG_DATA16LB_OFFSET] = (uint8_t) data;
   
   buf[MSG_TARGET_OFFSET] = target;//SRAM, PORT_IO, etc.
   
@@ -548,8 +548,8 @@ void build_set_data16_command(uint8_t *buf, uint16_t data)
 {
   buf[MSG_TYPE_OFFSET] = MSG_SET_DATA_LINES_CMD;
   
-  buf[MSG_DATA16HB_OFFSET] = data>>8;
-  buf[MSG_DATA16LB_OFFSET] = data;
+  buf[MSG_DATA16HB_OFFSET] = (uint8_t) (data>>8);
+  buf[MSG_DATA16LB_OFFSET] = (uint8_t) data;
 }
 
 void get_set_data16_message(uint8_t *buf, uint8_t *dataHB, uint8_t *dataLB)

@@ -266,7 +266,7 @@ void LibusbDeviceManager::refreshDeviceList()
   }
   
   libusb_device** device_list;
-  int num_devices = libusb_get_device_list(m_libusb, &device_list);
+  ssize_t num_devices = libusb_get_device_list(m_libusb, &device_list);
   std::map<unsigned int, bool> device_status;
   
   m_connected_devices_mutex.lock(); // LOCK m_connected_devices
@@ -332,6 +332,7 @@ void LibusbDeviceManager::refreshDeviceList()
       try {
         delete m_connected_devices[entry.first].linkmasta;
       } catch (std::exception &ex) {
+        (void) ex;
         // do nothing, fail silently
       }
 

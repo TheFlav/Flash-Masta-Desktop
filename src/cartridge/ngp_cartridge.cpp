@@ -199,6 +199,7 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, tas
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
         }
@@ -240,11 +241,14 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, tas
   }
   catch (std::exception& ex)
   {
+    (void) ex;
+    
     // Error occured! Clean up and pass error on to caller
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
       while (m_chips[curr_chip]->is_erasing());
     } catch (std::exception& ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -252,12 +256,14 @@ void ngp_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, tas
       // Attempt to reset the chip
       m_chips[curr_chip]->reset();
     } catch (std::exception& ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
     try {
       m_linkmasta->close();
     } catch (std::exception& ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -420,6 +426,7 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, tas
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
         }
@@ -440,11 +447,13 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, tas
   }
   catch (std::exception& ex)
   {
+    (void) ex;
     // Error occured! Clean up and pass error on to caller
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
       while (m_chips[curr_chip]->is_erasing());
     } catch (exception ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -452,12 +461,14 @@ void ngp_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, tas
       // Attempt to reset the chip
       m_chips[curr_chip]->reset();
     } catch (exception ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
     try {
       m_linkmasta->close();
     } catch (exception ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -612,6 +623,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, tas
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           // Inform controller of error
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
@@ -653,6 +665,7 @@ bool ngp_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, tas
   }
   catch (std::exception& ex)
   {
+    (void) ex;
     // Error occured! Clean up and pass error on to caller
     // Note: I appologize for the change in style: it's to save lines
     try {
@@ -823,6 +836,7 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, tas
           }
           catch (std::exception& ex)
           {
+            (void) ex;
             controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
             throw;
           }
@@ -865,11 +879,13 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, tas
   }
   catch (std::exception& ex)
   {
+    (void) ex;
     // Error occured! Clean up and pass error on to caller
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
       while (m_chips[curr_chip]->is_erasing());
     } catch (std::exception& ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -877,12 +893,14 @@ void ngp_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, tas
       // Attempt to reset the chip
       m_chips[curr_chip]->reset();
     } catch (std::exception& ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
     try {
       m_linkmasta->close();
     } catch (std::exception& ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -1096,6 +1114,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
         }
@@ -1109,6 +1128,7 @@ void ngp_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, tas
   }
   catch (std::exception& ex)
   {
+    (void) ex;
     // Error occured! Clean up and pass error on to caller
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
@@ -1328,6 +1348,7 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, tas
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           // Inform controller of error
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
@@ -1363,6 +1384,7 @@ bool ngp_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, tas
   }
   catch (std::exception& ex)
   {
+    (void) ex;
     // Error occured! Clean up and pass error on to caller
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
@@ -1461,6 +1483,7 @@ std::string ngp_cartridge::fetch_game_name(int slot)
   }
   catch (std::exception& ex)
   {
+    (void) ex;
     try {
       m_linkmasta->close();
     } catch(std::exception ex2) {

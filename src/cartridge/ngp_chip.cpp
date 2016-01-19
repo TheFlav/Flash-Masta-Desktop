@@ -191,7 +191,7 @@ protect_t ngp_chip::get_block_protection(address_t sector_address)
       enter_autoselect();
     }
     
-    return read((sector_address & MASK_SECTOR) | 0x00000002);
+    return (read((sector_address & MASK_SECTOR) | 0x00000002) != 0);
   }
 }
 
@@ -422,6 +422,7 @@ unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int 
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
         }
@@ -450,6 +451,7 @@ unsigned int ngp_chip::read_bytes(address_t address, data_t* data, unsigned int 
       }
       catch (std::exception& ex)
       {
+        (void) ex;
         // Inform controller that an error has occured and pass exception up
         if (controller != nullptr)
         {
@@ -513,6 +515,7 @@ unsigned int ngp_chip::program_bytes(address_t address, const data_t* data, unsi
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
         }
@@ -553,6 +556,7 @@ unsigned int ngp_chip::program_bytes(address_t address, const data_t* data, unsi
       }
       catch (std::exception& ex)
       {
+        (void) ex;
         if (controller != nullptr)
         {
           controller->on_task_end(task_status::ERROR, i);

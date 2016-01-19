@@ -74,6 +74,7 @@ unsigned int ws_sram_chip::read_bytes(address_t address, data_t* data, unsigned 
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
         }
@@ -102,6 +103,7 @@ unsigned int ws_sram_chip::read_bytes(address_t address, data_t* data, unsigned 
       }
       catch (std::exception& ex)
       {
+        (void) ex;
         // Inform controller that an error has occured and pass exception up
         if (controller != nullptr)
         {
@@ -153,6 +155,7 @@ unsigned int ws_sram_chip::program_bytes(address_t address, const data_t* data, 
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
         }
@@ -183,6 +186,7 @@ unsigned int ws_sram_chip::program_bytes(address_t address, const data_t* data, 
       }
       catch (std::exception& ex)
       {
+        (void) ex;
         if (controller != nullptr)
         {
           controller->on_task_end(task_status::ERROR, i);

@@ -66,6 +66,7 @@ ngp_linkmasta_device::~ngp_linkmasta_device()
     }
     catch (std::exception& ex)
     {
+      (void) ex;
       // Do nothing, fail silently
     }
   }

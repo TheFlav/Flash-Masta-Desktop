@@ -250,15 +250,15 @@ void CartridgeInfoWidget::clearChipData()
 QString CartridgeInfoWidget::stringifyBytesToBits(unsigned int num_bytes, bool reduce)
 {
   QString text;
-  if (reduce && (num_bytes & 0b111111111111111111111111111) == 0)
+  if (reduce && (num_bytes & 0x7FFFFFF) == 0)
   {
     text = QString::number(num_bytes >> 27) + QString(" Gib");
   }
-  else if (reduce && (num_bytes & 0b11111111111111111) == 0)
+  else if (reduce && (num_bytes & 0x1FFFF) == 0)
   {
     text = QString::number(num_bytes >> 17) + QString(" Mib");
   }
-  else if (reduce && (num_bytes & 0xb1111111) == 0)
+  else if (reduce && (num_bytes & 0x7F) == 0)
   {
     text = QString::number(num_bytes >> 7) + QString(" Kib");
   }
@@ -302,7 +302,7 @@ void CartridgeInfoWidget::setCartridgeNumChips(unsigned int num_chips)
     if (chip_i >= m_cart_num_chips) continue;
     
     m_cart_chip_widgets[chip_i] = new QWidget*[2 + 1];
-    for (unsigned int widget_i = 0; widget_i <= 2 + 1; widget_i++)
+    for (unsigned int widget_i = 0; widget_i <= 2; widget_i++)
     {
       m_cart_chip_widgets[chip_i][widget_i] = nullptr;
     }

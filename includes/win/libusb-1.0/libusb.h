@@ -719,6 +719,9 @@ struct libusb_ss_endpoint_companion_descriptor {
  * advised to check bDevCapabilityType and call the matching
  * libusb_get_*_descriptor function to get a structure fully matching the type.
  */
+#ifdef _MSC_VER
+#pragma warning( disable : 4200 )
+#endif
 struct libusb_bos_dev_capability_descriptor {
 	/** Size of this descriptor (in bytes) */
 	uint8_t bLength;
@@ -743,6 +746,9 @@ struct libusb_bos_dev_capability_descriptor {
  * This descriptor is documented in section 9.6.2 of the USB 3.0 specification.
  * All multiple-byte fields are represented in host-endian format.
  */
+#ifdef _MSC_VER
+#pragma warning( disable : 4200 )
+#endif
 struct libusb_bos_descriptor {
 	/** Size of this descriptor (in bytes) */
 	uint8_t  bLength;
@@ -1204,6 +1210,9 @@ typedef void (LIBUSB_CALL *libusb_transfer_cb_fn)(struct libusb_transfer *transf
  * completed, the library populates the transfer with the results and passes
  * it back to the user.
  */
+#ifdef _MSC_VER
+#pragma warning( disable : 4200 )
+#endif
 struct libusb_transfer {
 	/** Handle of the device that this transfer will be submitted to */
 	libusb_device_handle *dev_handle;

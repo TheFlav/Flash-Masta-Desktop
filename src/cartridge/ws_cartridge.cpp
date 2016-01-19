@@ -269,6 +269,7 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
         }
@@ -325,11 +326,13 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
   }
   catch (std::exception& ex)
   {
+    (void) ex;
     // Error occured! Clean up and pass error on to caller
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
       while (m_rom_chip->is_erasing());
     } catch (std::exception& ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -337,12 +340,14 @@ void ws_cartridge::backup_cartridge_game_data(std::ostream& fout, int slot, task
       // Attempt to reset the chip
       m_rom_chip->reset();
     } catch (std::exception& ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
     try {
       m_linkmasta->close();
     } catch (std::exception& ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -528,6 +533,7 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
         }
@@ -563,11 +569,13 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task
   }
   catch (std::exception& ex)
   {
+    (void) ex;
     // Error occured! Clean up and pass error on to caller
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
       while (m_rom_chip->is_erasing());
     } catch (exception ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -575,12 +583,14 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task
       // Attempt to reset the chip
       m_rom_chip->reset();
     } catch (exception ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
     try {
       m_linkmasta->close();
     } catch (exception ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -721,10 +731,10 @@ bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, task
       {
         fin.seekg(-((int) (slot_size - curr_offset)), fin.end);
       }
-      unsigned int f_start = fin.tellg();
+      streamoff f_start = fin.tellg();
       fin.read((char*) f_buffer, bytes_expected);
-      unsigned int f_end = fin.tellg();
-      f_buffer_size = f_end - f_start;
+      streamoff f_end = fin.tellg();
+      f_buffer_size = (unsigned int) (f_end - f_start);
       
       // Check for errors
       if (f_buffer_size != bytes_expected)
@@ -760,6 +770,7 @@ bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, task
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           // Inform controller of error
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
@@ -825,25 +836,29 @@ bool ws_cartridge::compare_cartridge_game_data(std::istream& fin, int slot, task
   }
   catch (std::exception& ex)
   {
+    (void) ex;
     // Error occured! Clean up and pass error on to caller
     // Note: I appologize for the change in style: it's to save lines
     try {
       // Spinlock while the chip finishes erasing (if it was erasing)
       while (m_rom_chip->is_erasing());
-    } catch (exception ex2) {
+    } catch (std::exception &ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
     try {
       // Attempt to reset the chip
       m_rom_chip->reset();
-    } catch (exception ex2) {
+    } catch (std::exception &ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
     try {
       m_linkmasta->close();
-    } catch (exception ex2) {
+    } catch (std::exception &ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -927,6 +942,7 @@ void ws_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, task
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
         }
@@ -962,10 +978,12 @@ void ws_cartridge::backup_cartridge_save_data(std::ostream& fout, int slot, task
   }
   catch (std::exception& ex)
   {
+    (void) ex;
     // Error occured! Clean up and pass error on to caller
     try {
       m_linkmasta->close();
     } catch (std::exception& ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -1069,6 +1087,7 @@ void ws_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, task
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
         }
@@ -1083,10 +1102,12 @@ void ws_cartridge::restore_cartridge_save_data(std::istream& fin, int slot, task
   }
   catch (std::exception& ex)
   {
+    (void) ex;
     // Error occured! Clean up and pass error on to caller
     try {
       m_linkmasta->close();
-    } catch (exception ex2) {
+    } catch (std::exception &ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
@@ -1195,6 +1216,7 @@ bool ws_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, task
         }
         catch (std::exception& ex)
         {
+          (void) ex;
           // Inform controller of error
           controller->on_task_end(task_status::ERROR, controller->get_task_work_progress());
           throw;
@@ -1230,10 +1252,12 @@ bool ws_cartridge::compare_cartridge_save_data(std::istream& fin, int slot, task
   }
   catch (std::exception& ex)
   {
+    (void) ex;
     // Error occured! Clean up and pass error on to caller
     try {
       m_linkmasta->close();
-    } catch (exception ex2) {
+    } catch (std::exception &ex2) {
+      (void) ex2;
       // Well... this is awkward
     }
     
