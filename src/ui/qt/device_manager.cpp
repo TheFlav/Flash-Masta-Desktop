@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include "common/log.h"
 #include "linkmasta_device/ngp_linkmasta_device.h"
 #include "linkmasta_device/ws_linkmasta_device.h"
 #include "usb/usb_device.h"
@@ -19,10 +20,9 @@ DeviceManager::DeviceManager()
 
 DeviceManager::~DeviceManager()
 {
-  m_thread_kill_flag = true;
-  
-  // Spinlock until thread is dead. May take a moment
-  while (!m_thread_dead);
+  log_start(log_level::DEBUG, "~DeviceManager() {");
+  stopAutoRefreshAndWait();
+  log_end("}");
 }
 
 
@@ -41,6 +41,25 @@ void DeviceManager::startAutoRefresh()
     m_refresh_thread = thread(&DeviceManager::refreshThreadFunction, this);
     m_refresh_thread.detach();
   }
+}
+
+void DeviceManager::stopAutoRefreshAndWait()
+{
+  log_start(log_level::DEBUG, "DeviceManager::stopAutoRefreshAndWait() {");
+  
+  m_thread_kill_flag = true;
+  if (m_refresh_thread.joinable())
+  {
+    log(log_level::DEBUG, "waiting to join refresh_thread");
+    m_refresh_thread.join();
+    log_cont("refresh_thread joined");
+  }
+  else
+  {
+    log(log_level::DEBUG, "refresh_thread already joined");
+  }
+  
+  log_end("}");
 }
 
 linkmasta_device* DeviceManager::buildLinkmastaDevice(usb::usb_device* device)

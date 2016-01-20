@@ -1,5 +1,6 @@
 #include "libusb_device_manager.h"
 
+#include "common/log.h"
 #include "libusb-1.0/libusb.h"
 #include "linkmasta_device/linkmasta_device.h"
 #include "usb/libusb_usb_device.h"
@@ -21,16 +22,24 @@ LibusbDeviceManager::LibusbDeviceManager()
 
 LibusbDeviceManager::~LibusbDeviceManager()
 {
+  log_start(log_level::DEBUG, "~LibusbDeviceManager() {");
+  
+  stopAutoRefreshAndWait();
+  
+  m_libusb_mutex.lock();
+  m_connected_devices_mutex.lock();
   for (auto entry : m_connected_devices)
   {
     delete entry.second.linkmasta;
     libusb_unref_device(entry.second.device);
   }
   
-  m_libusb_mutex.lock();
   libusb_exit(m_libusb);
   m_libusb_init = false;
+  m_connected_devices_mutex.unlock();
   m_libusb_mutex.unlock();
+  
+  log_end("}");
 }
 
 

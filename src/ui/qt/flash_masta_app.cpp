@@ -1,5 +1,6 @@
 #include "flash_masta_app.h"
 
+#include "common/log.h"
 #include "libusb_device_manager.h"
 #include "games/ws_game_catalog.h"
 #include "games/ngp_game_catalog.h"
@@ -36,9 +37,11 @@ FlashMastaApp::FlashMastaApp(int argc, char **argv, int flags)
 
 FlashMastaApp::~FlashMastaApp()
 {
+  log_start(log_level::DEBUG, "deleting FlashMastaApp...");
   delete m_device_manager;
   delete m_ws_game_catalog;
   delete m_ngp_game_catalog;
+  log_end("done");
 }
 
 DeviceManager* FlashMastaApp::getDeviceManager() const

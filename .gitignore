@@ -29,4 +29,5 @@ ipch/
 *.autosave
 build-database
 *.db
+log.txt
 

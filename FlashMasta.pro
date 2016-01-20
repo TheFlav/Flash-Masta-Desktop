@@ -67,7 +67,8 @@ SOURCES +=\
     src/games/ws_game_catalog.cpp \
     src/games/ngp_game_catalog.cpp \
     src/ui/qt/task/ngp_cartridge_verify_save_task.cpp \
-    src/ui/qt/task/ws_cartridge_verify_save_task.cpp
+    src/ui/qt/task/ws_cartridge_verify_save_task.cpp \
+    src/common/log.cpp
 
 HEADERS  +=\
     src/cartridge/cartridge.h \
@@ -127,7 +128,8 @@ HEADERS  +=\
     src/games/ws_game_catalog.h \
     src/games/ngp_game_catalog.h \
     src/ui/qt/task/ngp_cartridge_verify_save_task.h \
-    src/ui/qt/task/ws_cartridge_verify_save_task.h
+    src/ui/qt/task/ws_cartridge_verify_save_task.h \
+    src/common/log.h
 
 FORMS    +=\
     src/ui/qt/main_window.ui \

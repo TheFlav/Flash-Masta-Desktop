@@ -35,6 +35,7 @@ public:
 protected:
   unsigned int                      generateId();
   void                              startAutoRefresh();
+  void                              stopAutoRefreshAndWait();
   virtual void                      refreshDeviceList() = 0;
   static linkmasta_device*          buildLinkmastaDevice(usb::usb_device* device);
   
