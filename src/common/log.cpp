@@ -1,3 +1,13 @@
+/*! \file
+ *  \brief File containing the definitions for logging functions.
+ *
+ *  File containing the definitions for logging functions.
+ *  
+ *  \author Daniel Andrus
+ *  \date 2016-01-20
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
+
 #include "log.h"
 
 #ifndef DISABLE_LOGGING

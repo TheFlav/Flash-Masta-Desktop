@@ -1,7 +1,7 @@
 /*! \file
  *  \brief File containing the declaration of the \ref ws_sram_chip class.
  *
- *  File contaiing the header information and declaration of the
+ *  File containing the header information and declaration of the
  *  \ref ws_sram_chip class.
  *  
  *  \author Daniel Andrus
