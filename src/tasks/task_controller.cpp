@@ -1,10 +1,12 @@
-//
-//  task_controller.cpp
-//  FlashMasta
-//
-//  Created by Dan on 8/6/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing the implementation of \ref task_controller.
+ *  
+ *  File containing the implementation of \ref task_controller.
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-08-06
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #include "task_controller.h"
 
@@ -112,5 +114,3 @@ void task_controller::cancel_task()
   m_task_is_cancelled = true;
   m_mutex->unlock();
 }
-
-

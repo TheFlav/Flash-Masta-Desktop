@@ -1,10 +1,13 @@
-//
-//  forwarding_task_controller.cpp
-//  FlashMasta
-//
-//  Created by Dan on 8/6/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing the implementation of
+ *  \ref forwarding_task_controller.
+ *  
+ *  File containing the implementation of \ref forwarding_task_controller.
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-08-06
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #include "forwarding_task_controller.h"
 
