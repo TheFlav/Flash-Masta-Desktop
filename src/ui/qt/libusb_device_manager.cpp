@@ -2,7 +2,7 @@
 
 #include "common/log.h"
 #include "libusb-1.0/libusb.h"
-#include "linkmasta_device/linkmasta_device.h"
+#include "linkmasta/linkmasta_device.h"
 #include "usb/libusb_usb_device.h"
 
 using namespace std;

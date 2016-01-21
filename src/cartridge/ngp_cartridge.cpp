@@ -16,7 +16,7 @@
  */
 
 #include "ngp_cartridge.h"
-#include "linkmasta_device/linkmasta_device.h"
+#include "linkmasta/linkmasta_device.h"
 #include "ngp_chip.h"
 #include "tasks/task_controller.h"
 #include "tasks/forwarding_task_controller.h"

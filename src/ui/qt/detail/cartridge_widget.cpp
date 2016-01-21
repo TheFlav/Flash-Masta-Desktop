@@ -7,7 +7,7 @@
 #include <QThread>
 
 #include "cartridge/cartridge.h"
-#include "linkmasta_device/linkmasta_device.h"
+#include "linkmasta/linkmasta_device.h"
 #include "games/ngp_game_catalog.h"
 #include "games/ws_game_catalog.h"
 #include "games/game_descriptor.h"

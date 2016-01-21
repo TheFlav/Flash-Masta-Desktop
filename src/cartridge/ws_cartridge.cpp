@@ -14,7 +14,7 @@
  */
 
 #include "ws_cartridge.h"
-#include "linkmasta_device/linkmasta_device.h"
+#include "linkmasta/linkmasta_device.h"
 #include "ws_rom_chip.h"
 #include "ws_sram_chip.h"
 #include "tasks/task_controller.h"

@@ -14,7 +14,7 @@
  */
 
 #include "ws_rom_chip.h"
-#include "linkmasta_device/linkmasta_device.h"
+#include "linkmasta/linkmasta_device.h"
 #include "tasks/task_controller.h"
 #include "tasks/forwarding_task_controller.h"
 

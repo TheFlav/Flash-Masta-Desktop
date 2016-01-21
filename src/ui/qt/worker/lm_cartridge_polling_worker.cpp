@@ -3,7 +3,7 @@
 #include "../flash_masta_app.h"
 #include "../device_manager.h"
 #include "cartridge/ngp_cartridge.h"
-#include "linkmasta_device/linkmasta_device.h"
+#include "linkmasta/linkmasta_device.h"
 
 const int LmCartridgePollingWorker::INTERVAL = 2000; // 1k milliseconds = 1 second
 

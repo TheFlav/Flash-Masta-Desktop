@@ -3,8 +3,8 @@
 #include <chrono>
 
 #include "common/log.h"
-#include "linkmasta_device/ngp_linkmasta_device.h"
-#include "linkmasta_device/ws_linkmasta_device.h"
+#include "linkmasta/ngp_linkmasta_device.h"
+#include "linkmasta/ws_linkmasta_device.h"
 #include "usb/usb_device.h"
 
 using namespace std;

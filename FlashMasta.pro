@@ -19,8 +19,8 @@ SOURCES +=\
     src/cartridge/ngp_cartridge.cpp \
     src/cartridge/cartridge_descriptor.cpp \
     src/cartridge/ngp_chip.cpp \
-    src/linkmasta_device/ngp_linkmasta_device.cpp \
-    src/linkmasta_device/ngp_linkmasta_messages.cpp \
+    src/linkmasta/ngp_linkmasta_device.cpp \
+    src/linkmasta/ngp_linkmasta_messages.cpp \
     src/tasks/forwarding_task_controller.cpp \
     src/tasks/task_controller.cpp \
     src/usb/exception/busy_exception.cpp \
@@ -35,12 +35,12 @@ SOURCES +=\
     src/usb/libusb_usb_device.cpp \
     src/usb/usb_device.cpp \
     src/ui/qt/main_window.cpp \
-    src/linkmasta_device/ws_linkmasta_device.cpp \
-    src/linkmasta_device/ws_linkmasta_messages.cpp \
+    src/linkmasta/ws_linkmasta_device.cpp \
+    src/linkmasta/ws_linkmasta_messages.cpp \
     src/cartridge/ws_cartridge.cpp \
     src/cartridge/ws_rom_chip.cpp \
     src/cartridge/ws_sram_chip.cpp \
-    src/linkmasta_device/linkmasta_device.cpp \
+    src/linkmasta/linkmasta_device.cpp \
     src/ui/qt/task/ngp_cartridge_backup_save_task.cpp \
     src/ui/qt/task/ngp_cartridge_backup_task.cpp \
     src/ui/qt/task/ngp_cartridge_flash_task.cpp \
@@ -76,9 +76,9 @@ HEADERS  +=\
     src/common/types.h \
     src/cartridge/cartridge_descriptor.h \
     src/cartridge/ngp_chip.h \
-    src/linkmasta_device/linkmasta_device.h \
-    src/linkmasta_device/ngp_linkmasta_device.h \
-    src/linkmasta_device/ngp_linkmasta_messages.h \
+    src/linkmasta/linkmasta_device.h \
+    src/linkmasta/ngp_linkmasta_device.h \
+    src/linkmasta/ngp_linkmasta_messages.h \
     src/tasks/forwarding_task_controller.h \
     src/tasks/task_controller.h \
     src/usb/exception/busy_exception.h \
@@ -95,8 +95,8 @@ HEADERS  +=\
     src/usb/usb_device.h \
     src/usb/usbfwd.h \
     src/ui/qt/main_window.h \
-    src/linkmasta_device/ws_linkmasta_device.h \
-    src/linkmasta_device/ws_linkmasta_messages.h \
+    src/linkmasta/ws_linkmasta_device.h \
+    src/linkmasta/ws_linkmasta_messages.h \
     src/cartridge/ws_cartridge.h \
     src/cartridge/ws_rom_chip.h \
     src/cartridge/ws_sram_chip.h \

@@ -1,7 +1,7 @@
 #include "lm_detail_widget.h"
 #include "ui_lm_detail_widget.h"
 
-#include "linkmasta_device/linkmasta_device.h"
+#include "linkmasta/linkmasta_device.h"
 
 #include "cartridge_widget.h"
 #include "../device_manager.h"

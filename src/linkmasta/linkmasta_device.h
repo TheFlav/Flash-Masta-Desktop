@@ -40,6 +40,8 @@ enum linkmasta_system
   LINKMASTA_WONDERSWAN
 };
 
+
+
 /*! \class linkmasta_device
  *  \brief Provides functionality for communicating with a linkmasta device and
  *         interfaces for determining what features the implementation supports.
