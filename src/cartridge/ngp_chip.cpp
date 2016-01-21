@@ -589,5 +589,3 @@ void ngp_chip::enter_autoselect()
   write(ADDR_COMMAND3, 0x90);
   m_mode = AUTOSELECT;
 }
-
-

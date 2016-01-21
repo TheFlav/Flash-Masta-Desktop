@@ -34,6 +34,7 @@ class task_controller;
 class ws_sram_chip
 {
 public:
+  
   /*! \brief Type used to represent data content. */
   typedef unsigned char   data_t;
   
@@ -45,6 +46,8 @@ public:
   
   /*! \brief Type used to represent an address into the device's storage. */
   typedef unsigned int    address_t;
+  
+  
   
   /*! \brief The constructor for this class.
    *  
@@ -64,6 +67,8 @@ public:
    *  Frees dynamically allocated memory and closes any open connections.
    */
                           ~ws_sram_chip();
+  
+  
   
   /*! \brief Reads a single word from the chip.
    *  
@@ -132,7 +137,10 @@ public:
    */
   unsigned int            program_bytes(address_t address, const data_t* data, unsigned int num_bytes, task_controller* controller = nullptr);
   
+  
+  
 private:
+  
   /*! \brief A pointer to the \ref linkmasta_device used for communicating with
    *         the chip.
    *  

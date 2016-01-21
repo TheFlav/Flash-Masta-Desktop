@@ -35,6 +35,7 @@ class ngp_chip;
 class ngp_cartridge: public cartridge
 {
 private:
+  
   /*! \brief The maximum number of chips to test for.
    *  
    *  Some Neo Geo Pocket cartridges can have multiple chips. This variable
@@ -46,6 +47,7 @@ private:
   
 
 public:
+  
   /*! \brief A struct for representing and storing the metadata of a Neo Geo
    *         Pocket game.
    */
@@ -90,6 +92,8 @@ public:
    *  free that object.
    */
                         ~ngp_cartridge();
+  
+  
   
   /*!
    *  \see cartridge::system()
@@ -413,4 +417,4 @@ private:
   std::vector<game_metadata> m_metadata;
 };
 
-#endif // __NGP_CARTRIDGE_H__
+#endif /* defined(__NGP_CARTRIDGE_H__) */

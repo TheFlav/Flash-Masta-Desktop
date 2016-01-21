@@ -1555,5 +1555,3 @@ void ws_cartridge::game_metadata::write_to_data_array(unsigned char* data)
   data[8] = checksum >> 8;
   data[9] = checksum & 0xFF;
 }
-
-
