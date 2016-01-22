@@ -52,7 +52,7 @@ CartridgeInfoWidget::~CartridgeInfoWidget()
 
 void CartridgeInfoWidget::buildFromCartridge(cartridge* cart)
 {
-  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->try_claim_device(m_device_id));
   
   const cartridge_descriptor* descriptor = cart->descriptor();
   
@@ -152,7 +152,7 @@ void CartridgeInfoWidget::buildFromCartridge(cartridge* cart)
   setPromptLabelVisible(is_flashmasta);
   setCartridgeSpecNumSlotsVisible(is_flashmasta);
   
-  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
+  FlashMastaApp::getInstance()->getDeviceManager()->release_device(m_device_id);
 }
 
 

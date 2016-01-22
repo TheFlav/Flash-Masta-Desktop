@@ -36,14 +36,14 @@ void LmCartridgePollingWorker::stop()
 
 void LmCartridgePollingWorker::run()
 {
-  if (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_id))
+  if (!FlashMastaApp::getInstance()->getDeviceManager()->try_claim_device(m_id))
   {
     // Do nothing
     return;
   }
   
   // This function simply tests if a cartridge was connected or disconnected
-  linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(m_id);
+  linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->get_linkmasta_device(m_id);
   bool device_connected;
   
   try
@@ -54,12 +54,12 @@ void LmCartridgePollingWorker::run()
   {
     (void) ex;
     // Do nothing; fail quietly
-    FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_id);
+    FlashMastaApp::getInstance()->getDeviceManager()->release_device(m_id);
     return;
   }
   
   // Must release device when done using it so as to not block other functions
-  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_id);
+  FlashMastaApp::getInstance()->getDeviceManager()->release_device(m_id);
   
   if (m_device_connected == device_connected)
   {

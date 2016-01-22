@@ -3,7 +3,7 @@
 
 #include <QApplication>
 
-class DeviceManager;
+class device_manager;
 class MainWindow;
 class game_catalog;
 
@@ -14,7 +14,7 @@ public:
   FlashMastaApp(int argc, char** argv, int flags = ApplicationFlags);
   ~FlashMastaApp();
   
-  DeviceManager* getDeviceManager() const;
+  device_manager* getDeviceManager() const;
   MainWindow* getMainWindow() const;
   game_catalog* getWonderswanGameCatalog() const;
   game_catalog* getNeoGeoGameCatalog() const;
@@ -51,7 +51,7 @@ private:
   Q_DISABLE_COPY(FlashMastaApp)
   
   MainWindow* m_main_window;
-  DeviceManager* m_device_manager;
+  device_manager* m_device_manager;
   game_catalog* m_ws_game_catalog;
   game_catalog* m_ngp_game_catalog;
   bool m_game_backup_enabled;
