@@ -8,9 +8,9 @@
 
 #include "cartridge/cartridge.h"
 #include "linkmasta/linkmasta_device.h"
-#include "games/ngp_game_catalog.h"
-#include "games/ws_game_catalog.h"
-#include "games/game_descriptor.h"
+#include "game/ngp_game_catalog.h"
+#include "game/ws_game_catalog.h"
+#include "game/game_descriptor.h"
 
 #include "cartridge_info_widget.h"
 #include "fm_cartridge_slot_widget.h"

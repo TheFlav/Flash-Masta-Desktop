@@ -18,8 +18,8 @@
 #include "ngp_cartridge.h"
 #include "linkmasta/linkmasta_device.h"
 #include "ngp_chip.h"
-#include "tasks/task_controller.h"
-#include "tasks/forwarding_task_controller.h"
+#include "task/task_controller.h"
+#include "task/forwarding_task_controller.h"
 #include <iostream>
 
 using namespace std;

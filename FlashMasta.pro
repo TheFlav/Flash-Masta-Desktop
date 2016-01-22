@@ -21,8 +21,8 @@ SOURCES +=\
     src/cartridge/ngp_chip.cpp \
     src/linkmasta/ngp_linkmasta_device.cpp \
     src/linkmasta/ngp_linkmasta_messages.cpp \
-    src/tasks/forwarding_task_controller.cpp \
-    src/tasks/task_controller.cpp \
+    src/task/forwarding_task_controller.cpp \
+    src/task/task_controller.cpp \
     src/usb/exception/busy_exception.cpp \
     src/usb/exception/disconnected_exception.cpp \
     src/usb/exception/exception.cpp \
@@ -62,10 +62,10 @@ SOURCES +=\
     src/ui/qt/worker/lm_cartridge_polling_worker.cpp \
     src/ui/qt/detail/lm_detail_widget.cpp \
     src/ui/qt/detail/cartridge_info_widget.cpp \
-    src/games/game_descriptor.cpp \
+    src/game/game_descriptor.cpp \
     src/sqlite/sqlite3.c \
-    src/games/ws_game_catalog.cpp \
-    src/games/ngp_game_catalog.cpp \
+    src/game/ws_game_catalog.cpp \
+    src/game/ngp_game_catalog.cpp \
     src/ui/qt/task/ngp_cartridge_verify_save_task.cpp \
     src/ui/qt/task/ws_cartridge_verify_save_task.cpp \
     src/common/log.cpp
@@ -79,8 +79,8 @@ HEADERS  +=\
     src/linkmasta/linkmasta_device.h \
     src/linkmasta/ngp_linkmasta_device.h \
     src/linkmasta/ngp_linkmasta_messages.h \
-    src/tasks/forwarding_task_controller.h \
-    src/tasks/task_controller.h \
+    src/task/forwarding_task_controller.h \
+    src/task/task_controller.h \
     src/usb/exception/busy_exception.h \
     src/usb/exception/disconnected_exception.h \
     src/usb/exception/exception.h \
@@ -121,12 +121,12 @@ HEADERS  +=\
     src/ui/qt/worker/lm_cartridge_polling_worker.h \
     src/ui/qt/detail/lm_detail_widget.h \
     src/ui/qt/detail/cartridge_info_widget.h \
-    src/games/game_catalog.h \
-    src/games/game_descriptor.h \
+    src/game/game_catalog.h \
+    src/game/game_descriptor.h \
     src/sqlite/sqlite3.h \
     src/sqlite/sqlite3ext.h \
-    src/games/ws_game_catalog.h \
-    src/games/ngp_game_catalog.h \
+    src/game/ws_game_catalog.h \
+    src/game/ngp_game_catalog.h \
     src/ui/qt/task/ngp_cartridge_verify_save_task.h \
     src/ui/qt/task/ws_cartridge_verify_save_task.h \
     src/common/log.h

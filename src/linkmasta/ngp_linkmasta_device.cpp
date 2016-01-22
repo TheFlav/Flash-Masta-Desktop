@@ -17,7 +17,7 @@
 #include "usb/usb_device.h"
 #include "cartridge/ngp_cartridge.h"
 #include "ngp_linkmasta_messages.h"
-#include "tasks/task_controller.h"
+#include "task/task_controller.h"
 #include <limits>
 
 using namespace usb;

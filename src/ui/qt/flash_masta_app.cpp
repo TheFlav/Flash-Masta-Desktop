@@ -2,8 +2,8 @@
 
 #include "common/log.h"
 #include "libusb_device_manager.h"
-#include "games/ws_game_catalog.h"
-#include "games/ngp_game_catalog.h"
+#include "game/ws_game_catalog.h"
+#include "game/ngp_game_catalog.h"
 #include "main_window.h"
 
 FlashMastaApp* FlashMastaApp::instance = nullptr;

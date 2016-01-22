@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <mutex>
-#include "tasks/task_controller.h"
+#include "task/task_controller.h"
 #include "usb/usbfwd.h"
 
 class cartridge;
