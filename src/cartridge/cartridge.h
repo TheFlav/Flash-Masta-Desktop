@@ -13,7 +13,7 @@
 #ifndef __CARTRIDGE_H__
 #define __CARTRIDGE_H__
 
-#include "../common/types.h"
+#include "common/types.h"
 #include "cartridge_descriptor.h"
 #include <iosfwd>
 #include <string>
