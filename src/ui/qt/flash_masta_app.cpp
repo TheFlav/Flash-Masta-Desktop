@@ -1,7 +1,7 @@
 #include "flash_masta_app.h"
 
 #include "common/log.h"
-#include "libusb_device_manager.h"
+#include "device/libusb_device_manager.h"
 #include "game/ws_game_catalog.h"
 #include "game/ngp_game_catalog.h"
 #include "main_window.h"

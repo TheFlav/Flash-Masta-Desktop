@@ -8,7 +8,7 @@
 
 #include "ngp_fm_cartridge_info_worker.h"
 #include "../flash_masta.h"
-#include "../device_manager.h"
+#include "device/device_manager.h"
 
 NgpFmCartridgeInfoWorker:NgpFmCartridgeInfoWorker(unsigned int device_id, QObject *parent)
   : QObject(parent), m_id(device_id), m_cancelled(false)

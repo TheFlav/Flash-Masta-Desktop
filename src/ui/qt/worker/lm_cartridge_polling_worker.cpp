@@ -1,7 +1,7 @@
 #include "lm_cartridge_polling_worker.h"
 
 #include "../flash_masta_app.h"
-#include "../device_manager.h"
+#include "device/device_manager.h"
 #include "cartridge/ngp_cartridge.h"
 #include "linkmasta/linkmasta_device.h"
 

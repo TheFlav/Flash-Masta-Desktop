@@ -53,8 +53,8 @@ SOURCES +=\
     src/ui/qt/task/ws_cartridge_restore_save_task.cpp \
     src/ui/qt/task/ws_cartridge_task.cpp \
     src/ui/qt/task/ws_cartridge_verify_task.cpp \
-    src/ui/qt/device_manager.cpp \
-    src/ui/qt/libusb_device_manager.cpp \
+    src/device/device_manager.cpp \
+    src/device/libusb_device_manager.cpp \
     src/ui/qt/detail/fm_cartridge_slot_widget.cpp \
     src/ui/qt/flash_masta_app.cpp \
     src/ui/qt/detail/cartridge_widget.cpp \
@@ -112,8 +112,8 @@ HEADERS  +=\
     src/ui/qt/task/ws_cartridge_restore_save_task.h \
     src/ui/qt/task/ws_cartridge_task.h \
     src/ui/qt/task/ws_cartridge_verify_task.h \
-    src/ui/qt/device_manager.h \
-    src/ui/qt/libusb_device_manager.h \
+    src/device/device_manager.h \
+    src/device/libusb_device_manager.h \
     src/ui/qt/detail/fm_cartridge_slot_widget.h \
     src/ui/qt/flash_masta_app.h \
     src/ui/qt/detail/cartridge_widget.h \
