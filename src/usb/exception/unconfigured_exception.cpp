@@ -1,10 +1,18 @@
-//
-//  unconfigured_exception.cpp
-//  FlashMasta
-//
-//  Created by Dan on 8/4/15.
-//  Copyright (c) 2015 7400 Circuits. All rights reserved.
-//
+/*! \file
+ *  \brief File containing the implementation of
+ *         \ref usb::unconfigured_exception.
+ *  
+ *  File containing the implementation of \ref usb::unconfigured_exception.
+ *  
+ *  See corrensponding header file to view documentation for class, its methods,
+ *  and its member variables.
+ *  
+ *  \see usb::unconfigured_exception
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-08-04
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
 
 #include "unconfigured_exception.h"
 
@@ -29,9 +37,11 @@ unconfigured_exception::unconfigured_exception(const unconfigured_exception& oth
   // Nothing else to do
 }
 
+
+
 const char* unconfigured_exception::missing_config() const
 {
   return m_missing_config.c_str();
 }
 
-};
+}

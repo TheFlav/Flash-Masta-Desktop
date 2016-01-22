@@ -19,7 +19,6 @@
 #ifndef __USBFWD_H__
 #define __USBFWD_H__
 
-
 namespace usb
 {
 
@@ -37,6 +36,5 @@ class uninitialized_exception;
 class unopen_exception;
 
 }
-
 
 #endif /* defined(__USBFWD_H__) */

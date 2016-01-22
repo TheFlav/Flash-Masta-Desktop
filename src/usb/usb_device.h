@@ -108,6 +108,8 @@ public:
     ENDPOINT_DIRECTION_OUT
   };
   
+  
+  
   /*! \brief Class destructor.
    *  
    *  Class destructor. Exists only to satisfy compiler.
@@ -668,4 +670,4 @@ struct usb_device::device_endpoint
 
 }
 
-#endif // __USB_COMMUNICATOR_H__
+#endif /* defined(__USB_DEVICE_H__) */
