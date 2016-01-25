@@ -7,7 +7,7 @@
 #include "game/game_catalog.h"
 #include "game/game_descriptor.h"
 
-#include "device/device_manager.h"
+#include "linkmasta/device_manager.h"
 #include "../flash_masta_app.h"
 #include "../main_window.h"
 

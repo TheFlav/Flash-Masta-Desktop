@@ -1,9 +1,22 @@
+/*! \file
+ *  \brief File containing the implementation of \ref libusb_device_manager.
+ *  
+ *  File containing the implementation of \ref libusb_device_manager.
+ *  
+ *  See corrensponding header file to view documentation for struct, its
+ *  methods, and its member variables.
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-09-08
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
+
 #include "libusb_device_manager.h"
 
 #include "common/log.h"
 #include "libusb-1.0/libusb.h"
-#include "linkmasta/linkmasta_device.h"
 #include "usb/libusb_usb_device.h"
+#include "linkmasta_device.h"
 
 using namespace std;
 
@@ -364,5 +377,3 @@ bool libusb_device_manager::is_supported(unsigned int vendor_id, unsigned int pr
           || (vendor_id == 0x20A0 && product_id == 0x4256)    // NGP (new flashmasta)
           || (vendor_id == 0x20A0 && product_id == 0x4252));  // WS
 }
-
-

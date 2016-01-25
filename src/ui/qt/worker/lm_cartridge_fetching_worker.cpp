@@ -1,7 +1,7 @@
 #include "lm_cartridge_fetching_worker.h"
 
 #include "../flash_masta_app.h"
-#include "device/device_manager.h"
+#include "linkmasta/device_manager.h"
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
 #include "cartridge/ws_cartridge.h"

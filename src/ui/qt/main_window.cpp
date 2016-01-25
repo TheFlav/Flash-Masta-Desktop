@@ -12,7 +12,7 @@
 #include <QString>
 
 #include "detail/lm_detail_widget.h"
-#include "device/device_manager.h"
+#include "linkmasta/device_manager.h"
 #include "flash_masta_app.h"
 #include "task/ngp_cartridge_backup_task.h"
 #include "task/ngp_cartridge_backup_save_task.h"

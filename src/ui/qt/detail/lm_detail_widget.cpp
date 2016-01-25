@@ -4,7 +4,7 @@
 #include "linkmasta/linkmasta_device.h"
 
 #include "cartridge_widget.h"
-#include "device/device_manager.h"
+#include "linkmasta/device_manager.h"
 #include "../worker/lm_cartridge_polling_worker.h"
 
 LmDetailWidget::LmDetailWidget(unsigned int device_id, QWidget *parent) :

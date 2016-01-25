@@ -15,7 +15,7 @@
 #include "cartridge_info_widget.h"
 #include "fm_cartridge_slot_widget.h"
 #include "../main_window.h"
-#include "device/device_manager.h"
+#include "linkmasta/device_manager.h"
 #include "../worker/lm_cartridge_fetching_worker.h"
 
 CartridgeWidget::CartridgeWidget(unsigned int device_id, QWidget *parent) :

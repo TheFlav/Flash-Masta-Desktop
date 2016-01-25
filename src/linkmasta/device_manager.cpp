@@ -1,11 +1,25 @@
+/*! \file
+ *  \brief File containing the implementation of \ref device_manager.
+ *  
+ *  File containing a partial implementation of \ref device_manager.
+ *  Pure virtual functions must be implemented by subclasses.
+ *  
+ *  See corrensponding header file to view documentation for struct, its
+ *  methods, and its member variables.
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-09-08
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
+
 #include "device_manager.h"
 
 #include <chrono>
 
 #include "common/log.h"
-#include "linkmasta/ngp_linkmasta_device.h"
-#include "linkmasta/ws_linkmasta_device.h"
 #include "usb/usb_device.h"
+#include "ngp_linkmasta_device.h"
+#include "ws_linkmasta_device.h"
 
 using namespace std;
 using namespace usb;
@@ -115,5 +129,3 @@ void device_manager::refresh_thread_function()
   
   m_thread_dead = true;
 }
-
-
