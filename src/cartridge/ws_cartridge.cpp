@@ -14,11 +14,11 @@
  */
 
 #include "ws_cartridge.h"
-#include "linkmasta_device/linkmasta_device.h"
+#include "linkmasta/linkmasta_device.h"
 #include "ws_rom_chip.h"
 #include "ws_sram_chip.h"
-#include "tasks/task_controller.h"
-#include "tasks/forwarding_task_controller.h"
+#include "task/task_controller.h"
+#include "task/forwarding_task_controller.h"
 #include <fstream>
 #include <sstream>
 #include <iomanip>
@@ -1555,5 +1555,3 @@ void ws_cartridge::game_metadata::write_to_data_array(unsigned char* data)
   data[8] = checksum >> 8;
   data[9] = checksum & 0xFF;
 }
-
-

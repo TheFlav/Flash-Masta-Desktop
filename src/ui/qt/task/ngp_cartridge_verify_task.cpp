@@ -4,7 +4,7 @@
 #include <fstream>
 #include "cartridge/cartridge.h"
 #include "../flash_masta_app.h"
-#include "games/game_catalog.h"
+#include "game/game_catalog.h"
 
 NgpCartridgeVerifyTask::NgpCartridgeVerifyTask(QWidget *parent, cartridge* cart, int slot)
   : NgpCartridgeTask(parent, cart, slot)

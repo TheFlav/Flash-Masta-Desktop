@@ -7,15 +7,15 @@
 #include <QThread>
 
 #include "cartridge/cartridge.h"
-#include "linkmasta_device/linkmasta_device.h"
-#include "games/ngp_game_catalog.h"
-#include "games/ws_game_catalog.h"
-#include "games/game_descriptor.h"
+#include "linkmasta/linkmasta_device.h"
+#include "game/ngp_game_catalog.h"
+#include "game/ws_game_catalog.h"
+#include "game/game_descriptor.h"
 
 #include "cartridge_info_widget.h"
 #include "fm_cartridge_slot_widget.h"
 #include "../main_window.h"
-#include "../device_manager.h"
+#include "linkmasta/device_manager.h"
 #include "../worker/lm_cartridge_fetching_worker.h"
 
 CartridgeWidget::CartridgeWidget(unsigned int device_id, QWidget *parent) :
@@ -69,8 +69,8 @@ void CartridgeWidget::refreshUi()
   setSlotsComboBoxVisible(m_cartridge->type() == cartridge_type::CARTRIDGE_FLASHMASTA);
   
   // Generate and display a name for the connected cartridge
-  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
-  linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(m_device_id);
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->try_claim_device(m_device_id));
+  linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->get_linkmasta_device(m_device_id);
   if (!linkmasta->is_integrated_with_cartridge())
   {
     std::string cartridgeName;
@@ -119,7 +119,7 @@ void CartridgeWidget::refreshUi()
   }
   setCartridgeNameVisible(!linkmasta->is_integrated_with_cartridge());
   setCartridgeSubtitleVisible(m_cartridge->type() == CARTRIDGE_OFFICIAL);
-  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
+  FlashMastaApp::getInstance()->getDeviceManager()->release_device(m_device_id);
   
   // Reset everything and erase cached data
   ui->slotsComboBox->clear();

@@ -1,9 +1,9 @@
 #include "flash_masta_app.h"
 
 #include "common/log.h"
-#include "libusb_device_manager.h"
-#include "games/ws_game_catalog.h"
-#include "games/ngp_game_catalog.h"
+#include "linkmasta/libusb_device_manager.h"
+#include "game/ws_game_catalog.h"
+#include "game/ngp_game_catalog.h"
 #include "main_window.h"
 
 FlashMastaApp* FlashMastaApp::instance = nullptr;
@@ -24,7 +24,7 @@ FlashMastaApp::FlashMastaApp(int argc, char **argv, int flags)
     FlashMastaApp::instance = this;
   }
   
-  m_device_manager = new LibusbDeviceManager();
+  m_device_manager = new libusb_device_manager();
   m_ws_game_catalog = new ws_game_catalog((QCoreApplication::applicationDirPath() + QString("/wsgames.db")).toStdString().c_str());
   m_ngp_game_catalog = new ngp_game_catalog((QCoreApplication::applicationDirPath() + QString("/ngpgames.db")).toStdString().c_str());
   m_main_window = new MainWindow();
@@ -44,7 +44,7 @@ FlashMastaApp::~FlashMastaApp()
   log_end("done");
 }
 
-DeviceManager* FlashMastaApp::getDeviceManager() const
+device_manager* FlashMastaApp::getDeviceManager() const
 {
   return m_device_manager;
 }

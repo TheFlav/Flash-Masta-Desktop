@@ -1,11 +1,11 @@
 #include "lm_cartridge_fetching_worker.h"
 
 #include "../flash_masta_app.h"
-#include "../device_manager.h"
+#include "linkmasta/device_manager.h"
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
 #include "cartridge/ws_cartridge.h"
-#include "linkmasta_device/linkmasta_device.h"
+#include "linkmasta/linkmasta_device.h"
 
 LmCartridgeFetchingWorker::LmCartridgeFetchingWorker(unsigned int device_id, QObject *parent) :
   QObject(parent), m_device_id(device_id), m_cancelled(false)
@@ -20,7 +20,7 @@ void LmCartridgeFetchingWorker::run()
   bool cancel = false;
   cartridge* cart = nullptr;
   std::string game_name = "";
-  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->try_claim_device(m_device_id));
   
   m_mutex.lock();
   if (m_cancelled) cancel = true;
@@ -30,7 +30,7 @@ void LmCartridgeFetchingWorker::run()
   
   if (!cancel)
   {
-    linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(m_device_id);
+    linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->get_linkmasta_device(m_device_id);
     m_mutex.lock();
     if (m_cancelled) cancel = true;
     m_mutex.unlock();
@@ -52,7 +52,7 @@ void LmCartridgeFetchingWorker::run()
     m_mutex.unlock();
   }
   
-  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
+  FlashMastaApp::getInstance()->getDeviceManager()->release_device(m_device_id);
   m_mutex.lock();
   if (m_cancelled) cancel = true;
   m_mutex.unlock();

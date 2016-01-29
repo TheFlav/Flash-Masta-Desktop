@@ -51,7 +51,7 @@ public:
    *  \param [in] device The handle to the USb device to use for communicating
    *         with Libusb.
    */
-  libusb_usb_device(libusb_device* device);
+                            libusb_usb_device(libusb_device* device);
   
   /*!
    *  \brief The destructor for the class.
@@ -59,39 +59,39 @@ public:
    *  The destructor for the class. Closes open connections and releases any
    *  dynamically allocated resources.
    */
-  ~libusb_usb_device();
+                            ~libusb_usb_device();
   
   /*!
    *  \see usb_device::init() 
    */
-  void init();
+  void                      init();
   
   
   
   /*!
    *  \see usb_device::timeout()
    */
-  timeout_t timeout() const;
+  timeout_t                 timeout() const;
   
   /*!
    *  \see usb_device::configuration()
    */
-  configuration_t configuration() const;
+  configuration_t           configuration() const;
   
   /*!
    *  \see usb_device::interface()
    */
-  interface_t interface() const;
+  interface_t               interface() const;
   
   /*!
    *  \see usb_device::input_endpoint()
    */
-  endpoint_t input_endpoint() const;
+  endpoint_t                input_endpoint() const;
   
   /*!
    *  \see usb_device::output_endpoint()
    */
-  endpoint_t output_endpoint() const;
+  endpoint_t                output_endpoint() const;
   
   /*!
    *  \see usb_device::get_device_description()
@@ -101,76 +101,76 @@ public:
   /*!
    *  \see usb_device::get_manufacturer_string()
    */
-  std::string get_manufacturer_string();
+  std::string               get_manufacturer_string();
   
   /*!
    *  \see usb_device::get_product_string()
    */
-  std::string get_product_string();
+  std::string               get_product_string();
   
   /*!
    *  \see usb_device::get_serial_number()
    */
-  std::string get_serial_number();
+  std::string               get_serial_number();
   
   
   
   /*!
    *  \see usb_device::set_timeout(timeout_t timeout)
    */
-  void set_timeout(timeout_t timeout);
+  void                      set_timeout(timeout_t timeout);
   
   /*!
    *  \see usb_device::set_configuration(configuration_t configuration)
    */
-  void set_configuration(configuration_t configuration);
+  void                      set_configuration(configuration_t configuration);
   
   /*!
    *  \see usb_device::set_interface(interface_t interface)
    */
-  void set_interface(interface_t interface);
+  void                      set_interface(interface_t interface);
   
   /*!
    *  \see usb_device::set_input_endpoint(endpoint_t input_endpoint)
    */
-  void set_input_endpoint(endpoint_t input_endpoint);
+  void                      set_input_endpoint(endpoint_t input_endpoint);
   
   /*!
    *  \see usb_device::set_output_endpoint(endpoint_t output_endpoint)
    */
-  void set_output_endpoint(endpoint_t output_endpoint);
+  void                      set_output_endpoint(endpoint_t output_endpoint);
   
   
   
   /*!
    *  \see usb_device::open()
    */
-  void open();
+  void                      open();
   
   /*!
    *  \see usb_device::close()
    */
-  void close();
+  void                      close();
   
   /*!
    *  \see usb_device::read(data_t* data, unsigned int num_bytes)
    */
-  unsigned int read(data_t* data, unsigned int num_bytes);
+  unsigned int              read(data_t* data, unsigned int num_bytes);
   
   /*!
    *  \see usb_device::read(data_t* data, unsigned int num_bytes, timeout_t timeout)
    */
-  unsigned int read(data_t* data, unsigned int num_bytes, timeout_t timeout);
+  unsigned int              read(data_t* data, unsigned int num_bytes, timeout_t timeout);
   
   /*!
    *  \see usb_device::write(const data_t* buffer, unsigned int num_bytes)
    */
-  unsigned int write(const data_t* buffer, unsigned int num_bytes);
+  unsigned int              write(const data_t* buffer, unsigned int num_bytes);
   
   /*!
    *  \see usb_device::write(const data_t* buffer, unsigned int num_bytes, timeout_t timeout)
    */
-  unsigned int write(const data_t* buffer, unsigned int num_bytes, timeout_t timeout);
+  unsigned int              write(const data_t* buffer, unsigned int num_bytes, timeout_t timeout);
   
   
   
@@ -184,7 +184,7 @@ private:
    *  \return Pointer to the newly created \ref device_description object. If
    *          an error occured, will return nullptr instead.
    */
-  device_description*   build_device_description();
+  device_description*       build_device_description();
   
   /*!
    *  \brief Builds one of the device's \ref device_configuration descriptors.
@@ -197,7 +197,7 @@ private:
    *  \return A pointer to the new descriptor. If an error occured or the
    *          provided parameters are invalid, will return nullptr instead.
    */
-  device_configuration* build_device_config(unsigned int index);
+  device_configuration*     build_device_config(unsigned int index);
   
   /*!
    *  \brief Builds one of the device's \ref device_interface descriptors.
@@ -212,7 +212,7 @@ private:
    *  \return Pointer to the new interface descriptor. If an error occured or
    *          a parameter was invalid, will return nullptr instead.
    */
-  device_interface*     build_device_interface(const libusb_config_descriptor* config, unsigned int index);
+  device_interface*         build_device_interface(const libusb_config_descriptor* config, unsigned int index);
   
   /*!
    *  \brief Builds one of the device's \ref device_alt_setting descriptors.
@@ -227,7 +227,7 @@ private:
    *  \return Pointer to the new alternate setting descriptor. If an error
    *          occured or a parameter was invalid, will return nullptr instead.
    */
-  device_alt_setting*   build_device_alt_setting(const libusb_interface* interface, unsigned int index);
+  device_alt_setting*       build_device_alt_setting(const libusb_interface* interface, unsigned int index);
   
   /*!
    *  \brief Builds one of the device's \ref device_endpoint descriptors.
@@ -241,7 +241,7 @@ private:
    *  \return Pointer to the new endpoint descriptor. If an error occured or a
    *          parameter was invalid, will return nullptr instead.
    */
-  device_endpoint*      build_device_endpoint(const libusb_interface_descriptor* interface, unsigned int index);
+  device_endpoint*          build_device_endpoint(const libusb_interface_descriptor* interface, unsigned int index);
   
   /*!
    *  \brief Detects if the given integer indicates that an error has occured.
@@ -257,7 +257,7 @@ private:
    *  \return True if \ref libusb_error is indicative of an error, or false if
    *          all is well.
    */
-  static bool           libusb_error_occured(int libusb_error);
+  static bool               libusb_error_occured(int libusb_error);
   
   /*!
    *  \brief Given a Libusb error code, throws the corresponding
@@ -273,88 +273,88 @@ private:
    *         encountered the error. This value is only used if the error is a
    *         type is related to the timeout value.
    */
-  static void           throw_libusb_exception(int libusb_error, timeout_t timeout);
+  static void               throw_libusb_exception(int libusb_error, timeout_t timeout);
   
   
   
   /*! \brief Flag indicating that the object has been initalized. */
-  bool                  m_was_initialized;
+  bool                      m_was_initialized;
   
   /*! \brief Flag indicating that the connection to the USB device is open. */
-  bool                  m_is_open;
+  bool                      m_is_open;
   
   /*!
    *  \brief Flag indicating that the system's kernel was previously attached to
    *         the device and should be reattached when the connection is closed.
    */
-  bool                  m_kernel_was_attached;
+  bool                      m_kernel_was_attached;
   
   /*! \brief Flag indicating that the timeout value has been previously set. */
-  bool                  m_timeout_set;
+  bool                      m_timeout_set;
   
   /*! \brief Flag indicating that the configuration has been previously set. */
-  bool                  m_configuration_set;
+  bool                      m_configuration_set;
   
   /*! \brief Flag indicating that the interface has been previously set. */
-  bool                  m_interface_set;
+  bool                      m_interface_set;
   
   /*! \brief Flag indicating that the input endpoint has been manually set. */
-  bool                  m_input_endpoint_set;
+  bool                      m_input_endpoint_set;
   
   /*! \brief Flag indicating that the output endpoint has been manually set. */
-  bool                  m_output_endpoint_set;
+  bool                      m_output_endpoint_set;
   
   
   
   /*! \brief Value of the timeout for blocking operations in milliseconds. */
-  unsigned int          m_timeout;
+  unsigned int              m_timeout;
   
   /*! \brief The ID of the configuration set for the device. */
-  int                   m_configuration;
+  int                       m_configuration;
   
   /*! \brief The ID of the device's previous configuration before opening. */ 
-  int                   m_old_configuration;
+  int                       m_old_configuration;
   
   /*! \brief The ID of the interface set for the device. */
-  int                   m_interface;
+  int                       m_interface;
   
   /*! \brief The address of the endpoint used for write operations. */
-  unsigned char         m_input_endpoint;
+  unsigned char             m_input_endpoint;
   
   /*! \brief The address of the endpoint used for read operations. */
-  unsigned char         m_output_endpoint;
+  unsigned char             m_output_endpoint;
   
   /*! \brief the ID of the laternate setting set for the device. */
-  unsigned int          m_alt_setting;
+  unsigned int              m_alt_setting;
   
   
   
   /*! \brief Device struct used for interacting with Libusb. */
-  libusb_device* const  m_device;
+  libusb_device* const      m_device;
   
   /*! \brief Handle used for communications with the device through Libusb. */
-  libusb_device_handle* m_device_handle;
+  libusb_device_handle*     m_device_handle;
   
   /*! \brief Cached device descritor built during initialization. */
-  device_description*   m_device_description;
+  device_description*       m_device_description;
   
   /*! \brief Cached value of the device's manufacturer string. */
-  std::string           m_manufacturer_string;
+  std::string               m_manufacturer_string;
   
   /*! \brief Flag indicating that \ref m_manufacturer_string has been set. */
-  bool                  m_manufacturer_string_set;
+  bool                      m_manufacturer_string_set;
   
   /*! \brief Cached value of the device's product string. */
-  std::string           m_product_string;
+  std::string               m_product_string;
   
   /*! \brief Flag indicating that \ref m_product_string has been set. */
-  bool                  m_product_string_set;
+  bool                      m_product_string_set;
   
   /*! \brief Cached value of the device's serial number string. */
-  std::string           m_serial_number;
+  std::string               m_serial_number;
   
   /*! \brief Flag indicating that \ref m_serial_number has been set. */
-  bool                  m_serial_number_set;
+  bool                      m_serial_number_set;
 };
 
 }

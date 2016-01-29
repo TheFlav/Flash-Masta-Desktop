@@ -19,8 +19,8 @@
 
 #include "libusb_usb_device.h"
 #include "usb.h"
-#include "tasks/task_controller.h"
-#include "tasks/forwarding_task_controller.h"
+#include "task/task_controller.h"
+#include "task/forwarding_task_controller.h"
 #include "libusb-1.0/libusb.h"
 #include <stdexcept>
 #include <string>

@@ -123,5 +123,3 @@ cartridge_descriptor::chip_descriptor::block_descriptor::~block_descriptor()
 {
   // Nothing else to do
 }
-
-

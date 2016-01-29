@@ -19,10 +19,10 @@ SOURCES +=\
     src/cartridge/ngp_cartridge.cpp \
     src/cartridge/cartridge_descriptor.cpp \
     src/cartridge/ngp_chip.cpp \
-    src/linkmasta_device/ngp_linkmasta_device.cpp \
-    src/linkmasta_device/ngp_linkmasta_messages.cpp \
-    src/tasks/forwarding_task_controller.cpp \
-    src/tasks/task_controller.cpp \
+    src/linkmasta/ngp_linkmasta_device.cpp \
+    src/linkmasta/ngp_linkmasta_messages.cpp \
+    src/task/forwarding_task_controller.cpp \
+    src/task/task_controller.cpp \
     src/usb/exception/busy_exception.cpp \
     src/usb/exception/disconnected_exception.cpp \
     src/usb/exception/exception.cpp \
@@ -35,12 +35,12 @@ SOURCES +=\
     src/usb/libusb_usb_device.cpp \
     src/usb/usb_device.cpp \
     src/ui/qt/main_window.cpp \
-    src/linkmasta_device/ws_linkmasta_device.cpp \
-    src/linkmasta_device/ws_linkmasta_messages.cpp \
+    src/linkmasta/ws_linkmasta_device.cpp \
+    src/linkmasta/ws_linkmasta_messages.cpp \
     src/cartridge/ws_cartridge.cpp \
     src/cartridge/ws_rom_chip.cpp \
     src/cartridge/ws_sram_chip.cpp \
-    src/linkmasta_device/linkmasta_device.cpp \
+    src/linkmasta/linkmasta_device.cpp \
     src/ui/qt/task/ngp_cartridge_backup_save_task.cpp \
     src/ui/qt/task/ngp_cartridge_backup_task.cpp \
     src/ui/qt/task/ngp_cartridge_flash_task.cpp \
@@ -53,8 +53,8 @@ SOURCES +=\
     src/ui/qt/task/ws_cartridge_restore_save_task.cpp \
     src/ui/qt/task/ws_cartridge_task.cpp \
     src/ui/qt/task/ws_cartridge_verify_task.cpp \
-    src/ui/qt/device_manager.cpp \
-    src/ui/qt/libusb_device_manager.cpp \
+    src/linkmasta/device_manager.cpp \
+    src/linkmasta/libusb_device_manager.cpp \
     src/ui/qt/detail/fm_cartridge_slot_widget.cpp \
     src/ui/qt/flash_masta_app.cpp \
     src/ui/qt/detail/cartridge_widget.cpp \
@@ -62,10 +62,10 @@ SOURCES +=\
     src/ui/qt/worker/lm_cartridge_polling_worker.cpp \
     src/ui/qt/detail/lm_detail_widget.cpp \
     src/ui/qt/detail/cartridge_info_widget.cpp \
-    src/games/game_descriptor.cpp \
+    src/game/game_descriptor.cpp \
     src/sqlite/sqlite3.c \
-    src/games/ws_game_catalog.cpp \
-    src/games/ngp_game_catalog.cpp \
+    src/game/ws_game_catalog.cpp \
+    src/game/ngp_game_catalog.cpp \
     src/ui/qt/task/ngp_cartridge_verify_save_task.cpp \
     src/ui/qt/task/ws_cartridge_verify_save_task.cpp \
     src/common/log.cpp
@@ -76,11 +76,11 @@ HEADERS  +=\
     src/common/types.h \
     src/cartridge/cartridge_descriptor.h \
     src/cartridge/ngp_chip.h \
-    src/linkmasta_device/linkmasta_device.h \
-    src/linkmasta_device/ngp_linkmasta_device.h \
-    src/linkmasta_device/ngp_linkmasta_messages.h \
-    src/tasks/forwarding_task_controller.h \
-    src/tasks/task_controller.h \
+    src/linkmasta/linkmasta_device.h \
+    src/linkmasta/ngp_linkmasta_device.h \
+    src/linkmasta/ngp_linkmasta_messages.h \
+    src/task/forwarding_task_controller.h \
+    src/task/task_controller.h \
     src/usb/exception/busy_exception.h \
     src/usb/exception/disconnected_exception.h \
     src/usb/exception/exception.h \
@@ -95,8 +95,8 @@ HEADERS  +=\
     src/usb/usb_device.h \
     src/usb/usbfwd.h \
     src/ui/qt/main_window.h \
-    src/linkmasta_device/ws_linkmasta_device.h \
-    src/linkmasta_device/ws_linkmasta_messages.h \
+    src/linkmasta/ws_linkmasta_device.h \
+    src/linkmasta/ws_linkmasta_messages.h \
     src/cartridge/ws_cartridge.h \
     src/cartridge/ws_rom_chip.h \
     src/cartridge/ws_sram_chip.h \
@@ -112,8 +112,8 @@ HEADERS  +=\
     src/ui/qt/task/ws_cartridge_restore_save_task.h \
     src/ui/qt/task/ws_cartridge_task.h \
     src/ui/qt/task/ws_cartridge_verify_task.h \
-    src/ui/qt/device_manager.h \
-    src/ui/qt/libusb_device_manager.h \
+    src/linkmasta/device_manager.h \
+    src/linkmasta/libusb_device_manager.h \
     src/ui/qt/detail/fm_cartridge_slot_widget.h \
     src/ui/qt/flash_masta_app.h \
     src/ui/qt/detail/cartridge_widget.h \
@@ -121,12 +121,12 @@ HEADERS  +=\
     src/ui/qt/worker/lm_cartridge_polling_worker.h \
     src/ui/qt/detail/lm_detail_widget.h \
     src/ui/qt/detail/cartridge_info_widget.h \
-    src/games/game_catalog.h \
-    src/games/game_descriptor.h \
+    src/game/game_catalog.h \
+    src/game/game_descriptor.h \
     src/sqlite/sqlite3.h \
     src/sqlite/sqlite3ext.h \
-    src/games/ws_game_catalog.h \
-    src/games/ngp_game_catalog.h \
+    src/game/ws_game_catalog.h \
+    src/game/ngp_game_catalog.h \
     src/ui/qt/task/ngp_cartridge_verify_save_task.h \
     src/ui/qt/task/ws_cartridge_verify_save_task.h \
     src/common/log.h

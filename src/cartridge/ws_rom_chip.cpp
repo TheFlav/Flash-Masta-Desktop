@@ -14,9 +14,9 @@
  */
 
 #include "ws_rom_chip.h"
-#include "linkmasta_device/linkmasta_device.h"
-#include "tasks/task_controller.h"
-#include "tasks/forwarding_task_controller.h"
+#include "linkmasta/linkmasta_device.h"
+#include "task/task_controller.h"
+#include "task/forwarding_task_controller.h"
 
 
 
@@ -567,5 +567,3 @@ void ws_rom_chip::enter_autoselect()
   write(ADDR_COMMAND3, 0x90);
   m_mode = AUTOSELECT;
 }
-
-

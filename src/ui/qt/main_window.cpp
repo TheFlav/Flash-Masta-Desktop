@@ -12,7 +12,7 @@
 #include <QString>
 
 #include "detail/lm_detail_widget.h"
-#include "device_manager.h"
+#include "linkmasta/device_manager.h"
 #include "flash_masta_app.h"
 #include "task/ngp_cartridge_backup_task.h"
 #include "task/ngp_cartridge_backup_save_task.h"
@@ -30,7 +30,7 @@
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
 #include "cartridge/ws_cartridge.h"
-#include "linkmasta_device/linkmasta_device.h"
+#include "linkmasta/linkmasta_device.h"
 
 using namespace std;
 
@@ -48,10 +48,10 @@ using namespace std;
     return;\
   }\
   \
-  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(device_index));
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->try_claim_device(device_index));
 
 #define POST_ACTION \
-  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(device_index);\
+  FlashMastaApp::getInstance()->getDeviceManager()->release_device(device_index);\
   delete cart;\
   emit cartridgeContentChanged(device_index, slot_index);
 
@@ -111,13 +111,13 @@ cartridge* MainWindow::buildCartridgeForDevice(int id)
   linkmasta_device* linkmasta;
   cartridge* cart;
   
-  linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(id);
+  linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->get_linkmasta_device(id);
   if (linkmasta == nullptr)
   {
     return nullptr;
   }
   
-  switch (FlashMastaApp::getInstance()->getDeviceManager()->getProductId(id))
+  switch (FlashMastaApp::getInstance()->getDeviceManager()->get_product_id(id))
   {
   case 0x4256:       // NGP (new flashmasta)
   case 0x4178:       // NGP (linkmasta)
@@ -129,9 +129,9 @@ cartridge* MainWindow::buildCartridgeForDevice(int id)
     break;
   }
   
-  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(id));
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->try_claim_device(id));
   cart->init();
-  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(id);
+  FlashMastaApp::getInstance()->getDeviceManager()->release_device(id);
   return cart;
 }
 
@@ -360,7 +360,7 @@ void MainWindow::refreshDeviceList_timeout()
   set<unsigned int> new_devices;      // newly connected devices
   set<unsigned int> removed_devices;  // recently removed devices
   
-  if (FlashMastaApp::getInstance()->getDeviceManager()->tryGetConnectedDevices(connected_devices))
+  if (FlashMastaApp::getInstance()->getDeviceManager()->try_get_connected_devices(connected_devices))
   {
     // new row selection after updating list
     int selection = -1;
@@ -415,7 +415,7 @@ void MainWindow::refreshDeviceList_timeout()
     {
       // Instantiate a new item and append it to the list widget
       QString device_name = "";
-      linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(device_id);
+      linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->get_linkmasta_device(device_id);
       switch (linkmasta->system())
       {
       default:

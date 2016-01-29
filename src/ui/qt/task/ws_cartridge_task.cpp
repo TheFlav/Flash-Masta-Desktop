@@ -6,7 +6,7 @@
 #include <limits>
 #include "cartridge/ws_cartridge.h"
 #include "usb/libusb_usb_device.h"
-#include "linkmasta_device/ws_linkmasta_device.h"
+#include "linkmasta/ws_linkmasta_device.h"
 #include "libusb-1.0/libusb.h"
 
 using namespace usb;

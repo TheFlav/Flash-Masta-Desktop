@@ -1,49 +1,63 @@
+/*! \file
+ *  \brief File containing the implementation of \ref device_manager.
+ *  
+ *  File containing a partial implementation of \ref device_manager.
+ *  Pure virtual functions must be implemented by subclasses.
+ *  
+ *  See corrensponding header file to view documentation for struct, its
+ *  methods, and its member variables.
+ *  
+ *  \author Daniel Andrus
+ *  \date 2015-09-08
+ *  \copyright Copyright (c) 2015 7400 Circuits. All rights reserved.
+ */
+
 #include "device_manager.h"
 
 #include <chrono>
 
 #include "common/log.h"
-#include "linkmasta_device/ngp_linkmasta_device.h"
-#include "linkmasta_device/ws_linkmasta_device.h"
 #include "usb/usb_device.h"
+#include "ngp_linkmasta_device.h"
+#include "ws_linkmasta_device.h"
 
 using namespace std;
 using namespace usb;
 
 
 
-DeviceManager::DeviceManager()
+device_manager::device_manager()
   : m_thread_kill_flag(false), m_thread_dead(true), curr_id(0)
 {
   // Nothing else to do
 }
 
-DeviceManager::~DeviceManager()
+device_manager::~device_manager()
 {
   log_start(log_level::DEBUG, "~DeviceManager() {");
-  stopAutoRefreshAndWait();
+  stop_auto_refresh_and_wait();
   log_end("}");
 }
 
 
 
-unsigned int DeviceManager::generateId()
+unsigned int device_manager::generate_id()
 {
   return curr_id++;
 }
 
-void DeviceManager::startAutoRefresh()
+void device_manager::start_auto_refresh()
 {
   if (m_thread_dead)
   {
     m_thread_dead = false;
     m_thread_kill_flag = false;
-    m_refresh_thread = thread(&DeviceManager::refreshThreadFunction, this);
+    m_refresh_thread = thread(&device_manager::refresh_thread_function, this);
     m_refresh_thread.detach();
   }
 }
 
-void DeviceManager::stopAutoRefreshAndWait()
+void device_manager::stop_auto_refresh_and_wait()
 {
   log_start(log_level::DEBUG, "DeviceManager::stopAutoRefreshAndWait() {");
   
@@ -62,7 +76,7 @@ void DeviceManager::stopAutoRefreshAndWait()
   log_end("}");
 }
 
-linkmasta_device* DeviceManager::buildLinkmastaDevice(usb::usb_device* device)
+linkmasta_device* device_manager::build_linkmasta_device(usb::usb_device* device)
 {
   device->init();
   
@@ -90,7 +104,7 @@ linkmasta_device* DeviceManager::buildLinkmastaDevice(usb::usb_device* device)
 
 
 
-void DeviceManager::refreshThreadFunction()
+void device_manager::refresh_thread_function()
 {
   // Set target time to refresh
   auto target_time = chrono::steady_clock::now();
@@ -106,7 +120,7 @@ void DeviceManager::refreshThreadFunction()
     }
     
     // Make call to child
-    refreshDeviceList();
+    refresh_device_list();
     
     // Update refresh timer
     target_time = target_time = chrono::steady_clock::now();
@@ -115,5 +129,3 @@ void DeviceManager::refreshThreadFunction()
   
   m_thread_dead = true;
 }
-
-

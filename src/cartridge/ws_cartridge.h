@@ -36,6 +36,7 @@ class ws_sram_chip;
 class ws_cartridge: public cartridge
 {
 public:
+  
   /*! \brief A struct for representing and storing the metadata of a Wonderswan
    *         game.
    */
@@ -80,6 +81,8 @@ public:
    *  *not* be deallocated, and thus must be freed manually.
    */
                         ~ws_cartridge();
+  
+  
   
   /*!
    *  \see cartridge::system()

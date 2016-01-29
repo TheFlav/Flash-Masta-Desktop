@@ -35,6 +35,7 @@ class task_controller;
 class ws_rom_chip
 {
 public:
+  
   /* \brief Type used for data content. */
   typedef unsigned char   data_t;
   

@@ -1,10 +1,10 @@
 #include "lm_detail_widget.h"
 #include "ui_lm_detail_widget.h"
 
-#include "linkmasta_device/linkmasta_device.h"
+#include "linkmasta/linkmasta_device.h"
 
 #include "cartridge_widget.h"
-#include "../device_manager.h"
+#include "linkmasta/device_manager.h"
 #include "../worker/lm_cartridge_polling_worker.h"
 
 LmDetailWidget::LmDetailWidget(unsigned int device_id, QWidget *parent) :
@@ -18,12 +18,12 @@ LmDetailWidget::LmDetailWidget(unsigned int device_id, QWidget *parent) :
   connect(FlashMastaApp::getInstance(), SIGNAL(selectedDeviceChanged(int,int)), this, SLOT(selectedDeviceChanged(int,int)));
   connect(FlashMastaApp::getInstance(), SIGNAL(selectedSlotChanged(int,int)), this, SLOT(selectedSlotChanged(int,int)));
   
-  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(device_id));
-  linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->getLinkmastaDevice(device_id);
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->try_claim_device(device_id));
+  linkmasta_device* linkmasta = FlashMastaApp::getInstance()->getDeviceManager()->get_linkmasta_device(device_id);
   linkmasta->open();
   std::string ver = linkmasta->firmware_version();
   linkmasta->close();
-  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(device_id);
+  FlashMastaApp::getInstance()->getDeviceManager()->release_device(device_id);
   
   if (linkmasta->is_integrated_with_cartridge())
   {

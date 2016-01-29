@@ -13,7 +13,7 @@
 #ifndef __CARTRIDGE_H__
 #define __CARTRIDGE_H__
 
-#include "../common/types.h"
+#include "common/types.h"
 #include "cartridge_descriptor.h"
 #include <iosfwd>
 #include <string>
@@ -43,12 +43,16 @@ public:
    */
   static int const    SLOT_ALL = -1;
   
+  
+  
   /*!
    *  \brief Class destructor.
    *  
    *  Destructor for the class. Cleans up and frees resources.
    */
   virtual             ~cartridge() { /* Provides virtual destructor */ };
+  
+  
   
   /*! \brief Get the game system to which the cartridge belongs.
    *  
@@ -375,4 +379,4 @@ public:
   virtual std::string  fetch_game_name(int slot) = 0;
 };
 
-#endif // __CARTRIDGE_H__
+#endif // defined(__CARTRIDGE_H__)

@@ -34,6 +34,7 @@ class task_controller;
 class ngp_chip
 {
 public:
+  
   /*! \brief Type used for data content. */
   typedef unsigned char    data_t;
   
@@ -84,6 +85,8 @@ public:
     /*! \brief Device is busy erasing. */
     ERASE
   };
+  
+  
   
   /*! \brief The constructor for this class.
    *  
@@ -519,6 +522,7 @@ public:
   
   
 private:
+  
   /*! \brief Send the command sequence to enter \ref chip_mode::AUTOSELECT mode
    *         to the chip.
    *  

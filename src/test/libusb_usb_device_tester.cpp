@@ -10,7 +10,7 @@
 #include "libusb-1.0/libusb.h"
 #include "hardware/AVR/messages.h"
 #include <iomanip>
-#include "linkmasta_device/ngp_linkmasta_device.h"
+#include "linkmasta/ngp_linkmasta_device.h"
 
 using namespace std;
 using namespace usb;

@@ -16,7 +16,7 @@
 #include "ws_linkmasta_device.h"
 #include "usb/usb_device.h"
 #include "ws_linkmasta_messages.h"
-#include "tasks/task_controller.h"
+#include "task/task_controller.h"
 #include "cartridge/ws_cartridge.h"
 #include <limits>
 

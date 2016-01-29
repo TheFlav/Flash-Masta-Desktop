@@ -4,10 +4,10 @@
 #include "cartridge/cartridge.h"
 #include "cartridge/ngp_cartridge.h"
 #include "cartridge/ws_cartridge.h"
-#include "games/game_catalog.h"
-#include "games/game_descriptor.h"
+#include "game/game_catalog.h"
+#include "game/game_descriptor.h"
 
-#include "../device_manager.h"
+#include "linkmasta/device_manager.h"
 #include "../flash_masta_app.h"
 #include "../main_window.h"
 
@@ -89,9 +89,9 @@ void FmCartridgeSlotWidget::buildFromCartridge(cartridge* cart, int slot)
 
 void FmCartridgeSlotWidget::buildFromNgpCartridge(ngp_cartridge* cart, int slot)
 {
-  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->try_claim_device(m_device_id));
   const game_descriptor* descriptor = FlashMastaApp::getInstance()->getNeoGeoGameCatalog()->identify_game(cart, slot);
-  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
+  FlashMastaApp::getInstance()->getDeviceManager()->release_device(m_device_id);
   
   std::string game_name = cart->fetch_game_name(slot);
   if (game_name.empty())
@@ -117,9 +117,9 @@ void FmCartridgeSlotWidget::buildFromNgpCartridge(ngp_cartridge* cart, int slot)
 
 void FmCartridgeSlotWidget::buildFromWsCartridge(ws_cartridge* cart, int slot)
 {
-  while (!FlashMastaApp::getInstance()->getDeviceManager()->tryClaimDevice(m_device_id));
+  while (!FlashMastaApp::getInstance()->getDeviceManager()->try_claim_device(m_device_id));
   const game_descriptor* descriptor = FlashMastaApp::getInstance()->getWonderswanGameCatalog()->identify_game(cart, slot);
-  FlashMastaApp::getInstance()->getDeviceManager()->releaseDevice(m_device_id);
+  FlashMastaApp::getInstance()->getDeviceManager()->release_device(m_device_id);
   
   // Set fields based on contents of descriptor
   setSlotGameNameVisible(true);
