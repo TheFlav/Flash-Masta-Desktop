@@ -308,4 +308,4 @@ mv *.db ../build
 
 cd ../build
 
-./FlashMastaDesktop
+./FlashMasta
