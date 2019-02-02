@@ -183,6 +183,9 @@ win32 {
     DEFINES  +=\
         OS_WINDOWS
 }
+unix {
+    LIBS += -ldl -lusb-1.0
+}
 
 RESOURCES += \
     resources.qrc
