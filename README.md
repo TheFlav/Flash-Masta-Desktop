@@ -295,5 +295,4 @@ mkdir build
 cd build
 
 qmake ../FlashMasta.pro
-
 make
