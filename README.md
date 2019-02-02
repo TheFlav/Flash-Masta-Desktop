@@ -297,3 +297,15 @@ cd build
 qmake ../FlashMasta.pro
 
 make
+
+cd ../tools
+
+make
+
+./build-database
+
+mv *.db ../build
+
+cd ../build
+
+./FlashMastaDesktop
