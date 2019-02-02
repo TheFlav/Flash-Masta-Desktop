@@ -12,20 +12,20 @@ ifeq ($(OS),Windows_NT)
 else
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Linux)
-        CCFLAGS += -lpthread -ldl
+        CPPFLAGS += -lpthread -ldl
     endif
     ifeq ($(UNAME_S),Darwin)
-        CCFLAGS += -lpthread -ldl
+        CPPFLAGS += -lpthread -ldl
     endif
     UNAME_P := $(shell uname -p)
     ifeq ($(UNAME_P),x86_64)
-        CCFLAGS += 
+        CPPFLAGS += 
     endif
     ifneq ($(filter %86,$(UNAME_P)),)
-        CCFLAGS += 
+        CPPFLAGS += 
     endif
     ifneq ($(filter arm%,$(UNAME_P)),)
-        CCFLAGS += 
+        CPPFLAGS += 
     endif
 endif
 
