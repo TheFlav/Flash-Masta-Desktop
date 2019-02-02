@@ -7,6 +7,28 @@ CFLAGS=-Wno-dangling-else
 CPPC=g++
 CPPFLAGS=-Wno-dangling-else -std=c++11
 
+ifeq ($(OS),Windows_NT)
+    CPPFLAGS+=
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+        CCFLAGS += -lpthread -ldl
+    endif
+    ifeq ($(UNAME_S),Darwin)
+        CCFLAGS += -lpthread -ldl
+    endif
+    UNAME_P := $(shell uname -p)
+    ifeq ($(UNAME_P),x86_64)
+        CCFLAGS += 
+    endif
+    ifneq ($(filter %86,$(UNAME_P)),)
+        CCFLAGS += 
+    endif
+    ifneq ($(filter arm%,$(UNAME_P)),)
+        CCFLAGS += 
+    endif
+endif
+
 TARGETS=build-database
 
 
