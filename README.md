@@ -6,6 +6,7 @@
 2. [Coding Conventions](#coding-conventions)
   1. [Naming](#naming)
   2. [Indentation](#indentation)
+3. [Building](#building)
 
 --------------------------------------------------------------------------------
 
@@ -282,3 +283,17 @@ function header above them.
         goto my_start_label;
       }
     }
+## <a name="building"></a>[Building](#top)
+**Linux**
+
+git clone https://github.com/TheFlav/Flash-Masta-Desktop.git
+
+cd Flash-Masta-Desktop
+
+mkdir build
+
+cd build
+
+qmake ../FlashMasta.pro
+
+make
