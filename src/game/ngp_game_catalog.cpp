@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <string>
+#include <stdexcept>
 
 #include "cartridge/ngp_cartridge.h"
 #include "sqlite/sqlite3.h"
