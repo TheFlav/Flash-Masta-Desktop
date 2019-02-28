@@ -284,7 +284,7 @@ function header above them.
       }
     }
 ## <a name="building"></a>[Building](#top)
-**Linux**
+**Manjaro Linux**
 
 git clone https://github.com/TheFlav/Flash-Masta-Desktop.git
 
@@ -309,3 +309,30 @@ mv *.db ../build
 cd ../build
 
 ./FlashMasta
+
+**Ubuntu Linux**
+sudo apt install git qtchooser qt5-default build-essential libqt5svg5* libusb-1.0-0-dev
+
+git clone https://github.com/TheFlav/Flash-Masta-Desktop.git
+
+cd Flash-Masta-Desktop
+
+mkdir build
+
+cd build
+
+qmake ../FlashMasta.pro
+
+make
+
+cd ../tools
+
+make
+
+./build-database
+
+mv *.db ../build
+
+cd ../build
+
+sudo ./FlashMasta
