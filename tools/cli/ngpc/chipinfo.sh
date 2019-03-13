@@ -1,0 +1,13 @@
+./NeoLinkmasta /l 0x5555 0xAA
+./NeoLinkmasta /l 0x2AAA 0x55
+./NeoLinkmasta /l 0x5555 0xF0
+./NeoLinkmasta /l 0x5555 0xAA
+./NeoLinkmasta /l 0x2AAA 0x55
+./NeoLinkmasta /l 0x5555 0x90
+./NeoLinkmasta /d 0
+./NeoLinkmasta /d 1
+./NeoLinkmasta /d 3
+./NeoLinkmasta /d 0
+./NeoLinkmasta /l 0x5555 0xAA
+./NeoLinkmasta /l 0x2AAA 0x55
+./NeoLinkmasta /l 0x5555 0xF0
