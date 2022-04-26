@@ -311,7 +311,7 @@ cd ../build
 ./FlashMasta
 
 **Ubuntu Linux**
-sudo apt install git qtchooser qt5-default build-essential libqt5svg5* libusb-1.0-0-dev
+sudo apt install git qtchooser qt5-default qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools build-essential libqt5svg5* libusb-1.0-0-dev
 
 git clone https://github.com/TheFlav/Flash-Masta-Desktop.git
 
