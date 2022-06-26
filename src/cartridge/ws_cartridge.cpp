@@ -453,7 +453,7 @@ void ws_cartridge::restore_cartridge_game_data(std::istream& fin, int slot, task
   // Begin writing data block-by-block
   try
   {
-    // Open connection to NGP chip
+    // Open connection to WS chip
     m_linkmasta->open();
     
     while (bytes_written < bytes_total && (controller == nullptr || !controller->is_task_cancelled()))

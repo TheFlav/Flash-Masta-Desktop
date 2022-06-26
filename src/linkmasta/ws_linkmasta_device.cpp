@@ -379,6 +379,22 @@ unsigned int ws_linkmasta_device::read_bytes(chip_index chip, address_t start_ad
   return offset;
 }
 
+static bool program_operation_is_noop(chip_index chip, const data_t *buffer, unsigned int num_bytes)
+{
+  if (chip == target_enum::TARGET_ROM)
+  {
+    for (unsigned int i = 0; i < num_bytes; i++)
+    {
+      if (((const uint8_t *) buffer)[i] != 0xFF)
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
 unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start_address, const data_t *buffer, unsigned int num_bytes, bool bypass_mode, task_controller* controller)
 {
   (void) bypass_mode;
@@ -420,7 +436,50 @@ unsigned int ws_linkmasta_device::program_bytes(chip_index chip, address_t start
     {
       num_packets = std::numeric_limits<uint8_t>::max();
     }
-    
+
+    if (chip == target_enum::TARGET_ROM)
+    {
+      // Optimization: If the next packet contains only 0xFF bytes, a write to a
+      // NOR-based flash chip will be equivalent to a no-operation. Skip.
+      if (program_operation_is_noop(chip, &buffer[offset], WS_LINKMASTA_USB_RXTX_SIZE))
+      {
+        // Update offset and inform controller of progress
+        offset += WS_LINKMASTA_USB_RXTX_SIZE;
+        if (controller != nullptr)
+        {
+          controller->on_task_update(task_status::RUNNING, WS_LINKMASTA_USB_RXTX_SIZE);
+        }
+        continue;
+      }
+
+      // Optimization: Do the same to the right-hand side, from a certain minimum
+      // burst size.
+      uint8_t first_skippable_num_packets = 0;
+      uint8_t skippable_num_packets_count = 0;
+      for (uint8_t i = 4; i < num_packets; i++)
+      {
+        if (program_operation_is_noop(chip, &buffer[offset + (WS_LINKMASTA_USB_RXTX_SIZE * i)],
+          WS_LINKMASTA_USB_RXTX_SIZE))
+        {
+          if (first_skippable_num_packets == 0)
+          {
+            first_skippable_num_packets = i;
+            skippable_num_packets_count = 0;
+          }
+          skippable_num_packets_count++;
+          if (skippable_num_packets_count >= 4)
+          {
+            num_packets = first_skippable_num_packets;
+            break;
+          }
+        }
+        else
+        {
+          first_skippable_num_packets = 0;
+        }
+      }
+    }
+
     // Treat writes to flash and sram differently
     switch (chip)
     {

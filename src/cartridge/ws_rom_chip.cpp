@@ -147,12 +147,18 @@ protect_t ws_rom_chip::get_block_protection(address_t sector_address)
 
 void ws_rom_chip::program_word(address_t address, word_t data)
 {
+  // Writing a 0xFF value to NOR flash is equivalent to a no-operation.
+  if (data == 0xFF)
+  {
+	return;
+  }
+  
   if (is_erasing())
   {
     // We can only reset when we're not erasing
     throw std::runtime_error("Chip still erasing");
   }
-  
+
   // Reset if in autoselect mode
   if (current_mode() != BYPASS && current_mode() != READ)
   {
